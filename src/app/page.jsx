@@ -48,6 +48,20 @@ const slides = [
      color: "text-white",
   },
 ];
+const services = [
+  { img: "/images/ac-service.png", label: "AC Service" },
+  { img: "/images/spa.png", label: "Spa for Women" },
+  { img: "/images/cleaning.png", label: "Cleaning & Disinfection" },
+  { img: "/images/men-grooming.png", label: "Men Grooming" },
+  { img: "/images/sofa.png", label: "Sofa Cleaning" },
+  { img: "/images/car-wash.png", label: "Car Washing" },
+  { img: "/images/solar.png", label: "Solar Panel" },
+  { img: "/images/women-beauty.png", label: "Women Beauty Care" },
+  { img: "/images/pest.png", label: "Pest Control" },
+  { img: "/images/skin.png", label: "Skin Treatment" },
+  { img: "/images/nail.png", label: "NAIL Studio" },
+  { img: "/images/other.png", label: "Other" },
+];
 
 export default function Home() {
   const [current, setCurrent] = useState(0);
@@ -59,7 +73,7 @@ export default function Home() {
   const prevSlide = () => {
     setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
-
+   const goToSlide = (index) => setCurrent(index); 
   // Auto Slide
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,12 +90,12 @@ export default function Home() {
           className="slides-wrapper flex transition-transform duration-700 ease-in-out"
           style={{
             transform: `translateX(-${current * 100}%)`,
-            width: `${slides.length * 15}%`,
-            height: `${slides.length * 13}%`
+            width: `${slides.length * 14.5}%`,
+            height: `${slides.length * 15}%`
           }}
         >
           {slides.map((slide, index) => (
-            <div key={index} className="w-full flex-shrink-0 relative h-[50vh]">
+            <div key={index} className=" slide w-full flex-shrink-0 relative h-[50vh] ">
               <Image
                 src={slide.img}
                 alt={`Slide ${index}`}
@@ -131,6 +145,7 @@ export default function Home() {
                       </button>
                     </form>
                   </div>
+                    
               </div>
             </div>
           ))}
@@ -164,6 +179,18 @@ export default function Home() {
             ></div>
           ))}
         </div> 
+      </section>
+       <section className="py-8 px-4 bg-white-100">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {services.map((service, index) => (
+            <div key={index} className="flex flex-col items-center justify-center p-4 bg-white rounded-lg shadow hover:shadow-lg transition">
+              <div className="relative w-16 h-16 mb-2">
+                <Image src={service.img} alt={service.label} fill className="object-contain" />
+              </div>
+              <p className="text-center text-sm font-medium">{service.label}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
