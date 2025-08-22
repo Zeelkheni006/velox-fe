@@ -1,0 +1,475 @@
+/* =========================
+   Header Styles
+   ========================= */
+
+
+/* Top Bar */
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #000;
+    color: #fff;
+    padding: 5px 40px;
+    font-size: 14px;
+}
+
+.header-top .left {
+    display: flex;
+    align-items: center;
+    /* ensures all spans are vertically centered */
+    gap: 15px;
+    /* spacing between spans */
+}
+
+.header-top .left span {
+    margin-right: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+}
+
+.header-top .right svg {
+    margin-left: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.header-top .right svg:hover {
+    color: #ee6b00;
+    /* example hover color */
+}
+
+
+/* Main Header */
+
+.header-main {
+    display: flex;
+    justify-content: center;
+    /* center all items */
+    align-items: center;
+    gap: 150px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px 25px;
+    /* space between items */
+}
+
+.header-main .logo {
+    display: flex;
+    align-items: center;
+}
+
+.header-main nav {
+    display: flex;
+    gap: 20px;
+}
+
+.header-main nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.header-main nav a:hover {
+    color: #f37500;
+}
+
+.header-main .nav-left,
+.header-main .right-section {
+    display: flex;
+    align-items: center;
+}
+
+.header-main .cart {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.header-main .cart span {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: red;
+    color: #e7e7e7;
+    font-size: 12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-main .auth-links a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.header-main .auth-links a:hover {
+    color: #0070f3;
+}
+
+
+/* Responsive */
+
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    .header-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .header-main nav {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .header-main .right-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.search-container {
+    max-width: 700px;
+    /* bigger search bar */
+    width: 90%;
+}
+
+.search-input {
+    height: 55px;
+    /* taller input */
+    font-size: 18px;
+    /* bigger text */
+    color: #fff;
+    /* white text */
+    background: rgba(255, 255, 255, 0.2);
+    /* semi-transparent input background */
+    border: 1px solid #fff;
+}
+
+.search-input::placeholder {
+    color: #ddd;
+    /* light gray placeholder */
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+}
+
+.search-btn {
+    height: 55px;
+    padding: 0 25px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #ff6600;
+    /* bright orange */
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    /* rounded button */
+    transition: 0.3s ease;
+    align-items: cneter;
+}
+
+.search-btn:hover {
+    background-color: #e65c00;
+    /* darker orange on hover */
+}
+
+.carousel-item {
+    position: relative;
+    height: 50vh;
+    /* Carousel height */
+}
+
+.carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* Overlay container for text + search bar */
+
+.carousel-top-overlay {
+    position: absolute;
+    top: 40%;
+    /* adjust vertical position */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    z-index: 10;
+    color: #fff;
+}
+
+
+/* Heading styles */
+
+.carousel-top-overlay h3 {
+    margin-bottom: 5px;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.carousel-top-overlay p {
+    margin-bottom: 15px;
+    font-size: 1rem;
+}
+
+
+/* Search bar */
+
+.carousel-top-overlay form {
+    display: flex;
+    width: 100%;
+}
+
+.carousel-top-overlay form input {
+    flex: 1;
+}
+
+.carousel-top-overlay form button {
+    margin-left: 5px;
+}
+
+.search-container {
+    max-width: 700px;
+    /* bigger search bar */
+    width: 90%;
+}
+
+.search-input {
+    height: 40px;
+    /* taller input */
+    font-size: 18px;
+    /* bigger text */
+    color: #fff;
+    /* white text */
+    background: rgb(250, 250, 250);
+    /* semi-transparent input background */
+    border: 1px solid #fff;
+    max-width: 700px;
+    width: 200%;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    margin-top: -30px;
+    margin-left: -80px;
+}
+
+.search-input::placeholder {
+    color: #ddd;
+    /* light gray placeholder */
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+}
+
+.search-btn {
+    height: 45px;
+    padding: 0 25px;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #ff6600;
+    /* bright orange */
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    /* rounded button */
+    transition: 0.3s ease;
+    padding: 0 30px;
+    margin: 0 170px;
+    margin-top: 10px;
+}
+
+.search-btn:hover {
+    background-color: #e65c00;
+    /* darker orange on hover */
+}
+
+.hero-text {
+    text-align: left;
+    color: #fff;
+    margin-bottom: 40px;
+    padding: 5px;
+    margin-left: 100px;
+}
+
+.hero-text h1 {
+    font-size: 30px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    margin-left: 50px;
+}
+
+.hero-text p {
+    font-size: 18px;
+    margin-bottom: 5px;
+    color: #ddd;
+    /* little softer white */
+}
+
+.input-group-text {
+    border-radius: 6px 0 0 6px;
+    padding: 10px 15px;
+    font-size: 18px;
+}
+
+.slides-wrapper {
+    transition: transform 0.7s ease-in-out;
+}
+
+
+/* ✅ General Reset */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ✅ Hero Slider */
+
+#hero-slider {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+    overflow: hidden;
+}
+
+
+/* ✅ Slides Wrapper */
+
+.slides-wrapper {
+    display: flex;
+    transition: transform 0.7s ease-in-out;
+    height: 100%;
+}
+
+
+/* ✅ Individual Slide */
+
+.slides-wrapper>div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+
+/* ✅ Overlay Text */
+
+.hero-text {
+    color: white;
+    text-align: center;
+    z-index: 10;
+}
+
+.hero-text h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.hero-text p {
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    animation: fadeInUp 1.3s ease-in-out;
+}
+
+
+/* ✅ Fade-in Animation */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ✅ Search Bar */
+
+.search-container {
+    margin-top: 1rem;
+}
+
+.search-input {
+    border: 1px solid #ccc;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.4rem;
+}
+
+.search-btn {
+    background: #ff8902;
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.4rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.search-btn:hover {
+    background: #ff9100;
+}
+
+
+/* ✅ Navigation Arrows */
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: rgba(255, 123, 0, 0.7);
+}
+
+
+/* ✅ Dot Indicators */
+
+.slides-wrapper+.absolute div {
+    transition: all 0.3s ease;
+}
+
+.carousel-caption h1 {
+    font-size: 30px;
+    color: white;
+}
+
+.carousel-caption p {
+    color: white !important;
+}
