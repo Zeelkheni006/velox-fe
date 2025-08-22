@@ -1,6 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "./main.css";
 
 // Array with image + text
@@ -46,6 +51,103 @@ const slides = [
     title: "KITCHEN CLEANING",
     desc: "VELOX KITCHEN CLEANING",
      color: "text-white",
+  },
+];
+const services = [
+  { img: "/icon/ac-service.png", label: "AC Service" },
+  { img: "/icon/spa.png", label: "Spa for Women" },
+  { img: "/icon/cleaning.png", label: "Cleaning & Disinfection" },
+  { img: "/icon/grooming.png", label: "Men Grooming" },
+  { img: "/icon/sofa.png", label: "Sofa Cleaning" },
+  { img: "/icon/car-wash.png", label: "Car Washing" },
+  { img: "/icon/solar.png", label: "Solar Panel" },
+  { img: "/icon/beauty.png", label: "Women Beauty Care" },
+  { img: "/icon/pest.png", label: "Pest Control" },
+  { img: "/icon/skin.png", label: "Skin Treatment" },
+  { img: "/icon/nail.png", label: "NAIL Studio" },
+  { img: "/icon/other.png", label: "Other" },
+];
+
+const bestServices = [
+  {
+    img: "/images/image1.jpg",
+    title: "Velox AC Care+ Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image2.jpg",
+    title: "Velox CoolCare AMC Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image3.jpg",
+    title: "Velox FreshGuard Home Plan",
+    category: "AC Service",
+    
+  },
+   {
+    img: "/images/image4.jpg",
+    title: "Velox AC Care+ Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image5.jpg",
+    title: "Velox CoolCare AMC Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image6.jpg",
+    title: "Velox FreshGuard Home Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image7.jpg",
+    title: "Velox AC Care+ Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image8.jpg",
+    title: "Velox CoolCare AMC Plan",
+    category: "AC Service",
+    
+  },
+  {
+    img: "/images/image9.jpg",
+    title: "Velox FreshGuard Home Plan",
+    category: "AC Service",
+    
+  },
+];
+const stats = [
+  {
+    id: 1,
+    icon: "/icon/icon-1.png", // replace with your icon path
+    value: "187",
+    label: "Services",
+  },
+  {
+    id: 2,
+    icon: "/icon/icon-3.png",
+    value: "15",
+    label: "City",
+  },
+  {
+    id: 3,
+    icon: "/icon/icon-2.png",
+    value: "22",
+    label: "Franchises",
+  },
+  {
+    id: 4,
+    icon: "/icon/icon-4.png",
+    value: "2113",
+    label: "Happy Customer",
   },
 ];
 
@@ -165,6 +267,117 @@ export default function Home() {
           ))}
         </div> 
       </section>
+       <section className="services-section">
+  <div className="services-grid">
+    {services.map((service, index) => (
+      <div key={index} className="service-card">
+        <div className="service-image">
+          <Image src={service.img} alt={service.label} fill className="service-img" />
+        </div>
+        <p className="service-label">{service.label}</p>
+      </div>
+    ))}
+  </div>
+</section>
+      <section className="py-10 px-4 ">
+        <div className="best-service">
+          <h2 className="text-center text-2xl font-bold mb-2">Best Services</h2>
+          <div className="w-20 h-1 bg-orange-500 mx-auto mb-6 rounded"></div>
+
+          <Swiper
+          className="best-service-swiper"
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={30}
+            slidesPerView={3}
+             slidesPerGroup={3}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 6000, disableOnInteraction: false }}
+            breakpoints={{
+                640: { slidesPerView: 1, slidesPerGroup: 1 },
+                768: { slidesPerView: 2, slidesPerGroup: 2 },
+                1024: { slidesPerView: 3, slidesPerGroup: 3 },
+            }}
+          >
+            {bestServices.map((service, index) => (
+              <SwiperSlide key={index}>
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden transition hover:shadow-xl service ">
+                  <div className="relative w-full h-48">
+                    <Image src={service.img} alt={service.title} fill className="object-cover" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-center text-orange-600">
+                      {service.title}
+                    </h3>
+                    <p className="text-center text-gray-600 text-sm">{service.category}</p>
+                    
+                    
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+          </div>
+        </section>
+         <section className=" stats-section py-12 px-6 bg-gray-50">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid">
+        {stats.map((stat) => (
+          <div
+            key={stat.id}
+            className="relative bg-white rounded-2xl shadow-md text-center p-6 transition transform hover:-translate-y-1 hover:shadow-lg"
+          >
+            {/* Orange Corner Border */}
+            <div className="absolute bottom-0 left-0 w-full h-full rounded-2xl border-2 border-transparent">
+              <div className="absolute bottom-0 left-0 w-1/3 h-1 border-b-4 border-orange-500 rounded-bl-xl"></div>
+              <div className="absolute bottom-0 left-0 h-1/3 w-1 border-l-4 border-orange-500 rounded-bl-xl"></div>
+            </div>
+            <div class="stat-card">
+                <div class="corner-border"></div>
+            <div className="flex justify-center mb-3 stat-icon">
+              <Image src={stat.icon} alt={stat.label} width={50} height={50} />
+            </div>
+            <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
+            <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>  
+    
+    <section className="about-section">
+      <div className="about-container">
+        
+        {/* Left Content */}
+        <div data-aos="fade-right">
+          <h2 className="about-title">
+            About <span>VELOX</span>
+          </h2>
+          <div className="about-underline"></div>
+
+          <p className="about-text">
+            Velox Solution comes up with the AIM of providing the best service
+            at your doorstep. We offer services like
+            
+              Cleaning & Disinfection, Salon For Women & Men, Paintwork, Car
+              Washing, and AC Services
+            
+             delivered by professionals and experts.
+          </p>
+
+          <button className="about-btn">Read More About Us</button>
+        </div>
+
+        {/* Right Image */}
+        <div className="about-image" data-aos="fade-left">
+          <Image
+            src="/images/about.png" // 👈 replace with your actual image
+            alt="About Velox Team"
+            width={500}
+            height={400}
+          />
+        </div>
+      </div>
+    </section>
     </main>
   );
 }
