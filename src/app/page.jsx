@@ -1,12 +1,16 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./main.css";
+import { useEffect } from 'react';
+import Link from 'next/link';
+
+
 
 // Array with image + text
 const slides = [
@@ -124,10 +128,12 @@ const bestServices = [
     
   },
 ];
+const fullServices =
+  bestServices.length < 6 ? [...bestServices, ...bestServices] : bestServices;
 const stats = [
   {
     id: 1,
-    icon: "/icon/icon-1.png", // replace with your icon path
+    icon: "/icon/icon-1.png", 
     value: "187",
     label: "Services",
   },
@@ -150,128 +156,115 @@ const stats = [
     label: "Happy Customer",
   },
 ];
+const order = [
+  {
+    id: 1,
+    icon: "/icon/search2.png", 
+    value: "187",
+    label: "Services",
+  },
+  {
+    id: 2,
+    icon: "/icon/search3.png",
+    value: "15",
+    label: "City",
+  },
+  {
+    id: 3,
+    icon: "/icon/enjoy3.png",
+    value: "22",
+    label: "Franchises",
+  },
+ 
+];
+const reviews = [
+    {
+      name: 'divya sagathiya',
+      image: '/images/user1.png', // replace with real image
+      rating: 5,
+    },
+    {
+      name: 'HIMAT VADHER',
+      image: '/images/user2.png',
+      rating: 5,
+    },
+  ];
 
 export default function Home() {
-  const [current, setCurrent] = useState(0);
-
-  const nextSlide = () => {
-    setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevSlide = () => {
-    setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
-  };
-
+     
+ useEffect(() => {
+   setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+   }, 100);
+ }, []);
   // Auto Slide
-  useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [current]);
+
 
   return (
     <main>
-      <section id="hero-slider" className="relative overflow-hidden">
-        {/* Wrapper for all slides */}
-        <div
-          className="slides-wrapper flex transition-transform duration-700 ease-in-out"
-          style={{
-            transform: `translateX(-${current * 100}%)`,
-            width: `${slides.length * 15}%`,
-            height: `${slides.length * 13}%`
-          }}
-        >
-          {slides.map((slide, index) => (
-            <div key={index} className="w-full flex-shrink-0 relative h-[50vh]">
-              <Image
-                src={slide.img}
-                alt={`Slide ${index}`}
-                fill
-                priority={index === 0}
-                sizes="100vw"
-                className="object-cover z-0"
-              />
 
-              {/* Overlay Content */}
-              <div
-                className="carousel-caption d-flex flex-col items-center justify-center text-center"
-                style={{
-                  position: "absolute",
-                 top: "25%",
-                  left: "90%",
-                  transform: "translateX(-50%)",
-                  width: "100%",
-                  height: "100%",
-                  zIndex: "2",
-                  
-                }}
-              >
-                  <div className="absolute top-1/4 left-1/2 -translate-x-1/2 text-center z-20"> 
-                <h1 className={`${slide.color} text-4xl font-bold`}>{slide.title}</h1>
-                <p className={`${slide.color} mt-2`}>{slide.desc}</p>
-                </div>
-                {/* Search Bar (Optional: only on first slide) */}
-                
-                  <div className="search-container  mt-5 w-full max-w-xl">
-                    <form
-                      action="#"
-                      method="GET"
-                      className="flex mt-5 items-center bg-white rounded-full shadow-lg overflow-hidden mx-auto max-w-xl"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Enter a location"
-                        name="location"
-                        className="flex-1 px-3 py-2 search-input"
-                      />
-                      <button
-                        type="submit"
-                        className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 font-semibold search-btn"
-                      >
-                        Go
-                      </button>
-                    </form>
-                  </div>
-              </div>
-            </div>
-          ))}
+       <section id="hero" className="relative overflow-hidden">
+       <Swiper
+  modules={[Navigation, Pagination, Autoplay]}
+  navigation
+  pagination={{ clickable: true }}
+  autoplay={{ delay: 5000, disableOnInteraction: false }}
+  loop
+>
+  {slides.map((slide, index) => (
+  <SwiperSlide key={index}>
+  <div className="relative w-full " style={{ height: "450px" }}>
+    {/* Background Image */}
+    <Image
+      src={slide.img}
+      alt={slide.title}
+      fill
+      priority={index === 0}
+      className="object-cover z-0"
+    />
+
+    {/* Dark overlay */}
+    <div className="absolute inset-0 bg-black/40 z-10" />
+
+    {/* Content on top */}
+    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6  relative z-20 search-container">
+      <h1 className={`${slide.color} text-4xl md:text-5xl font-bold`}>
+        {slide.title}
+      </h1>
+      <p className={`${slide.color} mt-3 text-lg`}>{slide.desc}</p>
+
+      {/* Show search box only on first slide */}
+     
+        <div className="mt-6 w-full max-w-2xl ">
+          <form className="flex items-center bg-white rounded-full shadow-lg overflow-hidden relative z-30">
+            <input
+              type="text"
+              placeholder="Enter a location"
+              className="flex-1 px-4 py-2 outline-none"
+            />
+            <button
+              type="submit"
+              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 font-semibold"
+            >
+              Go
+            </button>
+          </form>
         </div>
+    
+    </div>
+  </div>
+</SwiperSlide>
 
-        {/* Prev Button */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white px-3 py-2 rounded-full z-30"
-        >
-          ❮
-        </button>
 
-        {/* Next Button */}
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white px-3 py-2 rounded-full z-30"
-        >
-          ❯
-        </button>
+  ))}
+</Swiper>
 
-        {/* Dot Indicators */}
-         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-30 bg-black/40 px-3 py-2 rounded-full">
-          {slides.map((_, index) => (
-            <div
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-500 ${
-                current === index ? "bg-white w-6" : "bg-gray-400"
-              }`}
-            ></div>
-          ))}
-        </div> 
       </section>
        <section className="services-section">
   <div className="services-grid">
     {services.map((service, index) => (
       <div key={index} className="service-card">
-        <div className="service-image">
+        <div className="service-image">   
           <Image src={service.img} alt={service.label} fill className="service-img" />
         </div>
         <p className="service-label">{service.label}</p>
@@ -279,7 +272,7 @@ export default function Home() {
     ))}
   </div>
 </section>
-      <section className="py-10 px-4 ">
+      <section className="py-10 px-4  ">
         <div className="best-service">
           <h2 className="text-center text-2xl font-bold mb-2">Best Services</h2>
           <div className="w-20 h-1 bg-orange-500 mx-auto mb-6 rounded"></div>
@@ -290,16 +283,20 @@ export default function Home() {
             spaceBetween={30}
             slidesPerView={3}
              slidesPerGroup={3}
+             loop={true}
             navigation
             pagination={{ clickable: true }}
             autoplay={{ delay: 6000, disableOnInteraction: false }}
             breakpoints={{
+               0: { slidesPerView: 1, slidesPerGroup: 1 },
+                320: { slidesPerView: 1, slidesPerGroup: 1 },
+                375: { slidesPerView: 1, slidesPerGroup: 1 },
                 640: { slidesPerView: 1, slidesPerGroup: 1 },
                 768: { slidesPerView: 2, slidesPerGroup: 2 },
                 1024: { slidesPerView: 3, slidesPerGroup: 3 },
             }}
           >
-            {bestServices.map((service, index) => (
+              {fullServices.map((service, index) => (
               <SwiperSlide key={index}>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden transition hover:shadow-xl service ">
                   <div className="relative w-full h-48">
@@ -331,8 +328,8 @@ export default function Home() {
               <div className="absolute bottom-0 left-0 w-1/3 h-1 border-b-4 border-orange-500 rounded-bl-xl"></div>
               <div className="absolute bottom-0 left-0 h-1/3 w-1 border-l-4 border-orange-500 rounded-bl-xl"></div>
             </div>
-            <div class="stat-card">
-                <div class="corner-border"></div>
+            <div className="stat-card">
+                <div className="corner-border"></div>
             <div className="flex justify-center mb-3 stat-icon">
               <Image src={stat.icon} alt={stat.label} width={50} height={50} />
             </div>
@@ -364,19 +361,198 @@ export default function Home() {
              delivered by professionals and experts.
           </p>
 
-          <button className="about-btn">Read More About Us</button>
+          <Link href="/about">
+  <button className="about-btn">Read More About Us</button>
+</Link>
         </div>
 
         {/* Right Image */}
         <div className="about-image" data-aos="fade-left">
           <Image
-            src="/images/about.png" // 👈 replace with your actual image
+            src="/images/about.png" 
             alt="About Velox Team"
             width={500}
             height={400}
           />
         </div>
       </div>
+    </section>
+   <section className="py-12 bg-gray-50 easy-process-section">
+  <div className="container mx-auto px-6 text-center">
+    {/* Heading */}
+    <h2 className="text-3xl font-bold mb-10 relative inline-block">
+      Easy Ordering Process
+       <span className="service-underline"></span>
+    </h2>
+
+    {/* Steps */}
+    <div className="flex justify-center items-center relative steps-container">
+
+      {/* Step 1 */}
+      <div className="step flex flex-col items-center step ">
+        <div className="icon w-24 h-24 flex items-center justify-center rounded-full border-2 border-orange-400 mb-4 icon-container">
+          <Image src="/icon/search2.png" alt="Find Service" width={60} height={60} />
+        </div>
+         <div className="step-content">
+        <h3 className="text-lg font-sercher">Find Your Service</h3>
+        <p className="text-gray-600 mt-1 max-w-xs them-text">
+          Whatever service you are looking for, select them.
+        </p>
+        </div>
+      </div>
+
+      {/* Step 2 */}
+      <div className="step flex flex-col items-center step ">
+        <div className="icon w-24 h-24 flex items-center justify-center rounded-full border-2 border-orange-400 mb-4 service-container">
+          <Image src="/icon/service3.png" alt="Choose Options" width={60} height={60}/>
+        </div>
+        <div className="step-content">
+        <h3 className="text-lg font-service">Choose Your Services Options</h3>
+        <p className="text-gray-600 mt-1 max-w-xs select-them">
+          Thousand of service providers available select one of them.
+        </p>
+        </div>
+      </div>
+
+      {/* Step 3 */}
+      <div className="step flex flex-col items-center step ">
+        <div className="icon w-24 h-24 flex items-center justify-center rounded-full border-2 border-orange-400 mb-4 enjoy-container">
+          <Image src="/icon/enjoy3.png" alt="Enjoy Service" width={60} height={60}/>
+        </div>
+        <div className="step-content">
+        <h3 className="text-lg font-enjoy">Enjoy Your Service</h3>
+        <p className="text-gray-600 mt-1 max-w-xs deliver-them">
+          Professional comes to your doorstep and deliver service.
+        </p>
+        </div>
+      </div>
+
+    </div>
+
+    {/* Button */}
+    <div className="mt-10 ">
+      <button className=" bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-semibold text-lg steps-btn">
+        Book Now
+      </button>
+    </div>
+  </div>
+</section>
+
+ <section className="offerSection">
+      <div className="offer-container">
+        <h2 className="title">
+          Best Offer For Today
+          <span className="underline"></span>
+        </h2>
+
+        <div className="card">
+          <Image
+            src="/images/offer.png" // put your image in public/images/
+            alt="Velox Seasonal Care Plan"
+            width={400}
+            height={300}
+            className="offerImage"
+          />
+
+          <div className="offerFooter">
+            <p className="referText">Refer And Earn Offer</p>
+            <p className="discountText">up to Rs.100 off</p>
+          </div>
+        </div>
+      </div>
+    </section>
+         <section className="referSection">
+      <div className="refer-container">
+        {/* Left Content */}
+        <div className="leftContent">
+          <h2 className="title">
+            Refer and Get Free Services
+            <span className="underline"></span>
+          </h2>
+          <p className="subtitle">
+            Invite your friends to Velox Solution. They get Rs. 50 off. You win up to Rs. 100
+          </p>
+
+          <div className="inputWrapper">
+            <input
+              type="text"
+              placeholder="Enter Mobile Number"
+              className="input"
+            />
+            <button className="sendBtn">Send</button>
+          </div>
+
+          <div className="storeBtns">
+            <Image src="/images/google.webp" alt="Google Play" width={150} height={50} />
+            <Image src="/images/appstore.webp" alt="App Store" width={150} height={50} />
+          </div>
+        </div>
+
+        {/* Right Phone Images */}
+        <div className="rightImage">
+          <Image src="/images/app.png" alt="Mobile App UI" width={500} height={400} />
+        </div>
+      </div>
+    </section>
+<section className="reviewSection">
+      <h2 className="refer-title">
+        Customers Review
+        <span className="underline"></span>
+      </h2>
+
+      <div className="reviewContainer">
+        {reviews.map((review, index) => (
+          <div className="reviewCard" key={index}>
+            <div className="quote">❝</div>
+            <div className="userInfo">
+              <Image
+                src={review.image}
+                alt={review.name}
+                width={50}
+                height={50}
+                className="avatar"
+              />
+              <div>
+                <p className="name">{review.name}</p>
+                <div className="stars">
+                  {Array(review.rating)
+                    .fill()
+                    .map((_, i) => (
+                      <span key={i}>⭐</span>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+     <section className="enterpriseSection">
+      <h2 className="enterprise-title">
+        Enterprise Services
+        <span className="underline"></span>
+      </h2>
+
+      <form className="form">
+        <input type="text" placeholder="Name" className="input" />
+
+        <div className="row">
+          <input type="email" placeholder="E-mail" className="input" />
+          <input type="tel" placeholder="Phone" className="input" />
+        </div>
+
+        <input type="text" placeholder="Address" className="input" />
+
+        <textarea placeholder="Message" className="textarea"></textarea>
+
+        <div className="row">
+          <input type="date" className="input" />
+          <input type="time" className="input" />
+        </div>
+
+        <button type="submit" className="submitBtn">Submit</button>
+      </form>
     </section>
     </main>
   );
