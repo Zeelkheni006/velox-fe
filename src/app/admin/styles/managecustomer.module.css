@@ -1,0 +1,170 @@
+    .container {
+        display: flex;
+        flex-direction: column;
+        height: 0vh;
+        /* Full viewport height */
+        width: 200%;
+        padding: 20px;
+        background-color: #f4f6f9;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        margin-bottom: 900px;
+    }
+    
+    .topCard {
+        background: #ffffff;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 0 6px rgba(187, 169, 169, 0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .breadcrumb {
+        color: #888;
+        font-size: 14px;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+    
+    .breadcrumbActive {
+        color: #2563eb;
+        font-weight: 400;
+    }
+    
+    .addBtn {
+        background-color: #1e2a3a;
+        color: white;
+        padding: 8px 16px;
+        font-size: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    
+    .tableCard {
+        background: #fff;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .tableTitle {
+        font-size: 16px;
+        margin-bottom: 16px;
+        text-align: left;
+        color: #888;
+    }
+    
+    .tableControls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .select,
+    .searchInput {
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        color: #888;
+    }
+    
+    .table th,
+    .table td {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: left;
+    }
+    
+    .deletebtn {
+        background-color: #ff5c5c;
+        border: none;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+        align-items: center;
+        font-size: 15px;
+    }
+    
+    .paginationControls button {
+        background: #f0f0f0;
+        border: none;
+        padding: 6px 10px;
+        margin: 0 2px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    
+    .pageNumber {
+        background: #2563eb;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 4px;
+    }
+    /* create customer css */
+    
+    .formCard {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .formTitle {
+        font-size: 19px;
+        margin-bottom: 20px;
+        text-align: left;
+        color: #888;
+    }
+    
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        text-align: left;
+        font-size: 15px;
+    }
+    
+    .form input {
+        padding: 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+    
+    .submitBtn {
+        padding: 10px;
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 10px;
+        cursor: pointer;
+        margin-top: 10px;
+        width: 100px;
+        height: 40px;
+        font-size: 18px;
+    }

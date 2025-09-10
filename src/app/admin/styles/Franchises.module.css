@@ -1,0 +1,333 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 20vh;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 800px;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 10px;
+    color: #888;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.showEntries {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.dropdownGroup {
+    display: flex;
+    gap: 10px;
+    margin-top: -80px;
+    height: 40px;
+    width: 200px;
+}
+
+.searchBox {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.select {
+    padding: 8px 150px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.buttonPrimary {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    height: 35px;
+    font-size: 15px;
+}
+
+.buttonSecondary {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 35px;
+    font-size: 15px;
+}
+
+.buttonPrimary:hover,
+.buttonSecondary:hover {
+    background-color: #4d5977;
+}
+
+.tableWrapper {
+    color: #888;
+    margin-top: 50px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.table thead {
+    background-color: #e5e7eb;
+}
+
+.table th,
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    vertical-align: top;
+}
+
+.th {
+    background-color: #f0f0f0;
+    font-weight: 600;
+    color: #333;
+}
+
+.moreInfo {
+    color: #3b82f6;
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.editBtn {
+    background-color: #fbbf24;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    margin-right: 8px;
+    border-radius: 4px;
+    font-weight: 200;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.activeBtn {
+    background-color: #22c55e;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 200;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.inactiveBtn {
+    background-color: #ef4444;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 200;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.inactiveBtn:hover {
+    background-color: #e66c6c;
+}
+
+.activeBtn:hover {
+    background-color: #57e28a;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* more information css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.modalBox {
+    background-color: #fff;
+    padding: 25px 30px;
+    border-radius: 6px;
+    width: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    position: relative;
+    height: 500px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.modalCloseBtn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    margin: 0;
+}
+
+.modalCloseBtn:hover {
+    background-color: white;
+}
+
+.modalSection {
+    margin-top: 20px;
+}
+
+.modalSection h4 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+}
+
+.modalRow {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.label {
+    width: 100px;
+    font-weight: 500;
+    color: #555;
+    font-size: 15px;
+}
+
+.separator {
+    width: 10px;
+    text-align: left;
+}
+
+.value {
+    flex: 1;
+    color: #333;
+    font-size: 14px;
+    text-align: left;
+}
+
+.modalFooter {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.modalCloseBtnFooter {
+    background-color: rgb(91, 91, 116);
+    color: white;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modalCloseBtnFooter:hover {
+    background-color: #223;
+}

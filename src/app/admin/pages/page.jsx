@@ -27,10 +27,11 @@ export default function Layout({ children }) {
         <main className={styles.main}>
         {children}  
         </main>
-        <div className={styles.footer}>
+       
+      </div>
+       <div className={styles.footer}>
         <Footer/>
         </div>
-      </div>
     </div>
   );
 }

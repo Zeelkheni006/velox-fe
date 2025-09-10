@@ -180,14 +180,15 @@
 /* Scrollable main */
 
 .main {
-    margin-top: 10px;
-    /* same as header height */
-    margin-bottom: 1000px;
-    /* same as footer height */
-    flex: 1;
     padding: 20px;
+    margin-top: 10px;
+    /* height of fixed header */
+    margin-bottom: 60px;
+    /* height of fixed footer */
+    flex-grow: 1;
     background-color: #f9fafb;
     box-sizing: border-box;
+    max-width: 3000px;
 }
 
 
@@ -222,4 +223,53 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     z-index: 100;
+}
+
+@media (max-width: 375px) {
+    .container {
+        flex-direction: column;
+    }
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 1100;
+        background-color: #1e2a3a;
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .content {
+        margin-left: 0;
+        /* sidebar hidden by default */
+    }
+    .content> :first-child {
+        left: 0;
+        width: 100%;
+    }
+    .footer {
+        left: 0;
+        right: 0;
+    }
+    .main {
+        margin-top: 60px;
+        margin-bottom: 45px;
+        padding: 12px;
+    }
+    .card {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        margin: 0 auto 20px;
+    }
+    .scrollToTopBtn {
+        bottom: 60px;
+        right: 16px;
+        font-size: 14px;
+        padding: 8px 10px;
+    }
 }

@@ -70,9 +70,31 @@ const Sidebar = ({ isOpen, onClose }) => {
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.users && <div className={styles.subMenu}>Manage Staff<br />Manage Customer</div>}
+     {openMenus.users && (
+  <div className={styles.subMenu}>
+    <div onClick={() => {
+      router.push('/admin/staff'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Manage Staff
+    </div>
 
-      <div className={styles.menuItem}>
+    <div onClick={() => {
+      router.push('/admin/customer'); // 🔁 change this path to your customer page
+      onClose();
+    }}>
+      Manage Customer
+    </div>
+  </div>
+)}
+
+      <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/lead'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+>
         <FaProjectDiagram /><span>Lead</span>
       </div>
 
@@ -83,7 +105,12 @@ const Sidebar = ({ isOpen, onClose }) => {
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.franchise && <div className={styles.subMenu}> Franchise<br />Franchise user</div>}
+      {openMenus.franchise && <div className={styles.subMenu}>  <div onClick={() => {
+      router.push('/admin/franchises'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Franchise
+    </div>Franchise user</div>}
 
       <div className={styles.sectionTitle}>MANAGE SERVICE</div>
       <div className={styles.menuItem}><FaList /><span>Category</span></div>

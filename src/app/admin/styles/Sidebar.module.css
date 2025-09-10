@@ -249,44 +249,29 @@
 /* header media css  */
 
 @media (max-width: 375px) {
-    .hamburger {
-        display: flex;
-        /* Hide by default */
-        font-size: 22px;
-        color: #2b2e4a;
-        cursor: pointer;
-        background: rgb(255, 255, 255);
-        /* For testing */
-        border: none;
-        padding: 6px;
-        border-radius: 4px;
-        z-index: 1000;
-        margin-right: 270px;
-    }
-    .adminText {
-        font-size: 12px;
-        display: none;
-        /* Hide admin text on mobile if space is tight */
-    }
-    .profilePic {
-        width: 28px;
-        height: 28px;
-        border-width: 1.5px;
-    }
     .header {
         left: 0;
-        /* No sidebar on mobile, so remove left offset */
-        padding: 0 10px;
-        height: 50px;
-        /* Slightly smaller header height for mobile */
-        justify-content: flex-end;
-        /* Push rightSection fully to right */
+        width: 100%;
+        padding: 0 12px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .hamburger {
+        display: flex;
+        font-size: 22px;
+        background: transparent;
+        border: none;
+        color: #2b2e4a;
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
     }
     .rightSection {
-        gap: 12px;
-        /* Less gap on mobile */
         flex: none;
-        /* Remove flex-grow */
+        gap: 12px;
+    }
+    .adminText {
+        display: none;
     }
     .notification {
         font-size: 16px;
@@ -297,6 +282,11 @@
         width: 14px;
         height: 14px;
         font-size: 9px;
+    }
+    .profilePic {
+        width: 28px;
+        height: 28px;
+        border-width: 1.5px;
     }
 }
 

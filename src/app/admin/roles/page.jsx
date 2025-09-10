@@ -65,12 +65,19 @@ const rolesData = [
 
 const Roles = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+const [entriesPerPage, setEntriesPerPage] = useState(10);
+
 
   const filteredRoles = rolesData.filter((role) =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
    const router = useRouter();
 
+   const totalPages = Math.ceil(filteredRoles.length / entriesPerPage);
+const startIndex = (currentPage - 1) * entriesPerPage;
+const endIndex = startIndex + entriesPerPage;
+const currentRoles = filteredRoles.slice(startIndex, endIndex);
   return (
      
     <Layout>
@@ -89,11 +96,18 @@ const Roles = () => {
           <div className={styles.tableControls}>
             <div>
               Show
-              <select className={styles.select}>
-                <option>10</option>
-                <option>25</option>
-                <option>50</option>
-              </select>
+             <select
+  className={styles.select}
+  value={entriesPerPage}
+  onChange={(e) => {
+    setEntriesPerPage(Number(e.target.value));
+    setCurrentPage(1); // Reset page when changing limit
+  }}
+>
+  <option value={10}>10</option>
+  <option value={25}>25</option>
+  <option value={50}>50</option>
+</select>
               entries
             </div>
             <div>
@@ -117,14 +131,18 @@ const Roles = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredRoles.map((role, index) => (
+             {currentRoles.map((role, index) => (
+
                 <tr key={index}>
                   <td>{role.name}</td>
                   <td>{role.permissions?.join(", ")}</td>
                   <td>
-                    <button className={styles.editBtn}>
-                      <FaEdit />
-                    </button>
+                     <button
+    className={styles.editBtn}
+    onClick={() => router.push(`/admin/add-roles?role=${encodeURIComponent(role.name)}`)}
+  >
+    <FaEdit />
+  </button>
                   </td>
                 </tr>
               ))}
@@ -138,20 +156,42 @@ const Roles = () => {
             </tbody>
           </table>
        
-                <div className={styles.paginationInfo}>
-            <div>
-              Showing 1 to {filteredRoles.length} of {filteredRoles.length} entries
-            </div>
-            <div className={styles.paginationControls}>
-              <button className={styles.paginationButton}>Previous</button>
-              <button
-                className={`${styles.paginationButton} ${styles.activePage}`}
-              >
-                1
-              </button>
-              <button className={styles.paginationButton}>Next</button>
-            </div>
-          </div>
+       <div className={styles.paginationInfo}>
+  <div>
+    Showing {filteredRoles.length === 0 ? 0 : startIndex + 1} to{" "}
+    {Math.min(endIndex, filteredRoles.length)} of {filteredRoles.length} entries
+  </div>
+  <div className={styles.paginationControls}>
+    <button
+      className={styles.paginationButton}
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+
+    {[...Array(totalPages)].map((_, index) => (
+      <button
+        key={index}
+        className={`${styles.paginationButton} ${
+          currentPage === index + 1 ? styles.activePage : ""
+        }`}
+        onClick={() => setCurrentPage(index + 1)}
+      >
+        {index + 1}
+      </button>
+    ))}
+
+    <button
+      className={styles.paginationButton}
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</div>
+
          </div>
       </div>
    
