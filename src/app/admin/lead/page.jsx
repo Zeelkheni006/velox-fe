@@ -4,6 +4,8 @@
     import Layout from "../pages/page"; // Replace with your actual layout path
     import styles from "../styles/Leads.module.css";
     import { useRouter } from 'next/navigation';
+    import dynamic from "next/dynamic";
+
 
 
     const leadsData = [
@@ -79,7 +81,7 @@
     },
      
     ];
-
+const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
     export default function LeadsPage() {
     const [search, setSearch] = useState("");
     const [leads, setLeads] = useState(leadsData);
@@ -94,27 +96,47 @@ const handlePrintClick = () => {
   router.push(`/admin/print-leads?leads=${leadsString}`);
 };
 
-const handlePdfClick = async () => {
-  const response = await fetch("/api/generate-pdf", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ leads }),
-  });
+  const handlePdfClick = async () => {
+    const { jsPDF: JsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
 
+    const doc = new JsPDF();
 
-  const blob = await response.blob();
+    doc.text("Leads (Current Page)", 14, 20);
 
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "print-leads.pdf";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-};
+    // Prepare table head and body
+    const tableColumn = [
+      "Name",
+      "Email",
+      "Mobile",
+      "Skill",
+      "Country",
+      "State",
+      "City",
+      "Status",
+    ];
 
+    const tableBody = currentLeads.map(lead => [
+      lead.name,
+      lead.email,
+      lead.mobile,
+      lead.skill,
+      lead.country,
+      lead.state,
+      lead.city,
+      lead.status,
+    ]);
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableBody,
+      startY: 30,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [22, 160, 133] }, // teal-ish color for header
+    });
+
+    doc.save("leads.pdf");
+  };
 
     // ✅ Toggle status from PENDING to ACCEPT
     const handleStatusClick = (index) => {

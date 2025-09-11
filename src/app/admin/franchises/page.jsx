@@ -1,12 +1,11 @@
 "use client";
-import React, { useState } from "react";
-
+import React, { useState,useEffect } from "react";
 import { useRouter } from 'next/navigation'; 
-import { jsPDF } from "jspdf";
-import { applyPlugin } from "jspdf-autotable";
-
 import styles from "../styles/Franchises.module.css";
  import Layout from "../pages/page";
+import { jsPDF } from "jspdf";
+import dynamic from "next/dynamic";
+
 
 const franchiseData = [
   {
@@ -161,33 +160,37 @@ const handleCloseModal = () => {
   setSelectedFranchise(null);
 };
 
+  const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
-const handlePDFDownload = () => {
-  const doc = new jsPDF("p", "pt");
+  useEffect(() => {
+    import("jspdf-autotable");
+  }, []);
 
-  doc.setFontSize(18);
-  doc.text("Velox Solution", 40, 40);
+  const handlePDFDownload = async () => {
+    const { jsPDF: JsPDF } = await import("jspdf");
+    await import("jspdf-autotable");
 
-  const tableColumn = ["ID", "Name", "Country", "State", "City", "Commission"];
-  const tableRows = franchises.map((f) => [
+    const doc = new JsPDF();
+
+    doc.text("Franchises (Current Page)", 40, 40);
+      const tableBody = franchiseData.map(f => [
     f.id,
     f.name,
     f.country,
     f.state,
     f.city,
     f.commission,
+    f.status.trim(),
   ]);
+  console.log(tableBody);
+    doc.autoTable({
+      head: [["ID", "Name", "Country", "State", "City", "Commission", "Status"]],
+      body: tableBody,
+      startY: 60,
+    });
 
-  doc.autoTable({
-    head: [tableColumn],
-    body: tableRows,
-    startY: 60,
-    styles: { fontSize: 12 },
-    headStyles: { fillColor: [22, 160, 133] },
-  });
-
-  doc.save("franchises-list.pdf");
-};
+    doc.save("franchises.pdf");
+  };
 
   return (
     <Layout>
@@ -210,7 +213,9 @@ const handlePDFDownload = () => {
                   </div>
                    <div className={styles.controls}>
                 <div>
-             <button className={styles.buttonPrimary} onClick={handlePDFDownload}>PDF</button>
+             <button className={styles.buttonPrimary} onClick={handlePDFDownload}>
+  PDF
+</button>
 
        <button className={styles.buttonSecondary} onClick={handlePrintClick}>
   Print

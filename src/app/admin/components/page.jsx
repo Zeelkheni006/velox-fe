@@ -1,7 +1,8 @@
 "use client";
 import { useState } from 'react';
 import styles from '../styles/Sidebar.module.css';
-import { useRouter } from 'next/navigation'; // for App Router (Next.js 13+)
+import { useRouter } from 'next/navigation'; 
+
 
 
 import {
@@ -110,10 +111,21 @@ const Sidebar = ({ isOpen, onClose }) => {
       onClose(); // optional: close sidebar on mobile
     }}>
       Franchise
-    </div>Franchise user</div>}
+    </div><div onClick={() => {
+      router.push('/admin/franchises-user'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Franchise-user
+    </div></div>}
 
       <div className={styles.sectionTitle}>MANAGE SERVICE</div>
-      <div className={styles.menuItem}><FaList /><span>Category</span></div>
+       <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/categories'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaList /><span>Category</span></div>
       <div className={styles.menuItem}><FaTags /><span>Our Brand Ambassador</span></div>
       <div className={styles.menuItem}><FaProjectDiagram /><span>Sub Category</span></div>
 

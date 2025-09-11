@@ -10,7 +10,8 @@ import { useEffect, useState } from 'react';
 const AddRole = () => {
  
  const searchParams = useSearchParams();
-  const roleName = searchParams.get('role'); // get role name from URL
+ const [roleName, setRoleName] = useState('');
+
   const isEditMode = Boolean(roleName);
 
   const [formData, setFormData] = useState({
