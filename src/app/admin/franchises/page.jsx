@@ -232,7 +232,8 @@ const handleCloseModal = () => {
                     <option>Select City</option>
                 </select>
                 </div>
-
+<label className={styles.searchLabel}>
+  Search:{" "}
                 <input
                 className={styles.searchBox}
                 type="text"
@@ -240,6 +241,7 @@ const handleCloseModal = () => {
                 
                 onChange={(e) => setSearch(e.target.value)}
                 />
+                </label>
             </div>
             <div className="printableArea"></div>
               <div className={styles.tableWrapper}>
@@ -279,7 +281,7 @@ const handleCloseModal = () => {
   </a>
               </td>
              
-                    <td>{franchise.status}</td>
+                    <td className={styles.status}>{franchise.status}</td>
                       <td>
  <button
   className={styles.editBtn}
@@ -304,34 +306,34 @@ const handleCloseModal = () => {
         </tbody>
       </table>  
       </div>
-               <div className={styles.pagination}>
-            <span>
-              {franchises.length === 0 ? (
-                "No entries found"
-              ) : (
-                <>
-                  Showing {startIndex + 1} to {endIndex} of {franchises.length} entries
-                </>
-              )}
-            </span>
-            <div className={styles.paginationControls}>
-              <button
-                className={styles.paginationButton}
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span className={styles.pageNumber}>{currentPage}</span>
-              <button
-                className={styles.paginationButton}
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+                <div className={styles.pagination}>
+              <span>
+                {franchises.length === 0 ? (
+                  "No entries found"
+                ) : (
+                  <>
+                    Showing {startIndex + 1} to {endIndex} of {franchises.length} entries
+                  </>
+                )}
+              </span>
+              <div className={styles.paginationControls}>
+                <button
+                  className={styles.paginationButton}
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span className={styles.pageNumber}>{currentPage}</span>
+                <button
+                  className={styles.paginationButton}
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
       </div>
     </div>
     {showModal && selectedFranchise && (

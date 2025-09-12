@@ -245,7 +245,8 @@ const handleDecline = () => {
                     <option>Select City</option>
                 </select>
                 </div>
-
+<label className={styles.searchLabel}>
+  Search:{" "}
                 <input
                 className={styles.searchBox}
                 type="text"
@@ -253,6 +254,8 @@ const handleDecline = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 />
+                </label>
+
             </div>
 <div className="printableArea"></div>
            <div className={styles.tableWrapper}>

@@ -101,6 +101,8 @@ export default function FranchisesPage() {
           </div>
 
           <div className={styles.controls}>
+            <label className={styles.searchLabel}>
+  Search:{" "}
             <input
               className={styles.searchBox}
               type="text"
@@ -108,6 +110,8 @@ export default function FranchisesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+              
+</label>
           </div>
 
           <table className={styles.table}>

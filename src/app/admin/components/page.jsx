@@ -127,7 +127,13 @@ const Sidebar = ({ isOpen, onClose }) => {
   }}
 ><FaList /><span>Category</span></div>
       <div className={styles.menuItem}><FaTags /><span>Our Brand Ambassador</span></div>
-      <div className={styles.menuItem}><FaProjectDiagram /><span>Sub Category</span></div>
+       <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/sub-categories'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaProjectDiagram /><span>Sub Category</span></div>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('services')}>
         <FaWrench /><span>Services</span>{openMenus.services ? (

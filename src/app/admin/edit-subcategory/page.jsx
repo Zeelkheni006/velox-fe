@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import styles from '../styles/Categories.module.css';
+import styles from '../styles/SubCategories.module.css';
 import Layout from '../pages/page';
 // import dynamic from 'next/dynamic';
 
@@ -13,12 +13,14 @@ export default function EditCategory() {
   const searchParams = useSearchParams();
   const titleFromURL = searchParams.get('title');
   const logoFromURL = searchParams.get('logo'); 
+  const categoryFromURL = searchParams.get('category');
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [logoFile, setLogoFile] = useState(null);
    const [logoPreview, setLogoPreview] = useState(null);
   const [logoUrl, setLogoUrl] = useState('/icon/default.png'); // fallback image
+  
 
   // Mock loading from URL parameter
   useEffect(() => {
@@ -30,7 +32,10 @@ export default function EditCategory() {
   if (logoFromURL) {
     setLogoUrl(logoFromURL); // 👈 use actual logo path
   }
-}, [titleFromURL, logoFromURL]);
+   if (categoryFromURL) {
+    setFormData(prev => ({ ...prev, category: categoryFromURL }));
+  }
+}, [titleFromURL, logoFromURL, categoryFromURL]);
 const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -43,13 +48,26 @@ const handleLogoChange = (e) => {
     alert('Category Updated!');
     // You would send this data to your backend API here
   };
-
+ const [formData, setFormData] = useState({
+    title: '',
+    category: '',
+    logo: null,
+  });
+    const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'logo') {
+      setFormData({ ...formData, logo: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
   return (
     <Layout>
       <div className={styles.editcontainer}>
         <div className={styles.editheader}>
-          <span className={styles.editbreadcrumb}>Category</span> &gt;{" "}
-          <span className={styles.editbreadcrumbActive}>Edit Category</span>
+          <span className={styles.editbreadcrumb}>Sub Category</span> &gt;{" "}
+            <span className={styles.editbreadcrumb}>Sub Category</span> &gt;{" "}
+          <span className={styles.editbreadcrumbActive}>Edit Sub Category</span>
         </div>
 
         <div className={styles.editcard}>
@@ -62,7 +80,23 @@ const handleLogoChange = (e) => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-
+   <label className={styles.editlabel}>CATEGORY</label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className={styles.editinput}
+              required
+            >
+              <option value="">Select Category</option>
+              <option value="NAIL Studio">NAIL Studio</option>
+              <option value="AC service">AC service</option>
+               <option value="Spa For Women">Spa For Women</option>
+                <option value="Sofa cleaning">Sofa Cleaning</option>
+              <option value="Women Beauty Care">Women Beauty Care</option>
+              <option value="R O Water Purifier">R O Water Purifier</option>
+              <option value="Cleaning & Disinfection">Cleaning & Disinfection</option>
+            </select>
             <label className={styles.editlabel}>LOGO</label>
             <input
               type="file"
@@ -85,20 +119,8 @@ const handleLogoChange = (e) => {
   </div>
 )}
 
-            <label className={styles.editlabel}>DESCRIPTION</label>
-{/* <ReactQuill
-  theme="snow"
-  value={description}
-  onChange={setDescription}
-  className={styles.editquill}
-/> */}
-             <textarea
-              className={styles.edittextarea}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />  
 
-            <p className={styles.edithint}>Max file size allowed: 500Kb.</p>
+        
 
             <button type="submit" className={styles.editupdateBtn}>UPDATE</button>
           </form>

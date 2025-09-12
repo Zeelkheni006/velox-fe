@@ -62,6 +62,23 @@
     margin-bottom: 20px;
 }
 
+.searchLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+    font-size: 16px;
+    color: #888;
+}
+
+.search {
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
 .dropdownGroup {
     display: flex;
     gap: 10px;
@@ -156,6 +173,13 @@
     font-weight: 500;
 }
 
+.status {
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+    padding: 6px 12px;
+}
+
 .editBtn {
     background-color: #fbbf24;
     color: white;
@@ -169,25 +193,29 @@
 }
 
 .activeBtn {
-    background-color: #22c55e;
-    color: white;
-    border: none;
+    min-width: 100px;
+    /* ✅ Fixed width */
+    text-align: center;
     padding: 6px 12px;
+    font-size: 15px;
+    border: none;
     border-radius: 4px;
     font-weight: 200;
     cursor: pointer;
-    font-size: 15px;
+    background-color: #22c55e;
 }
 
 .inactiveBtn {
-    background-color: #ef4444;
-    color: white;
-    border: none;
+    min-width: 100px;
+    /* ✅ Fixed width */
+    text-align: center;
     padding: 6px 12px;
+    font-size: 15px;
+    border: none;
     border-radius: 4px;
     font-weight: 200;
     cursor: pointer;
-    font-size: 15px;
+    background-color: #ef4444;
 }
 
 .inactiveBtn:hover {

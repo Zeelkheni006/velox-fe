@@ -46,8 +46,8 @@ export default function EditLeadPage() {
   return (
     <Layout>
       <div className={styles.container}>
-        <div className={styles.breadcrumb}>
-                    <span>Lead</span> &gt; <span className={styles.breadcrumbActive}>Edit Lead</span>
+        <div className={styles.editheader}>
+                    <span className={styles.editbreadcrumb}>Lead</span> &gt; <span className={styles.editbreadcrumbActive}>Edit Lead</span>
                   </div>
         <h2 className={styles.title}>Edit Lead</h2>
         <form onSubmit={handleSubmit} className={styles.form}>

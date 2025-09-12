@@ -1,13 +1,14 @@
 .container {
     display: flex;
     flex-direction: column;
-    height: 20vh;
+    height: 30vh;
     /* Full viewport height */
-    width: 200%;
+    width: 105%;
     padding: 20px;
     background-color: #f4f6f9;
     box-sizing: border-box;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 800px;
 }
 
 .headerContainer {
@@ -61,9 +62,11 @@
 }
 
 .showEntries {
-    font-size: 14px;
-    margin-bottom: 10px;
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
 }
 
 .select1 {
@@ -89,6 +92,12 @@
     border-bottom: 1px solid #ddd;
 }
 
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
 .logo {
     width: 40px;
     height: 40px;
@@ -100,6 +109,10 @@
     border-radius: 12px;
     font-size: 12px;
     font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
 }
 
 .active {
@@ -123,6 +136,7 @@
     color: white;
     font-size: 12px;
     cursor: pointer;
+    min-width: 70px;
 }
 
 .editBtn {
@@ -139,6 +153,46 @@
 
 .activeBtn {
     background-color: #5cb85c;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.searchLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.search {
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
 }
 
 
@@ -227,7 +281,7 @@
 
 .editcontainer {
     padding: 20px;
-    width: 1800px;
+    width: 1600px;
 }
 
 .editheader {

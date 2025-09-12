@@ -1,0 +1,411 @@
+.wrapper {
+    padding: 30px;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1700px;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #888;
+    font-size: 19px;
+    font-weight: 1px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.addBtn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background-color: #477ef3;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+}
+
+.active {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactive {
+    background-color: #fdecea;
+    color: #f44336;
+}
+
+.editBtn {
+    background-color: #fbbf24;
+    border: none;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 4px;
+    margin-right: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.activeBtn {
+    background-color: #22c55e;
+    border: none;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.activeBtn:hover {
+    background-color: #50cc7d;
+}
+
+.inactiveBtn {
+    background-color: #ef4444;
+    border: none;
+    padding: 6px 12px;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.inactiveBtn:hover {
+    background-color: #f05d5d;
+}
+
+
+/* sub category css */
+
+
+/* Wrapper and layout */
+
+.wrapper {
+    padding: 30px;
+    background-color: #f4f7fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+
+/* Breadcrumb navigation */
+
+.addheaderContainer {
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 17px;
+}
+
+.addbreadcrumb {
+    color: #999;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #2885ff;
+    font-size: 15px;
+}
+
+
+/* Card styling */
+
+.addcard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.addcard h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: left;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.submitBtn {
+    background-color: #007bff;
+    color: #ffff;
+    width: 100px;
+    font-size: 15px;
+    height: 30px;
+    border-radius: 6px;
+}
+
+
+/* Add button */
+
+.addBtn {
+    background-color: #007bff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.addBtn:hover {
+    background-color: #0056b3;
+}
+
+
+/* Form inputs */
+
+.addform {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    color: #888;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addinput {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #007bff;
+}
+
+.searchLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.search {
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+
+/* Small note below file input */
+
+.small {
+    font-size: 12px;
+    color: #888;
+}
+
+
+/* edit-category css */
+
+.editcontainer {
+    padding: 20px;
+    width: 1600px;
+}
+
+.editheader {
+    margin-bottom: 20px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.editbreadcrumb {
+    color: #999;
+}
+
+.editbreadcrumbActive {
+    font-weight: bold;
+    color: #3478f7;
+}
+
+.editcard {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.editcard h2 {
+    color: #888;
+    text-align: left;
+}
+
+.editlabel {
+    display: block;
+    margin-top: 15px;
+    font-weight: 500;
+    text-align: left;
+    color: #888;
+    font-size: 15px;
+}
+
+.editinput,
+.edittextarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.edittextarea {
+    min-height: 150px;
+}
+
+.edithint {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    text-align: left;
+}
+
+.editimagePreview img {
+    margin-top: 10px;
+    height: 64px;
+    margin-right: 1500px;
+}
+
+.editupdateBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-right: 1500px;
+}
+
+.editquill {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    height: 200px;
+}
