@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { FaPhoneAlt, FaTwitter, FaFacebookF, FaLinkedinIn, FaInstagram, FaShoppingCart ,FaMapMarkerAlt, FaSearch, FaTimes} from 'react-icons/fa';
 import Image from 'next/image';
 import '../app/main.css'; 
+import "./media.css";
 export default function Header() {
   const [isSticky, setIsSticky] = useState(false);
 
@@ -33,7 +34,7 @@ export default function Header() {
   // Detect screen size for responsive behavior
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 375);
+      setIsMobile(window.innerWidth <= 840);
     };
 
     handleResize(); // Initial check
@@ -87,12 +88,12 @@ export default function Header() {
 
   {/* Mobile only: Auth + Hamburger */}
 
-    <div className=" auth-links md:flex text-orange-600 text-sm gap-2">
+    <div className=" auth-links ">
       <Link href="/login">Login</Link> / <Link href="/signup">Sign Up</Link>
     </div>
      {isMobile && (
             <button 
-              className="hamburger text-2xl ml-4"
+              className="hamburger "
               onClick={toggleMenu}
               aria-label="Toggle menu"
             >

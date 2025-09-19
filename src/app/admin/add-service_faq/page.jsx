@@ -11,8 +11,8 @@ export default function AddCategory() {
   const [formData, setFormData] = useState({
     title: '',
     logo: null,
-      description: '',
-    });
+    description: '',
+  });
   const [description, setDescription] = useState('');
 const [longDescription, setLongDescription] = useState('');
 const [mounted, setMounted] = useState(false);
@@ -37,15 +37,17 @@ const [mounted, setMounted] = useState(false);
   return (
     <Layout>
     <div className={styles.addcontainer}>
-         <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Category</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Add Category</span>
+     <div className={styles.addheaderContainer}>
+          <span className={styles.addbreadcrumb}>Services Faq</span> &gt;{' '}
+          <span className={styles.addbreadcrumb}>Services</span> &gt;{' '}
+          <span className={styles.addbreadcrumb}>Service Faq</span> &gt;{' '}
+          <span className={styles.addbreadcrumbActive}>Add Faq</span>
         </div>
 <div className={styles.addcard}>
-      <h2 className={styles.addheading}>Add Category</h2>
+      <h2 className={styles.addheading}>Add Faq</h2>
 
       <form className={styles.addform} onSubmit={handleSubmit}>
-        <label className={styles.addlabel}>Title</label>
+        <label className={styles.addlabel}>Question</label>
         <input
           type="text"
           name="title"
@@ -54,21 +56,8 @@ const [mounted, setMounted] = useState(false);
           required
         />
 
-        <label className={styles.addlabel}>Logo</label>
-        <input
-          type="file"
-          name="logo"
-          accept=".png"
-          className={styles.addinput}
-          onChange={handleChange}
-          required
-        />
-        <p className={styles.addnote}>
-          Only allowed PNG format. Image resolution must be 64×64. Max file size allowed: 2MB
-        </p>
-
     <div className={styles.flex1}>
-       <label htmlFor="description">DESCRIPTION</label>
+       <label htmlFor="description">Answer</label>
        {mounted && (
          <JoditEditor
            ref={editor}
@@ -93,14 +82,14 @@ const [mounted, setMounted] = useState(false);
            onBlur={newContent => setDescription(newContent)}
          />
        )}
-       <small className={styles.note}>Max file size allowed : 500Kb.</small>
+      
      </div>
 
         <button type="submit" className={styles.addsubmitButton}>
           SUBMIT
         </button>
       </form>
-      </div>
+    </div>
     </div>
     </Layout>
   );

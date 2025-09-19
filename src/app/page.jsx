@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import "./main.css";
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
 
 
 
@@ -203,63 +204,68 @@ export default function Home() {
   return (
     <main>
 
-       <section id="hero" className="relative overflow-hidden">
-       <Swiper
-  modules={[Navigation, Pagination, Autoplay]}
-  navigation
-  pagination={{ clickable: true }}
-  autoplay={{ delay: 5000, disableOnInteraction: false }}
-  loop
->
-  {slides.map((slide, index) => (
-  <SwiperSlide key={index}>
-  <div className="relative w-full " style={{ height: "450px" }}>
-    {/* Background Image */}
-    <Image
-      src={slide.img}
-      alt={slide.title}
-      fill
-      priority={index === 0}
-      className="object-cover z-0"
-    />
-
-    {/* Dark overlay */}
-    <div className="absolute inset-0 bg-black/40 z-10" />
-
-    {/* Content on top */}
-    <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6  relative z-20 search-container">
-      <h1 className={`${slide.color} text-4xl md:text-5xl font-bold`}>
-        {slide.title}
-      </h1>
-      <p className={`${slide.color} mt-3 text-lg`}>{slide.desc}</p>
-
-      {/* Show search box only on first slide */}
-     
-        <div className="mt-6 w-full max-w-2xl ">
-          <form className="flex items-center bg-white rounded-full shadow-lg overflow-hidden relative z-30">
-            <input
-              type="text"
-              placeholder="Enter a location"
-              className="flex-1 px-4 py-2 outline-none"
-            />
-            <button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 font-semibold"
-            >
-              Go
-            </button>
-          </form>
+<section id="hero" className="heroSection">
+        {/* Background Slider */}
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]} 
+          navigation pagination={{ clickable: true }} 
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+           loop
+          className="absolute inset-0 w-full h-full -z-10"
+        >
+          {slides.map((slide, index) => (
+      <SwiperSlide key={index}>
+        <div className="heroSlide">
+          <Image
+            src={slide.img}
+            alt={slide.title}
+            fill
+            priority={index === 0}
+            className="heroImage"
+          />
+          <div className="heroOverlay"></div>
+          <div className="heroContent">
+            <h1 className="heroTitle">{slide.title}</h1>
+            <p className="heroDesc">{slide.desc}</p>
+          </div>
         </div>
-    
+      </SwiperSlide>
+    ))}
+        </Swiper>
+
+        {/* 🔥 Static Search Box (doesn't slide) */}
+   <div className="searchBox">
+  <form className="searchForm">
+    <div className="searchInputWrapper">
+      {/* Left Search Icon */}
+      <span className="searchIcon">
+        <FaSearch />
+      </span>
+      <input
+        type="text"
+        placeholder="Enter a location"
+        className="searchInput"
+      />
+      {/* Right Location Icon */}
+      <span className="locationIcon">
+        <FaMapMarkerAlt />
+      </span>
+
+      {/* Right Clear Icon */}
+      <span className="clearIcon">
+        <FaTimesCircle />
+      </span>
     </div>
-  </div>
-</SwiperSlide>
 
-
-  ))}
-</Swiper>
-
+    {/* Button below input */}
+    <button type="submit" className="searchButton">
+      Go
+    </button>
+  </form>
+</div>
       </section>
+
+
        <section className="services-section">
   <div className="services-grid">
     {services.map((service, index) => (
@@ -292,14 +298,14 @@ export default function Home() {
                 320: { slidesPerView: 1, slidesPerGroup: 1 },
                 375: { slidesPerView: 1, slidesPerGroup: 1 },
                 640: { slidesPerView: 1, slidesPerGroup: 1 },
-                768: { slidesPerView: 2, slidesPerGroup: 2 },
+                768: { slidesPerView: 3, slidesPerGroup: 3 },
                 1024: { slidesPerView: 3, slidesPerGroup: 3 },
             }}
           >
               {fullServices.map((service, index) => (
               <SwiperSlide key={index}>
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden transition hover:shadow-xl service ">
-                  <div className="relative w-full h-48">
+                  <div className="relative w-full h-48 ">
                     <Image src={service.img} alt={service.title} fill className="object-cover" />
                   </div>
                   <div className="p-4">
@@ -483,14 +489,14 @@ export default function Home() {
           </div>
 
           <div className="storeBtns">
-            <Image src="/images/google.webp" alt="Google Play" width={150} height={50} />
-            <Image src="/images/appstore.webp" alt="App Store" width={150} height={50} />
+            <Image src="/images/google.webp"  alt="Google Play" width={150} height={50} />
+            <Image src="/images/appstore.webp"  alt="App Store" width={150} height={50} />
           </div>
         </div>
 
         {/* Right Phone Images */}
         <div className="rightImage">
-          <Image src="/images/app.png" alt="Mobile App UI" width={500} height={400} />
+          <Image src="/images/app.png"className="storeimg" alt="Mobile App UI" width={500} height={400} />
         </div>
       </div>
     </section>

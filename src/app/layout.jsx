@@ -1,6 +1,7 @@
 // app/layout.js
 import { Geist, Geist_Mono } from "next/font/google";
-import './main.css';  
+import './main.css'; 
+import "../components/media.css" 
 import LayoutWrapper from "../components/LayoutWrapper";
 
 

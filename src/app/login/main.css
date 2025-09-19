@@ -109,3 +109,26 @@
         font-size: 20px;
     }
 }
+
+@media (max-width: 414px) {
+    .modal-box {
+        width: 90% !important;
+        padding: 16px !important;
+    }
+    .modal-box h2 {
+        font-size: 18px !important;
+    }
+    .modal-box select {
+        font-size: 14px !important;
+        padding: 10px !important;
+    }
+    .modal-box .confirm {
+        font-size: 14px !important;
+        padding: 10px 0 !important;
+    }
+    .close-btn {
+        top: 10px;
+        right: 12px;
+        font-size: 20px;
+    }
+}

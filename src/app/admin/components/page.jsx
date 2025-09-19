@@ -126,7 +126,13 @@ const Sidebar = ({ isOpen, onClose }) => {
     onClose(); // this closes the sidebar if it's on mobile
   }}
 ><FaList /><span>Category</span></div>
-      <div className={styles.menuItem}><FaTags /><span>Our Brand Ambassador</span></div>
+          <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/ambassador'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaTags /><span>Our Brand Ambassador</span></div>
        <div
   className={styles.menuItem}
   onClick={() => {
@@ -142,7 +148,17 @@ const Sidebar = ({ isOpen, onClose }) => {
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.services && <div className={styles.subMenu}>Services<br />Best Services</div>}
+      {openMenus.services && <div className={styles.subMenu}> <div onClick={() => {
+      router.push('/admin/services'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Services
+    </div> <div onClick={() => {
+      router.push('/admin/best-service'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+Best Services
+    </div></div>}
 
       <div className={styles.menuItem}><FaList /><span>Package</span></div>
 

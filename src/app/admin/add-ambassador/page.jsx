@@ -38,14 +38,14 @@ const [mounted, setMounted] = useState(false);
     <Layout>
     <div className={styles.addcontainer}>
          <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Category</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Add Category</span>
+          <span className={styles.addbreadcrumb}>Brand Ambassador</span> &gt;{' '}
+          <span className={styles.addbreadcrumbActive}>Add Ambassador</span>
         </div>
 <div className={styles.addcard}>
-      <h2 className={styles.addheading}>Add Category</h2>
+      <h2 className={styles.addheading}>Add Ambassador</h2>
 
       <form className={styles.addform} onSubmit={handleSubmit}>
-        <label className={styles.addlabel}>Title</label>
+        <label className={styles.addlabel}>Name</label>
         <input
           type="text"
           name="title"
@@ -53,8 +53,39 @@ const [mounted, setMounted] = useState(false);
           onChange={handleChange}
           required
         />
-
-        <label className={styles.addlabel}>Logo</label>
+ <label className={styles.addlabel}>Facebook Profile</label>
+        <input
+          type="text"
+          name="title"
+          className={styles.addinput}
+          onChange={handleChange}
+          required
+        />
+         <label className={styles.addlabel}>whatsApp Number</label>
+        <input
+          type="text"
+          name="title"
+          className={styles.addinput}
+          onChange={handleChange}
+          required
+        />
+         <label className={styles.addlabel}>Instagram Profile</label>
+        <input
+          type="text"
+          name="title"
+          className={styles.addinput}
+          onChange={handleChange}
+          required
+        />
+        <label className={styles.addlabel}>Display Index</label>
+        <input
+          type="text"
+          name="title"
+          className={styles.addinput}
+          onChange={handleChange}
+          required
+        />
+        <label className={styles.addlabel}>Photo</label>
         <input
           type="file"
           name="logo"
@@ -68,7 +99,7 @@ const [mounted, setMounted] = useState(false);
         </p>
 
     <div className={styles.flex1}>
-       <label htmlFor="description">DESCRIPTION</label>
+       <label htmlFor="description">Time Line</label>
        {mounted && (
          <JoditEditor
            ref={editor}

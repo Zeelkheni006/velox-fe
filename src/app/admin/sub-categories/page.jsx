@@ -14,6 +14,9 @@ const initialData = [
   { title: 'Velox Special Detan', category: 'Women Beauty Care', logo: '/icon/spa1.png', status: 'ACTIVE' },
   { title: 'Ragga Detan', category: 'Women Beauty Care', logo: '/icon/spa2.png', status: 'ACTIVE' },
   { title: 'Aroma Detan', category: 'Women Beauty Care', logo: '/icon/spa3.png', status: 'ACTIVE' },
+    { title: 'Ragga Detan', category: 'Women Beauty Care', logo: '/icon/spa2.png', status: 'ACTIVE' },
+  { title: 'Aroma Detan', category: 'Women Beauty Care', logo: '/icon/spa3.png', status: 'ACTIVE' },
+
 ];
 
 function SortArrow({ direction }) {

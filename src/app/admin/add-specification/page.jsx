@@ -11,8 +11,8 @@ export default function AddCategory() {
   const [formData, setFormData] = useState({
     title: '',
     logo: null,
-      description: '',
-    });
+    description: '',
+  });
   const [description, setDescription] = useState('');
 const [longDescription, setLongDescription] = useState('');
 const [mounted, setMounted] = useState(false);
@@ -37,12 +37,13 @@ const [mounted, setMounted] = useState(false);
   return (
     <Layout>
     <div className={styles.addcontainer}>
-         <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Category</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Add Category</span>
+      <div className={styles.addheaderContainer}>
+          <span className={styles.addbreadcrumb}>Services</span> &gt;{' '}
+          <span className={styles.addbreadcrumb}>Service Specification</span> &gt;{' '}
+          <span className={styles.addbreadcrumbActive}>Add Specification</span>
         </div>
 <div className={styles.addcard}>
-      <h2 className={styles.addheading}>Add Category</h2>
+      <h2 className={styles.addheading}>Add Specification</h2>
 
       <form className={styles.addform} onSubmit={handleSubmit}>
         <label className={styles.addlabel}>Title</label>
@@ -54,7 +55,7 @@ const [mounted, setMounted] = useState(false);
           required
         />
 
-        <label className={styles.addlabel}>Logo</label>
+        <label className={styles.addlabel}>Image</label>
         <input
           type="file"
           name="logo"
@@ -100,7 +101,7 @@ const [mounted, setMounted] = useState(false);
           SUBMIT
         </button>
       </form>
-      </div>
+    </div>
     </div>
     </Layout>
   );

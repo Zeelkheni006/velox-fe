@@ -413,11 +413,34 @@
 
 .container1 {
     padding: 30px;
-    background: white;
-    border-radius: 6px;
+    background-color: #f4f7fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 17px;
+}
+
+.addbreadcrumb {
+    color: #999;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #2885ff;
+    font-size: 15px;
+}
+
+.addcard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    width: 1500px;
-    margin: auto;
 }
 
 .title1 {

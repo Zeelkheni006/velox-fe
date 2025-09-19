@@ -45,10 +45,13 @@ export default function EditLeadPage() {
 
   return (
     <Layout>
-      <div className={styles.container}>
+  <div className={styles.editcontainer}>
         <div className={styles.editheader}>
-                    <span className={styles.editbreadcrumb}>Lead</span> &gt; <span className={styles.editbreadcrumbActive}>Edit Lead</span>
-                  </div>
+          <span className={styles.editbreadcrumb}>Leads</span> &gt;{" "}
+          <span className={styles.editbreadcrumbActive}>Edit Leads</span>
+        </div>
+
+        <div className={styles.editcard}>
         <h2 className={styles.title}>Edit Lead</h2>
         <form onSubmit={handleSubmit} className={styles.form}>
           {[
@@ -75,6 +78,7 @@ export default function EditLeadPage() {
           ))}
           <button type="submit" className={styles.button}>Update</button>
         </form>
+      </div>
       </div>
     </Layout>
   );

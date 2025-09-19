@@ -36,12 +36,13 @@ export default function AddCustomerPage() {
 
   return (
     <Layout>
-      <div className={styles.container}>
-        <div className={styles.formCard}>
-          <div className={styles.breadcrumb}>
-            <span>Manage Customer</span> &gt; <span className={styles.breadcrumbActive}>Add Customer</span>
-          </div>
-
+        <div className={styles.addcontainer}>
+         <div className={styles.addheaderContainer}>
+          <span className={styles.addbreadcrumb}>Manage Customer</span> &gt;{' '}
+          <span className={styles.addbreadcrumb}>Manage Customer</span> &gt;{' '}
+          <span className={styles.addbreadcrumbActive}>Add Customer</span>
+        </div>
+<div className={styles.addcard}>
           <h2 className={styles.formTitle}>Add Customer</h2>
 
           <form className={styles.form} onSubmit={handleSubmit}>
