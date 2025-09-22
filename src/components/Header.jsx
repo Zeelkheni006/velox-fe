@@ -34,7 +34,7 @@ export default function Header() {
   // Detect screen size for responsive behavior
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 840);
+      setIsMobile(window.innerWidth <=1000);
     };
 
     handleResize(); // Initial check

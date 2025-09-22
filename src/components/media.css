@@ -1,805 +1,533 @@
-    /* media css  */
-    
-    @media (max-width: 375px) {
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem;
-        }
-        .logo img {
-            max-width: 120px;
-            height: auto;
-            margin-right: 200px;
-        }
-        .right-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-links {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 5px;
-            margin-top: -20px;
-            margin-left: 200px;
-        }
-        .hamburger {
-            display: block;
-            background-color: #ff6600;
-            color: white;
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 450px;
-            margin-top: -30px;
-        }
-        .mobile-nav {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: white;
-            padding: 0.5rem 1rem;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav.open {
-            display: flex;
-        }
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 0;
-        }
-        /* Header Top */
-        .header-top {
-            padding: 8px 12px;
-        }
-        .header-main .logo,
-        .header-main .right-section,
-        .header-main .hamburger {
-            display: inline-flex;
-            align-items: center;
-        }
-        .header-main .logo {
-            margin-right: 15px;
-        }
-        .header-main .right-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .cart {
-            margin-top: -20px;
-        }
+/* Ensure visibility of the mobile menu on small screens */
+
+.mobile-nav {
+    display: none;
+}
+
+.mobile-nav.open {
+    display: block;
+}
+
+.hamburger {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: #333;
+    cursor: pointer;
+}
+
+
+/* Styling the sticky header */
+
+.sticky-header {
+    background-color: #000;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.sticky-nav {
+    display: flex;
+    gap: 20px;
+}
+
+.sticky-nav a {
+    color: white;
+    text-decoration: none;
+}
+
+.sticky-nav a:hover {
+    color: #ff6600;
+}
+
+
+/* Mobile screen adjustments */
+
+@media screen and (max-width: 1000px) {
+    .header-main {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        /* thodi space */
     }
-    /* 414px - 430px */
-    
-    @media (min-width: 376px) and (max-width: 430px) {
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem;
-        }
-        .logo img {
-            max-width: 120px;
-            height: auto;
-            margin-right: 200px;
-        }
-        .right-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-links {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 5px;
-            margin-top: -20px;
-            margin-left: 200px;
-        }
-        .hamburger {
-            display: block;
-            background-color: #ff6600;
-            color: white;
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 450px;
-            margin-top: -30px;
-        }
-        .mobile-nav {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: white;
-            padding: 0.5rem 1rem;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav.open {
-            display: flex;
-        }
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 0;
-        }
-        /* Header Top */
-        .header-top {
-            padding: 8px 12px;
-        }
-        .header-main .logo,
-        .header-main .right-section,
-        .header-main .hamburger {
-            display: inline-flex;
-            align-items: center;
-        }
-        .header-main .logo {
-            margin-right: 15px;
-        }
-        .header-main .right-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .cart {
-            margin-top: -20px;
-        }
+    .header-main .logo {
+        order: 1;
     }
-    /* 540px */
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem;
-        }
-        .logo img {
-            max-width: 120px;
-            height: auto;
-            margin-right: 200px;
-        }
-        .right-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-links {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 5px;
-            margin-top: -20px;
-            margin-left: 200px;
-        }
-        .hamburger {
-            display: block;
-            background-color: #ff6600;
-            color: white;
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 450px;
-            margin-top: -30px;
-        }
-        .mobile-nav {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: white;
-            padding: 0.5rem 1rem;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav.open {
-            display: flex;
-        }
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 0;
-        }
-        /* Header Top */
-        .header-top {
-            padding: 8px 12px;
-        }
-        .header-main .logo,
-        .header-main .right-section,
-        .header-main .hamburger {
-            display: inline-flex;
-            align-items: center;
-        }
-        .header-main .logo {
-            margin-right: 15px;
-        }
-        .header-main .right-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .cart {
-            margin-top: -20px;
-        }
+    .header-main .cart {
+        order: 2;
     }
-    /* 768px */
-    
-    @media (min-width: 541px) and (max-width: 768px) {
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem;
-        }
-        .logo img {
-            max-width: 120px;
-            height: auto;
-            margin-right: 200px;
-        }
-        .right-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-links {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 5px;
-            margin-top: -20px;
-            margin-left: 200px;
-        }
-        .hamburger {
-            display: block;
-            background-color: #ff6600;
-            color: white;
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 450px;
-            margin-top: -30px;
-        }
-        .mobile-nav {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: white;
-            padding: 0.5rem 1rem;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav.open {
-            display: flex;
-        }
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 0;
-        }
-        /* Header Top */
-        .header-top {
-            padding: 8px 12px;
-        }
-        .header-main .logo,
-        .header-main .right-section,
-        .header-main .hamburger {
-            display: inline-flex;
-            align-items: center;
-        }
-        .header-main .logo {
-            margin-right: 15px;
-        }
-        .header-main .right-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .cart {
-            margin-top: -20px;
-        }
+    .header-main .auth-links {
+        order: 3;
+        display: flex;
+        gap: 8px;
+        font-size: 14px;
     }
-    /* Tablets 820px - 912px */
-    
-    @media (min-width: 769px) and (max-width: 912px) {
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 1rem;
-        }
-        .logo img {
-            max-width: 120px;
-            height: auto;
-            margin-right: 200px;
-        }
-        .right-section {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .auth-links {
-            display: flex;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 5px;
-            margin-top: -20px;
-            margin-left: 150px;
-        }
-        .hamburger {
-            display: block;
-            background-color: #ff6600;
-            color: white;
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            margin-left: 300px;
-            margin-top: -30px;
-        }
-        .mobile-nav {
-            display: none;
-            flex-wrap: wrap;
-            justify-content: center;
-            background-color: white;
-            padding: 0.5rem 1rem;
-            gap: 20px;
-            font-size: 0.9rem;
-        }
-        .mobile-nav.open {
-            display: flex;
-        }
-        .mobile-nav a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            padding: 8px 0;
-        }
-        /* Header Top */
-        .header-top {
-            padding: 8px 12px;
-        }
-        .header-main .logo,
-        .header-main .right-section,
-        .header-main .hamburger {
-            display: inline-flex;
-            align-items: center;
-        }
-        .header-main .logo {
-            margin-right: 15px;
-        }
-        .header-main .right-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .cart {
-            margin-top: -20px;
-        }
+    .hamburger {
+        display: block;
     }
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .mobile-sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 10%;
-            background-color: #505050;
-            color: white;
-            padding: 12px 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            overflow: visible;
-        }
-        .mobile-sticky-header .logo img {
-            width: 120px;
-            height: auto;
-            object-fit: contain;
-        }
-        .mobile-sticky-header .auth-links {
-            font-size: 12px;
-            color: #f97316;
-            display: flex;
-            gap: 8px;
-            margin-left: -150px;
-        }
-        .mobile-sticky-header .hamburger {
-            font-size: 24px;
-            background: rgb(255, 136, 0);
-            border: none;
-            color: white;
-            margin-left: 3px;
-            cursor: pointer;
-        }
-        .mobile-sticky-header .relative {
-            position: relative;
-        }
-        .mobile-sticky-header .relative .absolute {
-            position: absolute;
-            top: -6px;
-            right: 20px;
-            background-color: #f97316;
-            color: white;
-            font-size: 10px;
-            width: 16px;
-            height: 16px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-sticky-header .relative {
-            right: 30px;
-        }
-        .sticky-mobile-nav {
-            position: fixed;
-            top: 50px;
-            left: 0;
-            right: 0;
-            background-color: #505050;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            /* Push down below the header */
-        }
-        .sticky-mobile-nav a {
-            padding: 8px 0;
-            background-color: #505050;
-            color: white;
-            text-decoration: none;
-            width: 100%;
-            text-align: center;
-        }
-        .sticky-mobile-nav.open {
-            display: flex;
-        }
-        .sticky-header {
-            display: none;
-        }
+    .mobile-nav {
+        display: none;
     }
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .mobile-sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            width: 100%;
-            height: 10%;
-            background-color: #505050;
-            color: white;
-            padding: 12px 16px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            z-index: 50;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            overflow: visible;
-        }
-        .mobile-sticky-header .logo img {
-            width: 120px;
-            height: auto;
-            object-fit: contain;
-        }
-        .mobile-sticky-header .auth-links {
-            font-size: 12px;
-            color: #f97316;
-            display: flex;
-            gap: 8px;
-            margin-left: -150px;
-        }
-        .mobile-sticky-header .hamburger {
-            font-size: 24px;
-            background: rgb(255, 136, 0);
-            border: none;
-            color: white;
-            margin-left: 3px;
-            cursor: pointer;
-        }
-        .mobile-sticky-header .relative {
-            position: relative;
-        }
-        .mobile-sticky-header .relative .absolute {
-            position: absolute;
-            top: -6px;
-            right: 20px;
-            background-color: #f97316;
-            color: white;
-            font-size: 10px;
-            width: 16px;
-            height: 16px;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .mobile-sticky-header .relative {
-            right: 30px;
-        }
-        .sticky-mobile-nav {
-            position: fixed;
-            top: 50px;
-            left: 0;
-            right: 0;
-            background-color: #505050;
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-            padding: 1rem;
-            /* Push down below the header */
-        }
-        .sticky-mobile-nav a {
-            padding: 8px 0;
-            background-color: #505050;
-            color: white;
-            text-decoration: none;
-            width: 100%;
-            text-align: center;
-        }
-        .sticky-mobile-nav.open {
-            display: flex;
-        }
-        .sticky-header {
-            display: none;
-        }
+    .mobile-nav.open {
+        display: block;
+        background-color: #fff;
+        padding: 20px;
+        position: absolute;
+        top: 130px;
+        left: 0;
+        right: 0;
+        z-index: 999;
     }
-    
-    @media (max-width: 375px) {
-        .header-top {
-            flex-direction: column;
-            text-align: center;
-            padding: 10px;
-        }
-        .left {
-            margin-bottom: 10px;
-        }
-        .right {
-            margin-top: -40px;
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-left: 240px;
-        }
-        .left span {
-            display: none;
-            margin-bottom: 5px;
-        }
-        /* Hide the "24 Hour Service" text on mobile */
-        .left span:first-child {
-            display: none;
-        }
-        .right .fa-twitter,
-        .right .fa-facebook-f,
-        .right .fa-linkedin-in,
-        .right .fa-instagram {
-            font-size: 1.2rem;
-        }
+    .mobile-nav a {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
     }
-    
-    @media (min-width: 376px) and (max-width: 430px) {
-        .header-top {
-            flex-direction: column;
-            text-align: center;
-            padding: 10px;
-        }
-        .left {
-            margin-bottom: 10px;
-        }
-        .right {
-            margin-top: -40px;
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-left: 240px;
-        }
-        .left span {
-            display: none;
-            margin-bottom: 5px;
-        }
-        /* Hide the "24 Hour Service" text on mobile */
-        .left span:first-child {
-            display: none;
-        }
-        .right .fa-twitter,
-        .right .fa-facebook-f,
-        .right .fa-linkedin-in,
-        .right .fa-instagram {
-            font-size: 1.2rem;
-        }
+    .mobile-nav a:hover {
+        background-color: #f4f4f4;
     }
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .header-top {
-            flex-direction: column;
-            text-align: center;
-            padding: 10px;
-        }
-        .left {
-            margin-bottom: 10px;
-        }
-        .right {
-            margin-top: -40px;
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-left: 400px;
-        }
-        .left span {
-            display: none;
-            margin-bottom: 5px;
-        }
-        /* Hide the "24 Hour Service" text on mobile */
-        .left span:first-child {
-            display: none;
-        }
-        .right .fa-twitter,
-        .right .fa-facebook-f,
-        .right .fa-linkedin-in,
-        .right .fa-instagram {
-            font-size: 1.2rem;
-        }
+}
+
+
+/* Hide desktop navigation on smaller screens */
+
+.desktop-nav {
+    display: flex;
+}
+
+.header-main .hamburger {
+    order: 4;
+}
+
+@media (max-width: 1000px) {
+    .desktop-nav {
+        display: none;
+        /* Hide the desktop nav for smaller screens */
     }
-    
-    @media (min-width: 541px) and (max-width: 768px) {
-        .header-top {
-            flex-direction: column;
-            text-align: center;
-            padding: 10px;
-        }
-        .left {
-            margin-bottom: 10px;
-        }
-        .right {
-            margin-top: -40px;
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-left: 700px;
-        }
-        .left span {
-            display: none;
-            margin-bottom: 5px;
-        }
-        /* Hide the "24 Hour Service" text on mobile */
-        .left span:first-child {
-            display: none;
-        }
-        .right .fa-twitter,
-        .right .fa-facebook-f,
-        .right .fa-linkedin-in,
-        .right .fa-instagram {
-            font-size: 1.2rem;
-        }
+    .hamburger {
+        display: block;
+        /* Show hamburger menu on mobile */
     }
-    /* For desktop */
-    
-    @media (max-width: 375px) {
-        .left {
-            display: flex;
-            flex-direction: column;
-            /* Stack items vertically */
-            align-items: center;
-            text-align: center;
-        }
-        .left span {
-            margin-bottom: 10px;
-            /* Space between the spans */
-        }
-        /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
-        .left span:first-child {
-            margin-bottom: 20px;
-            /* Add more space for the first element */
-        }
+    .mobile-nav {
+        display: none;
+        /* Hide mobile menu by default */
     }
-    
-    @media (min-width: 376px) and (max-width: 430px) {
-        .left {
-            display: flex;
-            flex-direction: column;
-            /* Stack items vertically */
-            align-items: center;
-            text-align: center;
-        }
-        .left span {
-            margin-bottom: 10px;
-            /* Space between the spans */
-        }
-        /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
-        .left span:first-child {
-            margin-bottom: 20px;
-            /* Add more space for the first element */
-        }
+    .mobile-nav.open {
+        display: block;
+        /* Show mobile menu when open */
     }
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .left {
-            display: flex;
-            flex-direction: column;
-            /* Stack items vertically */
-            align-items: center;
-            text-align: center;
-        }
-        .left span {
-            margin-bottom: 10px;
-            /* Space between the spans */
-        }
-        /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
-        .left span:first-child {
-            margin-bottom: 20px;
-            /* Add more space for the first element */
-        }
+    .service {
+        display: none;
     }
-    
-    @media (min-width: 541px) and (max-width: 768px) {
-        .left {
-            display: flex;
-            flex-direction: column;
-            /* Stack items vertically */
-            align-items: center;
-            text-align: center;
-        }
-        .left span {
-            margin-bottom: 10px;
-            flex-direction: row;
-            /* Space between the spans */
-        }
-        /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
-        .left span:first-child {
-            margin-bottom: 20px;
-            /* Add more space for the first element */
-        }
+}
+
+@media (min-width: 431px) and (max-width: 540px) {
+    .mobile-sticky-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 10%;
+        background-color: #505050;
+        color: white;
+        padding: 12px 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: visible;
     }
-    
-    @media (max-width: 375px) {
-        .search-group {
-            display: none;
-            flex-direction: row;
-            align-items: center;
-        }
+    .mobile-sticky-header .logo img {
+        width: 120px;
+        height: auto;
+        object-fit: contain;
     }
-    
-    @media (min-width: 376px) and (max-width: 430px) {
-        .search-group {
-            display: none;
-            flex-direction: row;
-            align-items: center;
-        }
+    .mobile-sticky-header .auth-links {
+        font-size: 12px;
+        color: #f97316;
+        display: flex;
+        gap: 8px;
+        margin-left: -150px;
     }
-    
-    @media (min-width: 431px) and (max-width: 540px) {
-        .search-group {
-            display: none;
-            flex-direction: row;
-            align-items: center;
-        }
+    .mobile-sticky-header .hamburger {
+        font-size: 24px;
+        background: rgb(255, 136, 0);
+        border: none;
+        color: white;
+        margin-left: 3px;
+        cursor: pointer;
     }
-    
-    @media (min-width: 541px) and (max-width: 768px) {
-        .search-group {
-            display: none;
-            flex-direction: row;
-            align-items: center;
-        }
+    .mobile-sticky-header .relative {
+        position: relative;
     }
+    .mobile-sticky-header .relative .absolute {
+        position: absolute;
+        top: -6px;
+        right: 20px;
+        background-color: #f97316;
+        color: white;
+        font-size: 10px;
+        width: 16px;
+        height: 16px;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .mobile-sticky-header .relative {
+        right: 30px;
+    }
+    .sticky-mobile-nav {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        right: 0;
+        background-color: #505050;
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        /* Push down below the header */
+    }
+    .sticky-mobile-nav a {
+        padding: 8px 0;
+        background-color: #505050;
+        color: white;
+        text-decoration: none;
+        width: 100%;
+        text-align: center;
+    }
+    .sticky-mobile-nav.open {
+        display: flex;
+    }
+    .sticky-header {
+        display: none;
+    }
+}
+
+@media (min-width: 431px) and (max-width: 540px) {
+    .mobile-sticky-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 10%;
+        background-color: #505050;
+        color: white;
+        padding: 12px 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 50;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        overflow: visible;
+    }
+    .mobile-sticky-header .logo img {
+        width: 120px;
+        height: auto;
+        object-fit: contain;
+    }
+    .mobile-sticky-header .auth-links {
+        font-size: 12px;
+        color: #f97316;
+        display: flex;
+        gap: 8px;
+        margin-left: -150px;
+    }
+    .mobile-sticky-header .hamburger {
+        font-size: 24px;
+        background: rgb(255, 136, 0);
+        border: none;
+        color: white;
+        margin-left: 3px;
+        cursor: pointer;
+    }
+    .mobile-sticky-header .relative {
+        position: relative;
+    }
+    .mobile-sticky-header .relative .absolute {
+        position: absolute;
+        top: -6px;
+        right: 20px;
+        background-color: #f97316;
+        color: white;
+        font-size: 10px;
+        width: 16px;
+        height: 16px;
+        border-radius: 9999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .mobile-sticky-header .relative {
+        right: 30px;
+    }
+    .sticky-mobile-nav {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        right: 0;
+        background-color: #505050;
+        z-index: 40;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        /* Push down below the header */
+    }
+    .sticky-mobile-nav a {
+        padding: 8px 0;
+        background-color: #505050;
+        color: white;
+        text-decoration: none;
+        width: 100%;
+        text-align: center;
+    }
+    .sticky-mobile-nav.open {
+        display: flex;
+    }
+    .sticky-header {
+        display: none;
+    }
+}
+
+@media (max-width: 375px) {
+    .header-top {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+    .left {
+        margin-bottom: 10px;
+    }
+    .right {
+        margin-top: -40px;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-left: 240px;
+    }
+    .left span {
+        display: none;
+        margin-bottom: 5px;
+    }
+    /* Hide the "24 Hour Service" text on mobile */
+    .left span:first-child {
+        display: none;
+    }
+    .right .fa-twitter,
+    .right .fa-facebook-f,
+    .right .fa-linkedin-in,
+    .right .fa-instagram {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 376px) and (max-width: 430px) {
+    .header-top {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+    .left {
+        margin-bottom: 10px;
+    }
+    .right {
+        margin-top: -40px;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-left: 240px;
+    }
+    .left span {
+        display: none;
+        margin-bottom: 5px;
+    }
+    /* Hide the "24 Hour Service" text on mobile */
+    .left span:first-child {
+        display: none;
+    }
+    .right .fa-twitter,
+    .right .fa-facebook-f,
+    .right .fa-linkedin-in,
+    .right .fa-instagram {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 431px) and (max-width: 540px) {
+    .header-top {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+    .left {
+        margin-bottom: 10px;
+    }
+    .right {
+        margin-top: -40px;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-left: 400px;
+    }
+    .left span {
+        display: none;
+        margin-bottom: 5px;
+    }
+    /* Hide the "24 Hour Service" text on mobile */
+    .left span:first-child {
+        display: none;
+    }
+    .right .fa-twitter,
+    .right .fa-facebook-f,
+    .right .fa-linkedin-in,
+    .right .fa-instagram {
+        font-size: 1.2rem;
+    }
+}
+
+@media (min-width: 541px) and (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        text-align: center;
+        padding: 10px;
+    }
+    .left {
+        margin-bottom: 10px;
+    }
+    .right {
+        margin-top: -40px;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        margin-left: 700px;
+    }
+    .left span {
+        display: none;
+        margin-bottom: 5px;
+    }
+    /* Hide the "24 Hour Service" text on mobile */
+    .left span:first-child {
+        display: none;
+    }
+    .right .fa-twitter,
+    .right .fa-facebook-f,
+    .right .fa-linkedin-in,
+    .right .fa-instagram {
+        font-size: 1.2rem;
+    }
+}
+
+
+/* For desktop */
+
+@media (max-width: 375px) {
+    .left {
+        display: flex;
+        flex-direction: column;
+        /* Stack items vertically */
+        align-items: center;
+        text-align: center;
+    }
+    .left span {
+        margin-bottom: 10px;
+        /* Space between the spans */
+    }
+    /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
+    .left span:first-child {
+        margin-bottom: 20px;
+        /* Add more space for the first element */
+    }
+}
+
+@media (min-width: 376px) and (max-width: 430px) {
+    .left {
+        display: flex;
+        flex-direction: column;
+        /* Stack items vertically */
+        align-items: center;
+        text-align: center;
+    }
+    .left span {
+        margin-bottom: 10px;
+        /* Space between the spans */
+    }
+    /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
+    .left span:first-child {
+        margin-bottom: 20px;
+        /* Add more space for the first element */
+    }
+}
+
+@media (min-width: 431px) and (max-width: 540px) {
+    .left {
+        display: flex;
+        flex-direction: column;
+        /* Stack items vertically */
+        align-items: center;
+        text-align: center;
+    }
+    .left span {
+        margin-bottom: 10px;
+        /* Space between the spans */
+    }
+    /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
+    .left span:first-child {
+        margin-bottom: 20px;
+        /* Add more space for the first element */
+    }
+}
+
+@media (min-width: 541px) and (max-width: 768px) {
+    .left {
+        display: flex;
+        flex-direction: column;
+        /* Stack items vertically */
+        align-items: center;
+        text-align: center;
+    }
+    .left span {
+        margin-bottom: 10px;
+        flex-direction: row;
+        /* Space between the spans */
+    }
+    /* Optionally, you can hide the "24 Hour Service" text on small screens if desired */
+    .left span:first-child {
+        margin-bottom: 20px;
+        /* Add more space for the first element */
+    }
+}
+
+@media (max-width: 375px) {
+    .search-group {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+@media (min-width: 376px) and (max-width: 430px) {
+    .search-group {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+@media (min-width: 431px) and (max-width: 540px) {
+    .search-group {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+@media (min-width: 541px) and (max-width: 768px) {
+    .search-group {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+    }
+}
