@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signupUser, verifyEmail, verifyPhone } from "../api/auth/signup";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import "./main.css";
 
 export default function SignupPage() {
@@ -14,89 +15,135 @@ export default function SignupPage() {
     confirm_password: "",
   });
 
+  const [user_id, setUserId] = useState(""); // userId for OTP
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
-  const [otpStep, setOtpStep] = useState(0); // 0 = signup, 1 = email OTP, 2 = phone OTP
-  const [otp, setOtp] = useState("");
+  const [otpStep, setOtpStep] = useState(0); // 0=signup, 1=email OTP, 2=phone OTP
+  const [otp, setEmailOtp] = useState("");
+  const [phoneOtp, setPhoneOtp] = useState("");
   const router = useRouter();
+
+  // 🔹 Popup state
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState(""); // "success" | "error"
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🔹 Popup auto-hide
+  useEffect(() => {
+    if (!popupMessage) return;
+    const timer = setTimeout(() => {
+      setPopupType(prev => prev + " hide");
+      setTimeout(() => {
+        setPopupMessage("");
+        setPopupType("");
+      }, 400);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [popupMessage]);
+
   // Step 0: Signup
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
 
+    if (formData.password !== formData.confirm_password) {
+      setPopupMessage("❌ Passwords do not match!");
+      setPopupType("error");
+      return;
+    }
+
+    setLoading(true);
     try {
-      await signupUser(formData);
-      await verifyEmail(formData.email); // send email OTP
-      setOtpStep(1); // show email OTP form
-      setMessage("OTP sent to your email!");
+      const res = await signupUser(formData);
+      const id =
+        res?.data?.user_id ||
+        res?.data?.userId ||
+        res?.user_id ||
+        res?.user_id;
+
+      if (!id) throw new Error("Signup did not return userId");
+      
+      setUserId(String(id));
+      setOtpStep(1);
+      setEmailOtp("");
+      setPopupMessage("✅ OTP sent to your email!");
+      setPopupType("success");
     } catch (err) {
-      console.error("Signup Error:", err);
-      setMessage(err.data?.message || err.message || "Signup failed!");
+      console.error(err);
+      setPopupMessage(err?.data?.message || err.message || "Signup failed!");
+      setPopupType("error");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 1: Email OTP verification
+  // Step 1: Email OTP
   const handleEmailOtpSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
 
+    if (!user_id) {
+      setPopupMessage("❌ User ID missing. Please signup again.");
+      setPopupType("error");
+      return;
+    }
+    if (!otp.trim()) {
+      setPopupMessage("❌ Please enter the Email OTP.");
+      setPopupType("error");
+      return;
+    }
+
+    setLoading(true);
     try {
-      // Here you can call your API to verify email OTP
-      // await verifyEmailOtp(formData.email, otp)
-      console.log("Email OTP entered:", otp);
-      setOtpStep(2); // move to phone OTP
-      setOtp(""); // clear previous OTP
-      setMessage("Email verified! Now enter OTP sent to your phone.");
+      await verifyEmail(Number(user_id), Number(otp.trim()));
+      setOtpStep(2);
+      setPhoneOtp("");
+      setPopupMessage("✅ Email verified! Now enter OTP sent to your phone.");
+      setPopupType("success");
     } catch (err) {
-      console.error("Email OTP verification failed:", err);
-      setMessage("Email OTP verification failed.");
+      console.error(err);
+      setPopupMessage(err?.data?.message || err.message || "Email OTP verification failed.");
+      setPopupType("error");
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Phone OTP verification
+  // Step 2: Phone OTP
   const handlePhoneOtpSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
 
+    if (!user_id) {
+      setPopupMessage("❌ User ID missing. Please signup again.");
+      setPopupType("error");
+      return;
+    }
+    if (!phoneOtp.trim()) {
+      setPopupMessage("❌ Please enter the Phone OTP.");
+      setPopupType("error");
+      return;
+    }
+
+    setLoading(true);
     try {
-      // Here you can call your API to verify phone OTP
-      // await verifyPhoneOtp(formData.phonenumber, otp)
-      console.log("Phone OTP entered:", otp);
-      setMessage("Phone verified! Signup complete.");
-      router.push("/"); // redirect after verification
+      await verifyPhone(Number(user_id), Number(phoneOtp.trim()));
+      setPopupMessage("✅ Phone verified! Signup complete.");
+      setPopupType("success");
+      router.push("/login");
     } catch (err) {
-      console.error("Phone OTP verification failed:", err);
-      setMessage("Phone OTP verification failed.");
+      console.error(err);
+      setPopupMessage(err?.data?.message || err.message || "Phone OTP verification failed.");
+      setPopupType("error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClose = () => {
-    router.push("/");
-  };
+  const handleClose = () => router.push("/");
 
   return (
     <div className="signup-page">
-      <iframe
-        src="/"
-        className="iframe-bg"
-        frameBorder="0"
-        title="Homepage Background"
-      ></iframe>
-
+      <iframe src="/" className="iframe-bg" frameBorder="0" title="Homepage Background"></iframe>
       <div className="form-overlay">
         <div className="modal">
           <button
@@ -107,102 +154,61 @@ export default function SignupPage() {
             &times;
           </button>
 
+          {/* 🔹 Popup */}
+          {popupMessage && (
+            <div className={`email-popup ${popupType} show flex items-center gap-2`}>
+              {popupType === "success" ? (
+                <AiOutlineCheckCircle className="text-green-500 text-lg" />
+              ) : (
+                <AiOutlineCloseCircle className="text-red-500 text-lg" />
+              )}
+              <span>{popupMessage.replace(/^✅ |^❌ /, "")}</span>
+            </div>
+          )}
+
           {/* Step 0: Signup Form */}
           {otpStep === 0 && (
             <>
               <h2>Sign up to your account</h2>
               <form onSubmit={handleSignupSubmit}>
-                <input
-                  name="username"
-                  type="text"
-                  placeholder="Your Name"
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Your Email"
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="phonenumber"
-                  type="tel"
-                  placeholder="Your Mobile No"
-                  onChange={handleChange}
-                  required
-                />
+                <input name="username" type="text" placeholder="Your Name" onChange={handleChange} required />
+                <input name="email" type="email" placeholder="Your Email" onChange={handleChange} required />
+                <input name="phonenumber" type="tel" placeholder="Your Mobile No" onChange={handleChange} required />
                 <select name="city" onChange={handleChange} required>
                   <option value="">Select City</option>
                   <option value="Jamnagar">Jamnagar</option>
                   <option value="Rajkot">Rajkot</option>
                   <option value="Ahmedabad">Ahmedabad</option>
                 </select>
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Your Password"
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="confirm_password"
-                  type="password"
-                  placeholder="Confirm Password"
-                  onChange={handleChange}
-                  required
-                />
-                <button type="submit" disabled={loading}>
-                  {loading ? "Signing Up..." : "Sign Up"}
-                </button>
+                <input name="password" type="password" placeholder="Your Password" onChange={handleChange} required />
+                <input name="confirm_password" type="password" placeholder="Confirm Password" onChange={handleChange} required />
+                <button type="submit" disabled={loading}>{loading ? "Signing Up..." : "Sign Up"}</button>
               </form>
             </>
           )}
 
-          {/* Step 1: Email OTP Form */}
+          {/* Step 1: Email OTP */}
           {otpStep === 1 && (
             <>
               <h2>Verify Email</h2>
               <form onSubmit={handleEmailOtpSubmit} className="otp-form">
-                <input
-                  type="text"
-                  maxLength="6"
-                  placeholder="Enter Email OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  required
-                  className="otp-input"
-                />
-                <button type="submit" className="otp-btn">
-                  Verify Email OTP
-                </button>
+                <input type="text" maxLength="6" placeholder="Enter Email OTP" value={otp} onChange={(e) => setEmailOtp(e.target.value)} required className="otp-input" disabled={loading} />
+                <button type="submit" className="otp-btn" disabled={loading}>{loading ? "Verifying..." : "Verify Email OTP"}</button>
               </form>
             </>
           )}
 
-          {/* Step 2: Phone OTP Form */}
+          {/* Step 2: Phone OTP */}
           {otpStep === 2 && (
             <>
               <h2>Verify Phone</h2>
               <form onSubmit={handlePhoneOtpSubmit} className="otp-form">
-                <input
-                  type="text"
-                  maxLength="6"
-                  placeholder="Enter Phone OTP"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  required
-                  className="otp-input"
-                />
-                <button type="submit" className="otp-btn">
-                  Verify Phone OTP
-                </button>
+                <input type="text" maxLength="6" placeholder="Enter Phone OTP" value={phoneOtp} onChange={(e) => setPhoneOtp(e.target.value)} required className="otp-input" disabled={loading} />
+                <button type="submit" className="otp-btn" disabled={loading}>{loading ? "Verifying..." : "Verify Phone OTP"}</button>
               </form>
             </>
           )}
 
-          {message && <p className="message">{message}</p>}
         </div>
       </div>
     </div>

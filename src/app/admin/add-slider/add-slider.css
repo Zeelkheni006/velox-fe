@@ -1,0 +1,88 @@
+.add-slider-container {
+    width: 1500px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+.add-slider-container h2 {
+    margin-bottom: 20px;
+    color: #888;
+    text-align: left;
+    font-size: 20px;
+}
+
+.add-slider-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.add-slider-form input[type="text"],
+.add-slider-form select,
+.add-slider-form input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-slider-form small {
+    text-align: left;
+}
+
+.add-slider-form small {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    color: #888;
+}
+
+.submit-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* Rich Text Editor styling (optional) */
+
+.jodit-container {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 17px;
+}
+
+.addbreadcrumb {
+    color: #999;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #2885ff;
+    font-size: 15px;
+}

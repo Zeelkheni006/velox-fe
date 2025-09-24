@@ -10,54 +10,12 @@ import "./main.css";
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
+import { getSliders } from "./api/add-image/add-slider"; 
 
 
 
 // Array with image + text
-const slides = [
-  {
-    img: "/images/first-image.webp",
-    title: "FRANCHISE",
-    desc: "VELOX SOLUTION FRANCHISE",
-     color: "text-white", 
-  },
-  {
-    img: "/images/image2.png",
-    title: "FRANCHISE",
-    desc: "VELOX SOLUTION FRANCHISE",
-     color: "text-white",
-  },
-  {
-    img: "/images/image-3.webp",
-    title: "WE HAVE AC SPECIALIST IN RAJKOT",
-    desc: "WE ARE PROVIDING AC SERVICES IN RAJKOT",
-     color: "text-white",
-  },
-  {
-    img: "/images/home-image.jpg",
-    title: "Safe and Hygienic Service",
-    desc: "High Quality & Hygienic Home Service.",
-     color: "text-white",
-  },
-  {
-    img: "/images/solar-cleaning.jpg",
-    title: "SOLAR PANEL CLEANING",
-    desc: "Trust Velox Professionals for solar panel cleaning",
-     color: "text-white",
-  },
-  {
-    img: "/images/surat.webp",
-    title: "SURAT BRANCH",
-    desc: "WE ARE PROVIDING AC SERVICES IN SURAT",
-     color: "text-white",
-  },
-  {
-    img: "/images/kitchen-image.jpg",
-    title: "KITCHEN CLEANING",
-    desc: "VELOX KITCHEN CLEANING",
-     color: "text-white",
-  },
-];
+
 const services = [
   { img: "/icon/ac-service.png", label: "AC Service" },
   { img: "/icon/spa.png", label: "Spa for Women" },
@@ -192,79 +150,89 @@ const reviews = [
   ];
 
 export default function Home() {
-     
- useEffect(() => {
-   setTimeout(() => {
-    window.dispatchEvent(new Event('resize'));
-   }, 100);
- }, []);
+  const [slides, setSlides] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSlides = async () => {
+    
+      try {
+  
+        setLoading(true);
+        const data = await getSliders(); // fetch from backend
+        console.log("Fetched slides:", data); // 🔥 debug
+        setSlides(Array.isArray(data) ? data : []); // ensure array
+      } catch (err) {
+        console.error("Error fetching sliders:", err);
+        setSlides([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
+
+
+  // Trigger resize for Swiper layout fix
+  useEffect(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event("resize"));
+    }, 100);
+  }, []);
   // Auto Slide
 
 
   return (
     <main>
 
-<section id="hero" className="heroSection">
-        {/* Background Slider */}
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]} 
-          navigation pagination={{ clickable: true }} 
-          autoplay={{ delay: 5000, disableOnInteraction: false }}
-           loop
-          className="absolute inset-0 w-full h-full -z-10"
-        >
-          {slides.map((slide, index) => (
-      <SwiperSlide key={index}>
+      <section id="hero" className="heroSection">
+        {loading ? (
+          <p className="loadingText">Loading sliders...</p>
+        ) : slides.length > 0 ? (
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            loop
+            className="absolute inset-0 w-full h-full -z-10"
+          >
+            {slides.map((slides, index) => (
+              <SwiperSlide key={slides.id || index}>
         <div className="heroSlide">
-          <Image
-            src={slide.img}
-            alt={slide.title}
-            fill
-            priority={index === 0}
-            className="heroImage"
-          />
-          <div className="heroOverlay"></div>
-          <div className="heroContent">
-            <h1 className="heroTitle">{slide.title}</h1>
-            <p className="heroDesc">{slide.desc}</p>
-          </div>
-        </div>
-      </SwiperSlide>
-    ))}
-        </Swiper>
-
-        {/* 🔥 Static Search Box (doesn't slide) */}
-   <div className="searchBox">
-  <form className="searchForm">
-    <div className="searchInputWrapper">
-      {/* Left Search Icon */}
-      <span className="searchIcon">
-        <FaSearch />
-      </span>
-      <input
-        type="text"
-        placeholder="Enter a location"
-        className="searchInput"
-      />
-      {/* Right Location Icon */}
-      <span className="locationIcon">
-        <FaMapMarkerAlt />
-      </span>
-
-      {/* Right Clear Icon */}
-      <span className="clearIcon">
-        <FaTimesCircle />
-      </span>
-    </div>
-
-    {/* Button below input */}
-    <button type="submit" className="searchButton">
-      Go
-    </button>
-  </form>
+  <Image
+    src={slides.image.startsWith("http") ? slides.image : `http://192.168.29.69:5000${slides.image}`}
+    alt={slides.title || "Slide"}
+    fill
+    className="heroImage"
+  />
+  <div className="heroOverlay"></div>
+  <div className="heroContent">
+    <h1 className="heroTitle">{slides.title}</h1>
+    <p className="heroDesc">{slides.description}</p>
+  </div>
 </div>
-      </section>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        ) : (
+          <p className="noSliders">No sliders available</p>
+      )}
 
+      {/* 🔥 Static Search Box */}
+      <div className="searchBox">
+        <form className="searchForm">
+          <div className="searchInputWrapper">
+            <span className="searchIcon"><FaSearch /></span>
+            <input type="text" placeholder="Enter a location" className="searchInput" />
+            <span className="locationIcon"><FaMapMarkerAlt /></span>
+            <span className="clearIcon"><FaTimesCircle /></span>
+          </div>
+          <button type="submit" className="searchButton">Go</button>
+        </form>
+      </div>
+    </section>
 
        <section className="services-section">
   <div className="services-grid">

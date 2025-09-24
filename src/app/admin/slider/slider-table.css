@@ -1,0 +1,181 @@
+.slider-table-container {
+    display: flex;
+    flex-direction: column;
+    height: 0vh;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 900px;
+}
+
+.topCard {
+    background: #ffffff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 0 6px rgba(187, 169, 169, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.breadcrumb {
+    color: #888;
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.breadcrumbActive {
+    color: #2563eb;
+    font-weight: 400;
+}
+
+.addBtn {
+    padding: 6px 12px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background: #2563eb;
+}
+
+.tableCard {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.05);
+}
+
+.tableTitle {
+    font-size: 16px;
+    margin-bottom: 16px;
+    text-align: left;
+    color: #888;
+}
+
+.select,
+.searchInput {
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.tableControls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+th,
+td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 14PX;
+    color: #888;
+}
+
+th {
+    background: #f1f5f9;
+    font-weight: 600;
+}
+
+.slider-img {
+    width: 120px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.status {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.status.active {
+    background: #cffafe;
+    color: #0c4a6e;
+}
+
+.status.inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+button {
+    margin-right: 5px;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #f59e0b;
+    color: white;
+    font-size: 15px;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+    font-size: 15px;
+}
+
+.toggle-btn {
+    background: #f87171;
+    color: white;
+    font-size: 15px;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}

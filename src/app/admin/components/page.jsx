@@ -214,7 +214,13 @@ Best Services
 
       <div className={styles.sectionTitle}>MANAGE CONTENT</div>
       <div className={styles.menuItem}><FaNewspaper /><span>News Letter</span></div>
-      <div className={styles.menuItem}><FaImage /><span>Slider</span></div>
+      <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/slider'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaImage /><span>Slider</span></div>
       <div className={styles.menuItem}><FaExchangeAlt /><span>Referral Program</span></div>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('quotes')}>

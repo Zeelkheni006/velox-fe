@@ -139,10 +139,18 @@
 .admin-login-form .forgot-link a {
     color: #1d4ed8;
     text-decoration: none;
+    margin-top: -20px;
 }
 
 .admin-login-form .forgot-link a:hover {
     text-decoration: underline;
+}
+
+.login-password a {
+    color: #1d4ed8;
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: left;
 }
 
 .admin-login-form button {
@@ -178,7 +186,7 @@
     }
 }
 
-@media(max-width:375px) {
+@media(max-width:1000px) {
     .admin-login-logo {
         display: none;
         /* Hide logo on small screens */
@@ -190,4 +198,37 @@
     .admin-login-card {
         width: 350px;
     }
+}
+
+.email-popup {
+    position: fixed;
+    top: 20px;
+    right: -300px;
+    /* start off-screen */
+    padding: 30px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    z-index: 1000;
+    transition: right 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+
+.email-popup.success {
+    background-color: #e6ffed;
+    color: #2a7a2e;
+    right: 20px;
+    opacity: 1;
+}
+
+.email-popup.error {
+    background-color: #ffe6e6;
+    color: #a12727;
+    right: 20px;
+    opacity: 1;
+}
+
+.email-popup.hide {
+    opacity: 0;
+    transform: translateY(-10px);
 }
