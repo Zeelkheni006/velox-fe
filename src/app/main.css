@@ -4346,7 +4346,7 @@
         .heroSlide {
             position: relative;
             width: 100%;
-            height: 450px;
+            height: 500px;
         }
         .heroImage {
             object-fit: cover;
@@ -4466,5 +4466,37 @@
         }
         .searchButton:hover {
             background: #ea580c;
+        }
+    }
+    
+    .spinnerWrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.7);
+        /* semi-transparent background */
+        z-index: 10;
+        /* spinner piche na slider upar dekhaadva */
+    }
+    
+    .spinner {
+        width: 3rem;
+        height: 3rem;
+        border: 3px solid #d1d5db;
+        /* gray-300 */
+        border-top-color: #3b82f6;
+        /* blue-500 */
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
         }
     }

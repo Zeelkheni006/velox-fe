@@ -430,11 +430,11 @@
 /* manage media css */
 
 .mediacontainer {
-    padding: 30px;
+    padding: 20px;
     background-color: #f4f7fa;
-    min-height: 100vh;
     font-family: 'Segoe UI', sans-serif;
-    width: 1900px;
+    width: 2000px;
+    overflow-x: hidden;
 }
 
 .mediacontainer h3 {

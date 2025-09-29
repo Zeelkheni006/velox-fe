@@ -1,0 +1,246 @@
+.container {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 200%;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #777;
+    text-align: left;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.table th,
+.table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #333;
+}
+
+.table th {
+    background-color: #f1f3f6;
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.spinnerWrapper {
+    text-align: center;
+    font-size: 16px;
+    color: #3f51b5;
+    padding: 30px 0;
+}
+
+.filters {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+
+/* First row (all dropdowns & date inputs in one line) */
+
+.filtersTop {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.filtersTop input,
+.filtersTop select {
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+
+/* Second row (buttons left, show entries + search right) */
+
+.filtersBottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.leftButtons button {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #1e3a8a;
+    color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.leftButtons button:hover {
+    background-color: #303f9f;
+}
+
+.rightControls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.showEntries select {
+    padding: 5px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.search {
+    min-width: 200px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.showEntries {
+    margin-left: 200px;
+}
+
+.leftControls {
+    display: flex;
+    flex-direction: column;
+    /* stack vertically */
+    gap: 10px;
+    /* space between buttons and show entries */
+}
+
+.leftButtons {
+    display: flex;
+    gap: 8px;
+}
+
+.showEntriesBelow {
+    font-size: 14px;
+}
+
+.rightControls label {
+    font-size: 16px;
+    color: #888;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.action {
+    position: relative;
+    cursor: pointer;
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.dropdownTrigger {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dropdownMenu {
+    position: absolute;
+    right: 0;
+    top: 25px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    border-radius: 6px;
+    width: 160px;
+}
+
+.dropdownMenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.dropdownMenu li {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.dropdownMenu li:hover {
+    background-color: #f2f2f2;
+}

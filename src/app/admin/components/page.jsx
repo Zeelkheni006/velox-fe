@@ -23,7 +23,11 @@ const Sidebar = ({ isOpen, onClose }) => {
       [menu]: !prev[menu],
     }));
   };
+const [collapsed, setCollapsed] = useState(false);
 
+const toggleSidebar = () => {
+  setCollapsed(!collapsed);
+};
 
   return (
     <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
@@ -33,6 +37,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         <span className={styles.logoText}></span>
            <span className={styles['close-btn']} onClick={onClose}>×</span>
       </div>
+  
 
       <div
   className={styles.menuItem}
@@ -160,7 +165,14 @@ const Sidebar = ({ isOpen, onClose }) => {
 Best Services
     </div></div>}
 
-      <div className={styles.menuItem}><FaList /><span>Package</span></div>
+          <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/package'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+>
+  <FaList /><span>Package</span></div>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('orders')}>
         <FaTags /><span>Orders</span>{openMenus.orders ? (
@@ -169,7 +181,12 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.orders && <div className={styles.subMenu}>Orders<br />Unallocated Order</div>}
+      {openMenus.orders && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/orders'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Orders
+    </div><br />Unallocated Order</div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('offers')}>
         <FaGift /><span>Offers</span>{openMenus.offers ? (

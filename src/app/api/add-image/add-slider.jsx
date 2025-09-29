@@ -34,5 +34,18 @@ export async function getSliders() {
   }
 }
 
+// https://places.googleapis.com/v1/places/ChIJs5ydyTiuEmsR0fRSlU0C7k0?fields=id,displayName&key=API_KEY
+// https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJ05IRjKHxEQ0RJLV_5NLdK2w&fields=place_id&key=API_KEY
+// https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
+
+//search location api
+// utils/geocode.js
+// utils/places.js
+// pages/api/places.js
+// add category api
+
+
+
+
 
 

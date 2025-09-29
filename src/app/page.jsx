@@ -14,6 +14,7 @@ import { getSliders } from "./api/add-image/add-slider";
 
 
 
+
 // Array with image + text
 
 const services = [
@@ -153,25 +154,32 @@ export default function Home() {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchSlides = async () => {
-    
-      try {
-  
-        setLoading(true);
-        const data = await getSliders(); // fetch from backend
-        console.log("Fetched slides:", data); // 🔥 debug
-        setSlides(Array.isArray(data) ? data : []); // ensure array
-      } catch (err) {
-        console.error("Error fetching sliders:", err);
+useEffect(() => {
+  const fetchSlides = async () => {
+    try {
+      setLoading(true);
+      const data = await getSliders();
+      console.log("Fetched slides:", data); // 👀 Debug
+      // 🔑 Adjust mapping according to response
+      if (Array.isArray(data)) {
+        setSlides(data);
+      } else if (Array.isArray(data.slides)) {
+        setSlides(data.slides);
+      } else if (Array.isArray(data.data)) {
+        setSlides(data.data);
+      } else {
         setSlides([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (err) {
+      console.error("Error fetching slides:", err);
+      setSlides([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchSlides();
-  }, []);
+  fetchSlides();
+}, []);
 
 
   // Trigger resize for Swiper layout fix
@@ -188,7 +196,9 @@ export default function Home() {
 
       <section id="hero" className="heroSection">
         {loading ? (
-          <p className="loadingText">Loading sliders...</p>
+         <div className="spinnerWrapper">
+          <div className="spinner"></div>
+        </div>
         ) : slides.length > 0 ? (
           <Swiper
             modules={[Navigation, Pagination, Autoplay]}
@@ -198,23 +208,25 @@ export default function Home() {
             loop
             className="absolute inset-0 w-full h-full -z-10"
           >
-            {slides.map((slides, index) => (
-              <SwiperSlide key={slides.id || index}>
-        <div className="heroSlide">
-  <Image
-    src={slides.image.startsWith("http") ? slides.image : `http://192.168.29.69:5000${slides.image}`}
-    alt={slides.title || "Slide"}
-    fill
-    className="heroImage"
-  />
-  <div className="heroOverlay"></div>
-  <div className="heroContent">
-    <h1 className="heroTitle">{slides.title}</h1>
-    <p className="heroDesc">{slides.description}</p>
-  </div>
-</div>
-              </SwiperSlide>
-            ))}
+{slides.map((slide, index) => (
+  <SwiperSlide key={slide.id || index}>
+    <div className="heroSlide">
+       <img
+          src={slide.image ? `http://192.168.29.69:5000${slide.image}` : "https://via.placeholder.com/800x500"}
+          alt={slide.title || "Slide"}
+          className="heroSlide max-w-full max-h-full object-contain"
+        />
+      <div className="heroOverlay"></div>
+      <div className="heroContent">
+        <h1 className="heroTitle">{slide.title}</h1>
+       <div
+  className="heroDesc"
+  dangerouslySetInnerHTML={{ __html: slide.description || "" }}
+/>
+      </div>
+    </div>
+  </SwiperSlide>
+))}
           </Swiper>
         ) : (
           <p className="noSliders">No sliders available</p>

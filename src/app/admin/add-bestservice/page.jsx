@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import styles from '../styles/SubCategories.module.css';
+import styles from "../styles/bestservice.module.css";
 import Layout from '../pages/page'; // adjust path if needed
 
 export default function AddSubCategory() {

@@ -1,57 +1,25 @@
 'use client';
-
-import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import styles from '../styles/SubCategories.module.css';
-import Layout from '../pages/page';
-// import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
+import styles from "../styles/bestservice.module.css";
+import Layout from '../pages/page'; 
 
-
-  
-// const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-export default function EditCategory() {
+export default function AddSubCategory() {
   const searchParams = useSearchParams();
-  const titleFromURL = searchParams.get('title');
- 
-  const categoryFromURL = searchParams.get('category');
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-
-
-
-  
-
-  // Mock loading from URL parameter
-  useEffect(() => {
-  if (titleFromURL) {
-    setTitle(titleFromURL);
-    setDescription(`${titleFromURL} By Velox`);
+  // Prefill best service if coming from edit
+const bestServiceFromURL = searchParams.get('best-service') || '';
+const [formData, setFormData] = useState({
+  bestservice: '', // important: start as empty string
+  logo: null,
+});
+useEffect(() => {
+  if (bestServiceFromURL) {
+    setFormData(prev => ({ ...prev, bestservice: bestServiceFromURL }));
   }
+}, [bestServiceFromURL]);
 
-
-   if (categoryFromURL) {
-    setFormData(prev => ({ ...prev, category: categoryFromURL }));
-  }
-}, [titleFromURL,  categoryFromURL]);
-const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setLogoFile(file);
-      setLogoPreview(URL.createObjectURL(file));
-    }
-  };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Category Updated!');
-    // You would send this data to your backend API here
-  };
- const [formData, setFormData] = useState({
-    title: '',
-    category: '',
-    logo: null,
-  });
-    const handleChange = (e) => {
+  const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === 'logo') {
       setFormData({ ...formData, logo: files[0] });
@@ -59,38 +27,46 @@ const handleLogoChange = (e) => {
       setFormData({ ...formData, [name]: value });
     }
   };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form submitted:', formData);
+    alert('Best service submitted!');
+  };
+
   return (
     <Layout>
-      <div className={styles.editcontainer}>
-        <div className={styles.editheader}>
-          <span className={styles.editbreadcrumb}>Sub Category</span> &gt;{" "}
-            <span className={styles.editbreadcrumb}>Sub Category</span> &gt;{" "}
-          <span className={styles.editbreadcrumbActive}>Edit Sub Category</span>
+      <div className={styles.wrapper}>
+        <div className={styles.addheaderContainer}>
+          <span className={styles.addbreadcrumb}>Best Services</span> &gt;{' '}
+          <span className={styles.addbreadcrumb}>Best Services</span> &gt;{' '}
+          <span className={styles.addbreadcrumbActive}>Edit Services</span>
         </div>
 
-        <div className={styles.editcard}>
-          <h2>Edit Best Services</h2>
-          <form onSubmit={handleSubmit}>
-          
-   <label className={styles.editlabel}>Services</label>
+        <div className={styles.addcard}>
+          <h3>Edit Best Services</h3>
+          <form className={styles.addform} onSubmit={handleSubmit}>
+            <label>Services</label>
             <select
-              name="category"
-              value={formData.category}
+              name="bestservice"   // must match state field
+              value={formData.bestservice} // must match state field
               onChange={handleChange}
-              className={styles.editinput}
+              className={styles.addinput}
               required
             >
-              <option value="">Select Category</option>
-              <option value="NAIL Studio">Bathroom Deep Cleaning</option>
-              <option value="AC service">Water tank Cleaning</option>
-               <option value="Spa For Women">Fridge Cleaning</option>
-                <option value="Sofa cleaning">Oven Cleaning</option>
-              <option value="Women Beauty Care">6 Panel cleaning</option>
-              <option value="R O Water Purifier">9 Panel cleaning</option>
-              <option value="Cleaning & Disinfection">12 Panel cleaning</option>
+              <option value="">Select Best Service</option>
+              <option value="Velox AC Care+ Plan">Velox AC Care+ Plan</option>
+              <option value="Velox FreshGuard Home Plan">Velox FreshGuard Home Plan</option>
+              <option value="Velox CoolCare AMC Plan">Velox CoolCare AMC Plan</option>
+              <option value="Oven Cleaning">Velox CoolCare AMC Plan</option>
+              <option value="6 Panel cleaning">Velox FreshGuard Home Plan</option>
+              <option value="9 Panel cleaning">9 Panel cleaning</option>
+              <option value="12 Panel cleaning">12 Panel cleaning</option>
             </select>
 
-            <button type="submit" className={styles.editupdateBtn}>UPDATE</button>
+            <button type="submit" className={styles.submitBtn}>
+              SUBMIT
+            </button>
           </form>
         </div>
       </div>

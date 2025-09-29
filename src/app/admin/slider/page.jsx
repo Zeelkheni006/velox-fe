@@ -11,26 +11,38 @@ export default function SliderTable() {
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
-  const fetchSliders = async () => {
-    try {
-      const data = await getSliders();
-      setSliders(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching sliders:", err);
+const fetchSliders = async () => {
+  try {
+    const res = await getSliders();
+    console.log("Fetched sliders:", res);
+
+    // Adjust according to response
+    if (Array.isArray(res)) {
+      setSliders(res);
+    } else if (Array.isArray(res.data)) {
+      setSliders(res.data); // 🔑 proper array
+    } else {
       setSliders([]);
-    } finally {
-      setLoading(false); // ✅ important
     }
-  };
+  } catch (err) {
+    console.error("Error fetching sliders:", err);
+    setSliders([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   fetchSliders();
 }, []);
+
+
 
   
 const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
+  const stripHTML = (html) => html.replace(/<[^>]+>/g, "");
 
   const handleEdit = (id) => alert(`Edit slider with ID: ${id}`);
   const handleDelete = (id) => alert(`Delete slider with ID: ${id}`);
@@ -49,10 +61,10 @@ const router = useRouter();
   };
 
   // Filter sliders based on search
-  const filteredSliders = sliders.filter(slider =>
-    slider.title.toLowerCase().includes(searchText.toLowerCase()) ||
-    slider.description.toLowerCase().includes(searchText.toLowerCase())
-  );
+ const filteredSliders = sliders.filter(slide =>
+  slide.title.toLowerCase().includes(searchText.toLowerCase()) ||
+  stripHTML(slide.description).toLowerCase().includes(searchText.toLowerCase())
+);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredSliders.length / entriesPerPage);
@@ -70,13 +82,14 @@ const router = useRouter();
           <div>
             <span className="breadcrumb">Slider</span> &gt; <span className="breadcrumbActive">Slider</span>
           </div>
-         <button className="addBtn" onClick={() => router.push("/admin/add-slider")}>
-  + Add New
-</button>
+         
         </div>
 
         <div className="tableCard">
           <h3 className="tableTitle">Manage Sliders</h3>
+          <button className="addBtn" onClick={() => router.push("/admin/add-slider")}>
+  + Add New
+</button>
           <div className="tableControls">
             <div>
               Show{" "}
@@ -88,10 +101,10 @@ const router = useRouter();
               entries
             </div>
             <div>
-              <label>Search: </label>
+              <label className="searchLabel">Search:{" "} </label>
               <input
                 type="text"
-                className="searchInput"
+                className="search"
                 placeholder="Search by title or description"
                 value={searchText}
                 onChange={handleSearchChange}
@@ -109,33 +122,51 @@ const router = useRouter();
                 <th>Action</th>
               </tr>
             </thead>
-      <tbody>
+     <tbody>
   {loading ? (
-    <tr>
-      <td colSpan={5} style={{ textAlign: "center" }}>Loading sliders...</td>
+     <tr>
+      <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+        <div className="spinner"></div>
+      </td>
     </tr>
+   
   ) : currentSliders.length === 0 ? (
     <tr>
       <td colSpan={5} style={{ textAlign: "center" }}>No entries found</td>
     </tr>
   ) : (
-    currentSliders.map(slider => (
-      <tr key={slider.id}>
-        <td>{slider.title}</td>
-        <td><img src={slider.image || slider.mobile_image} alt={slider.title} className="slider-img" /></td>
-        <td>{slider.description}</td>
-        <td><span className={`status ${slider.status?.toLowerCase() || "active"}`}>{(slider.status || "Active").toUpperCase()}</span></td>
-        <td>
-          <button className="edit-btn" onClick={() => handleEdit(slider.id)}>Edit</button>
-          <button className="delete-btn" onClick={() => handleDelete(slider.id)}>Delete</button>
-          <button className="toggle-btn" onClick={() => handleToggleStatus(slider.id)}>
-            {slider.status === "Active" ? "InActive" : "Active"}
-          </button>
-        </td>
+    currentSliders.map(slide => (
+      <tr key={slide.id}>
+<td>{slide.title}</td>
+<td>
+  <img 
+    src={slide.image ? `http://192.168.29.69:5000${slide.image}` : "/placeholder.jpg"} 
+    alt={slide.title} 
+    className="slider-img" 
+    style={{ width: "170px", height: "50px", objectFit: "cover" }}
+  />
+</td>
+<td>{stripHTML(slide.description)}</td>
+<td>
+ <span className={`status ${
+  typeof slide.status === "string" ? slide.status.toLowerCase() : "active"
+}`}>
+  {typeof slide.status === "string" ? slide.status.toUpperCase() : "ACTIVE"}
+</span>
+</td>
+<td>
+  <button className="edit-btn" onClick={() => handleEdit(slide.id)}>Edit</button>
+  <button className="delete-btn" onClick={() => handleDelete(slide.id)}>Delete</button>
+  <button className="toggle-btn" onClick={() => handleToggleStatus(slide.id)}>
+    {slide.status === "Active" ? "InActive" : "Active"}
+  </button>
+</td>
+
       </tr>
     ))
   )}
 </tbody>
+
           </table>
 
           <div className="pagination">
