@@ -1,8 +1,12 @@
 .container {
-    padding: 24px;
-    font-family: Arial, sans-serif;
-    color: #999;
-    width: 1600px;
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .breadcrumb {

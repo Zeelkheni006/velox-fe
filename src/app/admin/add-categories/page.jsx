@@ -4,14 +4,17 @@ import styles from '../styles/Categories.module.css';
 import Layout from "../pages/page";
 import dynamic from 'next/dynamic';
 import { createCategory } from "../../api/admin-category/category"; 
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
 
- const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
+const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function AddCategory() {
   const [formData, setFormData] = useState({ title: '', logo: null });
   const [description, setDescription] = useState('');
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(""); 
+  const [popupType, setPopupType] = useState(""); 
   const editor = useRef(null);
 
   const handleChange = (e) => {
@@ -23,28 +26,52 @@ export default function AddCategory() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const result = await createCategory({
-        title: formData.title,
-        logo: formData.logo,
-        description
-      });
-      alert("Category created successfully!");
-      console.log("Category:", result);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const result = await createCategory({
+      title: formData.title,
+      logo: formData.logo,
+      description
+    });
+
+    if(result.success){
+      setPopupMessage("✅ Category created successfully!");
+      setPopupType("success");
+
       // Reset form
       setFormData({ title: '', logo: null });
       setDescription('');
-    } catch (err) {
-      alert("Failed to create category.");
-    } finally {
-      setLoading(false);
+    } else {
+      setPopupMessage(`❌ ${result.message}`);
+      setPopupType("error");
     }
-  };
+
+  } catch (err) {
+    setPopupMessage("❌ Something went wrong while creating category.");
+    setPopupType("error");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   useEffect(() => setMounted(true), []);
+
+  // Popup auto-hide
+useEffect(() => {
+  if (!popupMessage) return;
+  const timer = setTimeout(() => {
+    setPopupType(prev => prev + " hide"); 
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 400);
+  }, 4000);
+  return () => clearTimeout(timer);
+}, [popupMessage]);
 
   return (
     <Layout>
@@ -56,6 +83,17 @@ export default function AddCategory() {
 
         <div className={styles.addcard}>
           <h2 className={styles.addheading}>Add Category</h2>
+
+          {/* Popup */}
+{popupMessage && (
+  <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+    {popupType.startsWith("success") ? 
+      <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+      <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+    <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+  </div>
+)}
+
 
           <form className={styles.addform} onSubmit={handleSubmit}>
             <label className={styles.addlabel}>Title</label>

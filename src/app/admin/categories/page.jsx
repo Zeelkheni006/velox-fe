@@ -3,8 +3,8 @@ import styles from '../styles/Categories.module.css';
 import Layout from "../pages/page";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchCategories } from "../../api/admin-category/category"; // API
-
+import { fetchCategories, updateCategoryStatus } from "../../api/admin-category/category";
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
 function SortArrow({ direction }) {
   return (
     <span style={{ marginLeft: '5px', fontSize: '12px' }}>
@@ -22,6 +22,8 @@ export default function Categories() {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState('');
+   const [popupMessage, setPopupMessage] = useState(""); 
+  const [popupType, setPopupType] = useState(""); 
 
   const [sortConfig, setSortConfig] = useState({
     key: searchParams.get('sortBy') || null,
@@ -29,26 +31,26 @@ export default function Categories() {
   });
 
   // Load categories from API
-  const loadCategories = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchCategories();
-      // Ensure each category has title, logo, description, and status
-      const normalized = data.map(cat => ({
-        title: cat.title || '',
-        logo: cat.logo || '',
-        description: cat.description || '',
-        status: cat.status === true || cat.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
-      }));
-      setCategories(normalized);
-    } catch (err) {
-      console.error(err);
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const loadCategories = async () => {
+  setLoading(true);
+  try {
+    const data = await fetchCategories();
+    // Ensure each category has id, title, logo, description, and status
+    const normalized = data.map(cat => ({
+      id: cat.id, // <-- important
+      title: cat.title || '',
+      logo: cat.logo || '',
+      description: cat.description || '',
+      status: cat.status === true || cat.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+    }));
+    setCategories(normalized);
+  } catch (err) {
+    console.error(err);
+    setCategories([]);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     loadCategories();
   }, []);
@@ -86,18 +88,32 @@ export default function Categories() {
   const currentCategories = sortedCategories.slice(startIndex, endIndex);
 
   // Toggle status
-  const toggleStatus = (index) => {
-    const cat = currentCategories[index];
-    const globalIndex = categories.findIndex(c => c.title === cat.title);
+const toggleStatus = async (index) => {
+  const cat = currentCategories[index];
+  const globalIndex = categories.findIndex(c => c.id === cat.id); // compare by id
+  const newStatus = cat.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+try {
+  const res = await updateCategoryStatus(cat.id, newStatus); // id will be valid
+  if (res.success) {
     setCategories(prev => {
       const newCats = [...prev];
-      newCats[globalIndex] = {
-        ...newCats[globalIndex],
-        status: newCats[globalIndex].status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'
-      };
+      newCats[globalIndex] = { ...newCats[globalIndex], status: newStatus };
       return newCats;
     });
-  };
+    setPopupMessage("✅ Status updated successfully!", "success"); // ✅ popup
+    setPopupType("success");
+  } else {
+    setPopupMessage(res.message || "❌ Failed to update status", "error"); // ❌ popup
+   setPopupType("error");
+  }
+
+} catch (err) {
+  console.error("Error updating status:", err);
+  setPopupMessage("❌ Something went wrong while updating status", "error"); // ❌ popup
+ setPopupType("error");
+}
+};
 
   const handleAddCategory = () => router.push('/admin/add-categories');
   const handleDelete = (index) => {
@@ -122,6 +138,17 @@ export default function Categories() {
     setSortConfig({ key, direction });
   };
 
+  useEffect(() => {
+    if (!popupMessage) return;
+    const timer = setTimeout(() => {
+      setPopupType(prev => prev + " hide"); 
+      setTimeout(() => {
+        setPopupMessage("");
+        setPopupType("");
+      }, 400);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [popupMessage]);
   return (
     <Layout>
       <div className={styles.container}>
@@ -132,6 +159,14 @@ export default function Categories() {
 
         <div className={styles.card}>
           <h3>Categories</h3>
+          {popupMessage && (
+            <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+              {popupType.startsWith("success") ? 
+                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+            </div>
+          )}
           <button className={styles.addBtn} onClick={handleAddCategory}>+ Add New</button>
 
           <div className={styles.showEntries}>
@@ -159,11 +194,7 @@ export default function Categories() {
           {loading ? (
             <table className={styles.table}>
     <tbody>
-      <tr>
-        <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
-          <div className={styles.spinner}></div>
-        </td>
-      </tr>
+     
     </tbody>
   </table>
           ) : (
@@ -183,9 +214,12 @@ export default function Categories() {
               </thead>
               <tbody>
                 {currentCategories.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} style={{ textAlign: 'center' }}>No entries found</td>
-                  </tr>
+                   <tr>
+        <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+          <div className={styles.spinner}></div>
+        </td>
+      </tr>
+                  
                 ) : (
                   currentCategories.map((cat, i) => (
                     <tr key={i}>
@@ -206,12 +240,16 @@ export default function Categories() {
                         </span>
                       </td>
                       <td>
-                        <button
-                          className={styles.editBtn}
-                          onClick={() => router.push(`/admin/edit-category?title=${encodeURIComponent(cat.title)}&logo=${encodeURIComponent(cat.logo)}`)}
-                        >
-                          Edit
-                        </button>
+                       <button
+  className={styles.editBtn}
+  onClick={() =>
+    router.push(
+      `/admin/edit-category?id=${cat.id}&title=${encodeURIComponent(cat.title)}&logo=${encodeURIComponent(cat.logo)}&description=${encodeURIComponent(cat.description)}`
+    )
+  }
+>
+  Edit
+</button>
                         <button className={styles.deleteBtn} onClick={() => handleDelete(i)}>Delete</button>
                         <button
                           className={cat.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}

@@ -10,7 +10,7 @@ import "./main.css";
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
-import { getSliders } from "./api/add-image/add-slider"; 
+import { getSliders , getFullLocation} from "./api/add-image/add-slider"; 
 
 
 
@@ -153,6 +153,18 @@ const reviews = [
 export default function Home() {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
+    const [query, setQuery] = useState("");
+  const [fullLocation, setFullLocation] = useState("");
+ 
+ const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+
+    setLoading(true);
+    const location = await getFullLocation(query);
+    setFullLocation(location);
+    setLoading(false);
+  };
 
 useEffect(() => {
   const fetchSlides = async () => {
@@ -233,16 +245,38 @@ useEffect(() => {
       )}
 
       {/* 🔥 Static Search Box */}
-      <div className="searchBox">
-        <form className="searchForm">
+       <div className="searchBox">
+        <form className="searchForm" onSubmit={handleSearch}>
           <div className="searchInputWrapper">
             <span className="searchIcon"><FaSearch /></span>
-            <input type="text" placeholder="Enter a location" className="searchInput" />
+            <input
+              type="text"
+              placeholder="Enter a location"
+              className="searchInput"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
             <span className="locationIcon"><FaMapMarkerAlt /></span>
-            <span className="clearIcon"><FaTimesCircle /></span>
+            {query && (
+              <span
+                className="clearIcon"
+                onClick={() => {
+                  setQuery("");
+                  setFullLocation("");
+                }}
+              >
+                <FaTimesCircle />
+              </span>
+            )}
           </div>
-          <button type="submit" className="searchButton">Go</button>
+          <button type="submit" className="searchButton">
+            {loading ? "Loading..." : "Go"}
+          </button>
         </form>
+
+        {fullLocation && (
+          <p className="searchResult">📍 {fullLocation}</p>
+        )}
       </div>
     </section>
 

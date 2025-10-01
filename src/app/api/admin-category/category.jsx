@@ -1,5 +1,4 @@
    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 export async function createCategory({ title, logo, description }) {
   try {
     const data = new FormData();
@@ -14,16 +13,19 @@ export async function createCategory({ title, logo, description }) {
 
     const result = await res.json();
 
-    if (!res.ok) {
-      throw new Error(result.message || "Failed to create category");
-    }
+    // Always return result object
+    return {
+      success: result.success || false,
+      message: result.message || "Failed to create category",
+      data: result.data || null
+    };
 
-    return result;
   } catch (err) {
     console.error("API Error:", err);
-    throw err;
+    return { success: false, message: err.message || "Failed to create category" };
   }
 }
+
 // get category
 export const fetchCategories = async () => {
   try {
@@ -60,4 +62,36 @@ export async function getSubCategories(page = 1, per_page = 10) {
     return { success: false, data: [], page: 1, per_page: 10, total_items: 0, total_page: 1, message: err.message };
   }
 }
+// update category
+export async function updateCategory(id, formData) {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/update/${id}`, {
+      method: 'PATCH',
+      body: formData,
+    });
+    return await res.json();
+  } catch (err) {
+    console.error("❌ updateCategory error:", err);
+    return { success: false, message: "Network error" };
+  }
+}
 
+export const updateCategoryStatus = async (id, status) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/category/update/status/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || 'Failed to update category status');
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("API Error:", err);
+    return { success: false, message: err.message || "API call failed" };
+  }
+};

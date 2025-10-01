@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import styles from '../styles/SubCategories.module.css';
 import Layout from '../pages/page';
 import { updateSubCategory } from '../../api/admin-category/sub-category';
+import { getCategories } from '../../api/admin-category/sub-category';
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
 
 export default function EditCategory() {
   const searchParams = useSearchParams();
@@ -14,19 +16,35 @@ export default function EditCategory() {
   const titleFromURL = searchParams.get('title');
   const logoFromURL = searchParams.get('logo');
   const categoryFromURL = searchParams.get('category');
+  
 
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoUrl, setLogoUrl] = useState('/icon/default.svg');
+    const [popupMessage, setPopupMessage] = useState("");
+  const [popupType, setPopupType] = useState(""); 
+  const [mounted, setMounted] = useState(false);
 
   // Load initial data from URL
   useEffect(() => {
     if (titleFromURL) setTitle(decodeURIComponent(titleFromURL));
     if (logoFromURL) setLogoUrl(logoFromURL.startsWith('http') ? logoFromURL : decodeURIComponent(logoFromURL));
-    if (categoryFromURL) setCategoryId(categoryFromURL);
+     if (categoryFromURL) setCategoryId(categoryFromURL);
   }, [titleFromURL, logoFromURL, categoryFromURL]);
+
+
+const [categories, setCategories] = useState([]);
+
+useEffect(() => {
+  const fetchCategories = async () => {
+    const res = await getCategories();
+    if (res.success) setCategories(res.data || []);
+  };
+
+  fetchCategories();
+}, []);
 
   // Handle logo file change
   const handleLogoChange = (e) => {
@@ -54,24 +72,43 @@ export default function EditCategory() {
 
   const data = new FormData();
   data.append('title', title);
-  data.append('category_id', Number(categoryId));
+data.append('category_id', categoryId);
   if (logoFile) data.append('logo', logoFile);
 
   try {
     const res = await updateSubCategory(Number(idFromURL), data); // 👈 ensure ID is number
     console.log('API response:', res); // debug
     if (res.success) {
-      alert('Sub Category updated successfully!');
+      setPopupMessage('Sub Category updated successfully!');
+      setPopupType("success")
       router.push('/admin/sub-categories'); // go back to list
     } else {
-      alert(res.message || 'Update failed!');
+      setPopupMessage(res.message || 'Update failed!');
+      setPopupType("error")
     }
   } catch (err) {
     console.error(err);
-    alert('Something went wrong!');
+    setPopupMessage('Something went wrong!');
+    setPopupType("error")
   }
 };
+ useEffect(() => {
+    setMounted(true);
+  }, []);
 
+  useEffect(() => {
+  if (!popupMessage) return;
+
+  const timer = setTimeout(() => {
+    setPopupType(prev => prev + " hide");
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 400);
+  }, 4000);
+
+  return () => clearTimeout(timer);
+}, [popupMessage]);
 
   return (
     <Layout>
@@ -83,6 +120,14 @@ export default function EditCategory() {
 
         <div className={styles.editcard}>
           <h2>Edit Sub Category</h2>
+            {popupMessage && (
+                      <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+                        {popupType.startsWith("success") ? 
+                          <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                          <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+                        <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+                      </div>
+                    )}
           <form onSubmit={handleSubmit}>
             <label className={styles.editlabel}>TITLE</label>
             <input
@@ -93,23 +138,21 @@ export default function EditCategory() {
               required
             />
 
-            <label className={styles.editlabel}>CATEGORY</label>
-            <select
-              name="category_id"
-              value={categoryId}
-              onChange={handleCategoryChange}
-              className={styles.editinput}
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="20">NAIL Studio</option>
-              <option value="20">AC Service</option>
-              <option value="20">Spa For Women</option>
-              <option value="20">Sofa Cleaning</option>
-              <option value="20">Women Beauty Care</option>
-              <option value="20">R O Water Purifier</option>
-              <option value="20">Cleaning & Disinfection</option>
-            </select>
+<label className={styles.editlabel}>CATEGORY</label>
+<select
+  name="category_id"
+  value={categoryId}            // ✅ use categoryId state
+  onChange={(e) => setCategoryId(e.target.value)} // ✅ update categoryId state
+  className={styles.editinput}
+  required
+>
+  <option value="">Select Category</option>
+  {categories.map((cat) => (
+    <option key={cat.id} value={cat.id}>
+      {cat.title}
+    </option>
+  ))}
+</select>
 
             <label className={styles.editlabel}>LOGO (SVG only)</label>
             <input

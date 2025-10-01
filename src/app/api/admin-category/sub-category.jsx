@@ -59,3 +59,43 @@ export async function updateSubCategory(id, formData) {
     return { success: false, message: err.message };
   }
 }
+
+// category list title
+
+export async function getCategories() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/category/list/title`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Failed to fetch categories');
+
+    return data; // { success: true, data: [...] }
+  } catch (err) {
+    console.error('API Error:', err);
+    return { success: false, data: [], message: err.message };
+  }
+}
+
+// update status of a subcategory
+export async function updateSubCategoryStatus(id, status) {
+  if (!id) throw new Error("Subcategory ID is required");
+
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/sub-category/update/status/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error in updateSubCategoryStatus:", err);
+    throw err;
+  }
+}

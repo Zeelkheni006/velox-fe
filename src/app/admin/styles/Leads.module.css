@@ -3,14 +3,12 @@
 .pageWrapper {
     display: flex;
     flex-direction: column;
-    height: 1vh;
     /* Full viewport height */
     width: 200%;
     padding: 20px;
     background-color: #f4f6f9;
     box-sizing: border-box;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin-bottom: 800px;
 }
 
 

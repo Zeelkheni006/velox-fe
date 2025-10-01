@@ -5,13 +5,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
-  // Debug log for every request
   console.log("Sending request to:", url);
   console.log("Request options:", options);
 
-  const res = await fetch(url, {
-    ...options,
-  });
+  const res = await fetch(url, { ...options });
 
   let data;
   try {
@@ -22,17 +19,25 @@ export async function apiRequest(endpoint, options = {}) {
 
   if (!res.ok) {
     let errorMsg = `Request failed with status ${res.status}`;
+
     if (data && typeof data === "object") {
       if (data.message && typeof data.message === "object") {
         errorMsg = Object.entries(data.message)
-          .map(([key, val]) => `${key}: ${val.join(", ")}`)
+          .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(", ") : val}`)
           .join(" | ");
+      } else if (typeof data.message === "string") {
+        errorMsg = data.message;
+      } else if (data.error) {
+        errorMsg = data.error;
       } else {
-        errorMsg = data.message || data.error || JSON.stringify(data) || errorMsg;
+        errorMsg = JSON.stringify(data) || errorMsg;
       }
     } else if (data) {
       errorMsg = String(data);
     }
+
+    // Fallback to a string if everything fails
+    if (!errorMsg) errorMsg = "Unknown error occurred";
 
     const error = new Error(errorMsg);
     error.data = data;

@@ -157,9 +157,20 @@ const router = useRouter();
 <td>
   <button className="edit-btn" onClick={() => handleEdit(slide.id)}>Edit</button>
   <button className="delete-btn" onClick={() => handleDelete(slide.id)}>Delete</button>
-  <button className="toggle-btn" onClick={() => handleToggleStatus(slide.id)}>
-    {slide.status === "Active" ? "InActive" : "Active"}
-  </button>
+ <button
+  className="toggle-btn"
+  style={{
+    backgroundColor: slide.status === "Active" ? "#5cb85c" : "#d9534f",
+    color: "white",
+    border: "none",
+    padding: "5px 10px",
+    borderRadius: "5px",
+    cursor: "pointer"
+  }}
+  onClick={() => handleToggleStatus(slide.id)}
+>
+  {slide.status === "Active" ? "InActive" : "Active"}
+</button>
 </td>
 
       </tr>

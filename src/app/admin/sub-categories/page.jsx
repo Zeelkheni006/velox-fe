@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../styles/SubCategories.module.css';
 import Layout from "../pages/page";
-import { getSubCategories } from '../../api/admin-category/sub-category';
-
+import { getSubCategories, updateSubCategoryStatus } from '../../api/admin-category/sub-category';
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
 function SortArrow({ direction }) {
   return <span style={{ marginLeft: '5px', fontSize: '12px' }}>
     {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
@@ -21,7 +21,8 @@ export default function SubCategories() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-
+   const [popupMessage, setPopupMessage] = useState(""); 
+  const [popupType, setPopupType] = useState("");
   const router = useRouter();
 
   const fetchData = async (page = 1, per_page = 500) => {
@@ -29,8 +30,13 @@ export default function SubCategories() {
     try {
       const res = await getSubCategories(page, per_page, search);
       if (res.success) {
-        setSubCategories(res.data);
-        setTotalItems(res.total_items || res.data.length);
+        // Normalize status to 'ACTIVE' / 'INACTIVE'
+        const normalizedData = res.data.map(item => ({
+          ...item,
+          status: item.status === true || item.status === 'ACTIVE' || item.status === 'active' ? 'ACTIVE' : 'INACTIVE'
+        }));
+        setSubCategories(normalizedData);
+        setTotalItems(res.total_items || normalizedData.length);
         setTotalPages(res.total_page || 1);
         setCurrentPage(res.page || page);
         setEntriesPerPage(res.per_page || per_page);
@@ -49,20 +55,17 @@ export default function SubCategories() {
     }
   };
 
-  // Fetch data on mount and whenever page, entriesPerPage, or search changes
   useEffect(() => {
     fetchData(currentPage, entriesPerPage);
   }, [currentPage, entriesPerPage, search]);
 
-useEffect(() => {
-  const handleFocus = () => fetchData(currentPage, entriesPerPage);
-  window.addEventListener('focus', handleFocus);
-  return () => window.removeEventListener('focus', handleFocus);
-}, [currentPage, entriesPerPage]);
+  useEffect(() => {
+    const handleFocus = () => fetchData(currentPage, entriesPerPage);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [currentPage, entriesPerPage]);
 
-
-
-  // Sorting logic
+  // Sorting
   const sortedItems = [...subCategories];
   if (sortConfig.key) {
     sortedItems.sort((a, b) => {
@@ -82,29 +85,30 @@ useEffect(() => {
       return 0;
     });
   }
-const toggleStatus = async (item) => {
-  if (!item.id) return alert('Invalid ID');
 
-  const newStatus = item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-  const data = new FormData();
-  data.append('status', newStatus);
+  // Toggle status
+  const handleStatusToggle = async (item) => {
+    try {
+      const newStatus = item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+      const res = await updateSubCategoryStatus(item.id, newStatus);
 
-  try {
-    const res = await updateSubCategory(item.id, data);
-    if (res.success) {
-      setSubCategories(prev =>
-        prev.map(i => i.id === item.id ? { ...i, status: newStatus } : i)
-      );
-    } else {
-      alert(res.message || 'Failed to update status');
+      if (res.success) {
+        setSubCategories(prev =>
+          prev.map(i => i.id === item.id ? { ...i, status: newStatus } : i)
+        );
+        setPopupMessage("✅ Status updated successfully!", "success"); // ✅ popup
+    setPopupType("success");
+      } else {
+        setPopupMessage(res.message || "❌ Failed to update status", "error"); // ❌ popup
+   setPopupType("error");
+      }
+    } catch (err) {
+      console.error("Error updating subcategory:", err);
+       setPopupMessage("❌ Something went wrong while updating status", "error"); // ❌ popup
+ setPopupType("error");
     }
-  } catch (err) {
-    console.error(err);
-    alert('API error while updating status');
-  }
-};  
+  };
 
-   
   const handleSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
@@ -113,17 +117,19 @@ const toggleStatus = async (item) => {
     setSortConfig({ key: direction ? key : null, direction });
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
-
-
-  if (loading) return <Layout><div className={styles.wrapper}>Loading...</div></Layout>;
-
+  const handlePrevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
+  const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  useEffect(() => {
+    if (!popupMessage) return;
+    const timer = setTimeout(() => {
+      setPopupType(prev => prev + " hide"); 
+      setTimeout(() => {
+        setPopupMessage("");
+        setPopupType("");
+      }, 400);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [popupMessage]);
   return (
     <Layout>
       <div className={styles.wrapper}>
@@ -137,6 +143,14 @@ const toggleStatus = async (item) => {
         <div className={styles.card}>
           <div className={styles.header}>
             <h3>Sub Categories</h3>
+                {popupMessage && (
+                        <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+                          {popupType.startsWith("success") ? 
+                            <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                            <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+                          <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+                        </div>
+                      )}
             <button className={styles.addBtn} onClick={() => router.push('/admin/add-subcategory')}>
               + Add new
             </button>
@@ -187,43 +201,49 @@ const toggleStatus = async (item) => {
             </thead>
 
             <tbody>
-              {sortedItems.length === 0 ? (
-                <tr><td colSpan="5" style={{ textAlign: 'center' }}>No entries found</td></tr>
+              {loading ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+                    <div className={styles.spinner}></div>
+                  </td>
+                </tr>
+              ) : sortedItems.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: "center" }}>No subcategories found</td>
+                </tr>
               ) : (
                 sortedItems.map((item, i) => (
                   <tr key={i}>
                     <td>{item.title}</td>
                     <td>{item.category_title}</td>
-                 <td>
-  <img 
-    src={item.logo ? `http://192.168.29.69:5000${item.logo}` : '/default-logo.svg'} 
-    alt={item.title} 
-    className={styles.logo} 
-  />
-</td>
+                    <td>
+                      <img 
+                        src={item.logo ? `http://192.168.29.69:5000${item.logo}` : '/default-logo.svg'} 
+                        alt={item.title} 
+                        className={styles.logo} 
+                      />
+                    </td>
                     <td>
                       <span className={`${styles.status} ${item.status === 'ACTIVE' ? styles.active : styles.inactive}`}>
                         {item.status}
                       </span>
                     </td>
                     <td>
-                    <button
-  className={styles.editBtn}
-  onClick={() =>
-    router.push(
-      `/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`
-    )
-  }
->
-  Edit
-</button>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() =>
+                          router.push(`/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`)
+                        }
+                      >
+                        Edit
+                      </button>
 
-       <button
-  className={item.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}
-  onClick={() => toggleStatus(item)}
->
-  {item.status === 'ACTIVE' ? 'In Active' : 'Active'}
-</button>
+                      <button
+                        className={item.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}
+                        onClick={() => handleStatusToggle(item)}
+                      >
+                        {item.status === 'ACTIVE' ? 'In Active' : 'Active'}
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -232,7 +252,9 @@ const toggleStatus = async (item) => {
           </table>
 
           <div className={styles.pagination}>
-            <span>Showing {subCategories.length ? (currentPage - 1) * entriesPerPage + 1 : 0} to {Math.min(currentPage * entriesPerPage, totalItems)} of {totalItems} entries</span>
+            <span>
+              Showing {subCategories.length ? (currentPage - 1) * entriesPerPage + 1 : 0} to {Math.min(currentPage * entriesPerPage, totalItems)} of {totalItems} entries
+            </span>
             <div className={styles.paginationControls}>
               <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
               <span>{currentPage} / {totalPages}</span>

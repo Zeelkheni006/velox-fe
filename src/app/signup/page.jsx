@@ -15,7 +15,7 @@ export default function SignupPage() {
     confirm_password: "",
   });
 
-  const [user_id, setUserId] = useState(""); // userId for OTP
+  const [user_id, setUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [otpStep, setOtpStep] = useState(0); // 0=signup, 1=email OTP, 2=phone OTP
   const [otp, setEmailOtp] = useState("");
@@ -43,36 +43,33 @@ export default function SignupPage() {
     return () => clearTimeout(timer);
   }, [popupMessage]);
 
+  const showPopup = (message, type) => {
+    setPopupMessage(message);
+    setPopupType(type);
+  };
+
   // Step 0: Signup
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.password !== formData.confirm_password) {
-      setPopupMessage("❌ Passwords do not match!");
-      setPopupType("error");
+      showPopup("❌ Passwords do not match!", "error");
       return;
     }
 
     setLoading(true);
     try {
       const res = await signupUser(formData);
-      const id =
-        res?.data?.user_id ||
-        res?.data?.userId ||
-        res?.user_id ||
-        res?.user_id;
-
+      const id = res?.data?.user_id || res?.data?.userId || res?.user_id;
       if (!id) throw new Error("Signup did not return userId");
-      
+
       setUserId(String(id));
       setOtpStep(1);
       setEmailOtp("");
-      setPopupMessage("✅ OTP sent to your email!");
-      setPopupType("success");
+      showPopup("✅ OTP sent to your email!", "success");
     } catch (err) {
       console.error(err);
-      setPopupMessage(err?.data?.message || err.message || "Signup failed!");
-      setPopupType("error");
+      showPopup(err?.data?.message || err.message || "Signup failed!", "error");
     } finally {
       setLoading(false);
     }
@@ -82,28 +79,18 @@ export default function SignupPage() {
   const handleEmailOtpSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user_id) {
-      setPopupMessage("❌ User ID missing. Please signup again.");
-      setPopupType("error");
-      return;
-    }
-    if (!otp.trim()) {
-      setPopupMessage("❌ Please enter the Email OTP.");
-      setPopupType("error");
-      return;
-    }
+    if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
+    if (!otp.trim()) return showPopup("❌ Please enter the Email OTP.", "error");
 
     setLoading(true);
     try {
       await verifyEmail(Number(user_id), Number(otp.trim()));
       setOtpStep(2);
       setPhoneOtp("");
-      setPopupMessage("✅ Email verified! Now enter OTP sent to your phone.");
-      setPopupType("success");
+      showPopup("✅ Email verified! Now enter OTP sent to your phone.", "success");
     } catch (err) {
       console.error(err);
-      setPopupMessage(err?.data?.message || err.message || "Email OTP verification failed.");
-      setPopupType("error");
+      showPopup(err?.data?.message || err.message || "Email OTP verification failed.", "error");
     } finally {
       setLoading(false);
     }
@@ -113,27 +100,17 @@ export default function SignupPage() {
   const handlePhoneOtpSubmit = async (e) => {
     e.preventDefault();
 
-    if (!user_id) {
-      setPopupMessage("❌ User ID missing. Please signup again.");
-      setPopupType("error");
-      return;
-    }
-    if (!phoneOtp.trim()) {
-      setPopupMessage("❌ Please enter the Phone OTP.");
-      setPopupType("error");
-      return;
-    }
+    if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
+    if (!phoneOtp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
 
     setLoading(true);
     try {
       await verifyPhone(Number(user_id), Number(phoneOtp.trim()));
-      setPopupMessage("✅ Phone verified! Signup complete.");
-      setPopupType("success");
+      showPopup("✅ Phone verified! Signup complete.", "success");
       router.push("/login");
     } catch (err) {
       console.error(err);
-      setPopupMessage(err?.data?.message || err.message || "Phone OTP verification failed.");
-      setPopupType("error");
+      showPopup(err?.data?.message || err.message || "Phone OTP verification failed.", "error");
     } finally {
       setLoading(false);
     }
@@ -156,15 +133,15 @@ export default function SignupPage() {
 
           {/* 🔹 Popup */}
           {popupMessage && (
-            <div className={`email-popup ${popupType} show flex items-center gap-2`}>
-              {popupType === "success" ? (
-                <AiOutlineCheckCircle className="text-green-500 text-lg" />
-              ) : (
-                <AiOutlineCloseCircle className="text-red-500 text-lg" />
-              )}
-              <span>{popupMessage.replace(/^✅ |^❌ /, "")}</span>
-            </div>
-          )}
+                   <div className={`email-popup ${popupType} show flex items-center gap-2`}>
+                     {popupType==="success" ? 
+                       <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                       <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+                    <span>
+  {typeof popupMessage === "string" ? popupMessage.replace(/^✅ |^❌ /, "") : ""}
+</span>
+                   </div>
+                 )}
 
           {/* Step 0: Signup Form */}
           {otpStep === 0 && (

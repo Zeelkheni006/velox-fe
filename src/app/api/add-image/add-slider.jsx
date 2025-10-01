@@ -1,6 +1,7 @@
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
     export async function addSlider(formData) {
+      
     const res = await fetch(`${API_BASE_URL}/api/v1/admin/slider-image/add`, {
         method: "POST",
         body: formData,
@@ -11,7 +12,7 @@
     if (!res.ok) {
         throw new Error(data.message || "Failed to add slider");
     }
-
+  
     return data;
     }
     // ✅ GET sliders list
@@ -34,15 +35,30 @@ export async function getSliders() {
   }
 }
 
-// https://places.googleapis.com/v1/places/ChIJs5ydyTiuEmsR0fRSlU0C7k0?fields=id,displayName&key=API_KEY
-// https://maps.googleapis.com/maps/api/place/details/json?place_id=ChIJ05IRjKHxEQ0RJLV_5NLdK2w&fields=place_id&key=API_KEY
-// https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670522,151.1957362&radius=1500&type=restaurant&keyword=cruise&key=YOUR_API_KEY
+// services/locationApi.js
 
-//search location api
-// utils/geocode.js
-// utils/places.js
-// pages/api/places.js
-// add category api
+export async function getFullLocation(cityName) {
+  const API_KEY = "https://api.opencagedata.com/geocode/v1/json?q=52.5432379%2C+13.4142133&key=YOUR-API-KEY"; // <-- અહીં તમારી સાચી API key મૂકો
+
+  try {
+  
+const res = await fetch(
+  `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(cityName)}&key=${API_KEY}&limit=1&language=en&countrycode=in`
+);
+    const data = await res.json();
+
+    if (data.results && data.results.length > 0) {
+      return data.results[0].formatted; // Example: Surat, Gujarat, India
+    } else {
+      return "No location found";
+    }
+  } catch (err) {
+    console.error("Error fetching location:", err);
+    return "Error fetching location";
+  }
+}
+
+
 
 
 

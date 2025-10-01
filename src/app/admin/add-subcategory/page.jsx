@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import styles from '../styles/SubCategories.module.css';
 import Layout from '../pages/page';
 import { createSubCategory } from '../../api/admin-category/sub-category';
+import { getCategories } from '../../api/admin-category/sub-category';
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
 
 export default function AddSubCategory() {
   const [formData, setFormData] = useState({
@@ -11,6 +13,8 @@ export default function AddSubCategory() {
     logo: null,
   });
   const [loading, setLoading] = useState(false);
+  const [popupMessage, setPopupMessage] = useState(""); 
+    const [popupType, setPopupType] = useState(""); 
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -56,20 +60,46 @@ export default function AddSubCategory() {
 
       if (!res.success) {
         const messages = Object.values(res.message).flat().join('\n');
-        alert('❌ Failed to add subcategory:\n' + messages);
+        setPopupMessage('❌ Failed to add subcategory:\n' + messages);
+        setPopupType("error")
         return;
       }
 
-      alert('✅ Subcategory added successfully!');
+      setPopupMessage('✅ Subcategory added successfully!');
+      setPopupType("success")
       setFormData({ title: '', category_id: '', logo: null });
       document.querySelector('input[name="logo"]').value = null;
     } catch (err) {
       console.error('API Error:', err);
-      alert('❌ Unexpected error: ' + err.message);
+      setPopupMessage('❌ Unexpected error: ' + err.message);
+      setPopupType("error")
     } finally {
       setLoading(false);
     }
   };
+const [categories, setCategories] = useState([]);
+
+useEffect(() => {
+  const fetchCategories = async () => {
+    const res = await getCategories();
+    if (res.success) setCategories(res.data || []);
+  };
+
+  fetchCategories();
+}, []);
+  // Popup auto-hide
+useEffect(() => {
+  if (!popupMessage) return;
+  const timer = setTimeout(() => {
+    setPopupType(prev => prev + " hide"); 
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 400);
+  }, 4000);
+  return () => clearTimeout(timer);
+}, [popupMessage]);
+
 
   return (
     <Layout>
@@ -82,6 +112,15 @@ export default function AddSubCategory() {
 
         <div className={styles.addcard}>
           <h3>Add Sub Categories</h3>
+                    {/* Popup */}
+          {popupMessage && (
+            <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+              {popupType.startsWith("success") ? 
+                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+            </div>
+          )}
           <form className={styles.addform} onSubmit={handleSubmit}>
             <label>TITLE</label>
             <input
@@ -94,23 +133,20 @@ export default function AddSubCategory() {
             />
 
             <label>CATEGORY</label>
-            <select
-              name="category_id"
-              value={formData.category_id}
-              onChange={handleChange}
-              className={styles.addinput}
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="20">NAIL Studio</option>
-              <option value="20">AC service</option>
-              <option value="20">Spa For Women</option>
-              <option value="20">Sofa Cleaning</option>
-              <option value="20">Women Beauty Care</option>
-              <option value="20">R O Water Purifier</option>
-              <option value="20">Cleaning & Disinfection</option>
-         
-            </select>
+<select
+  name="category_id"
+  value={formData.category_id} // ✅ use formData
+  onChange={handleChange}      // ✅ same handleChange function
+  className={styles.editinput}
+  required
+>
+  <option value="">Select Category</option>
+  {categories.map((cat) => (
+    <option key={cat.id} value={String(cat.id)}>
+      {cat.title}
+    </option>
+  ))}
+</select>
 
             <label>LOGO</label>
             <input

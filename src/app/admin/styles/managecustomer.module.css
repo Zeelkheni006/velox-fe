@@ -1,14 +1,12 @@
     .container {
         display: flex;
         flex-direction: column;
-        height: 0vh;
         /* Full viewport height */
         width: 200%;
         padding: 20px;
         background-color: #f4f6f9;
         box-sizing: border-box;
         font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        margin-bottom: 900px;
     }
     
     .topCard {

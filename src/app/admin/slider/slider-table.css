@@ -127,13 +127,13 @@ th {
 }
 
 .status.active {
-    background: #cffafe;
-    color: #0c4a6e;
+    background-color: #ccf5f8;
+    color: #00bcd4;
 }
 
 .status.inactive {
-    background: #fee2e2;
-    color: #991b1b;
+    background-color: #fdecea;
+    color: #f44336;
 }
 
 button {
@@ -146,13 +146,13 @@ button {
 }
 
 .edit-btn {
-    background: #f59e0b;
+    background-color: #f0ad4e;
     color: white;
     font-size: 15px;
 }
 
 .delete-btn {
-    background: #ef4444;
+    background-color: #337ab7;
     color: white;
     font-size: 15px;
 }

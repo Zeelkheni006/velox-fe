@@ -2,9 +2,6 @@
 import { useState } from 'react';
 import styles from '../styles/Sidebar.module.css';
 import { useRouter } from 'next/navigation'; 
-
-
-
 import {
   FaUserCog, FaUsers, FaProjectDiagram, FaStore,
   FaTags, FaList, FaWrench, FaGift, FaStar,
@@ -186,7 +183,12 @@ Best Services
       onClose(); // optional: close sidebar on mobile
     }}>
       Orders
-    </div><br />Unallocated Order</div>}
+    </div> <div onClick={() => {
+      router.push('/admin/unallocated-order'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Unallocated Orders
+    </div></div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('offers')}>
         <FaGift /><span>Offers</span>{openMenus.offers ? (
@@ -195,7 +197,12 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.offers && <div className={styles.subMenu}>Offer<br />Best Offer</div>}
+      {openMenus.offers && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/offer'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Offer
+    </div><br />Best Offer</div>}
 
       <div className={styles.menuItem}><FaGift /><span>Gift</span></div>
 

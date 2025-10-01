@@ -428,3 +428,44 @@
         transform: rotate(360deg);
     }
 }
+
+.email-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 30px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+    transition: all 0.4s ease;
+    z-index: 9999;
+}
+
+.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.success {
+    background-color: #daf5e2;
+    color: #1a7f37;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
