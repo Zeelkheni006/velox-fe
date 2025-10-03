@@ -220,9 +220,17 @@
   >
     <FaEye style={{ marginRight: 5 }} /> View
   </li>
-          <li onClick={() => alert(`Franchise details for ${order.id}`)}>
-            <FaBuilding style={{ marginRight: 5 }} /> Franchise Details
-          </li>
+             <li
+  onClick={() =>
+router.push(
+  `/admin/franchise-orders-details?id=${order.id}?user_name=${encodeURIComponent(order.user_name)}&order_number=${order.order_number}&services=${encodeURIComponent(order.services)}&total_quantity=${order.total_quantity}&total_amount=${order.total_amount}&city=${order.city}&status=${order.status}`
+)
+
+  }
+  style={{ cursor: "pointer" }}
+>
+  <FaBuilding style={{ marginRight: 5 }} /> Franchise Details
+</li>
         </ul>
       </div>
     )}

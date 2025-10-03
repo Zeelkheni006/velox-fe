@@ -172,7 +172,7 @@ useEffect(() => {
           <input
             id="icon"
             type="file"
-            accept=".jpg"
+            accept=".svg"
             onChange={handleIconChange}
           />
           <small>

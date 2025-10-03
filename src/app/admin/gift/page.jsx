@@ -4,22 +4,22 @@ import Layout from "../pages/page";
 import styles from "../styles/offers.module.css";
 import { useRouter } from "next/navigation"; 
 
-export default function Offer() {
+export default function Gift() {
   const [offerlist, setOfferlist] = useState([
     {
-      title: "Refer And Earn Offer",
-      offervalue: 100,
-      offercode: "AC100",
-      valideupto: "05-10-2021 To 30-12-2021",
-      owner: "-",
+      id: 1,
+      title: "Car service",
+      giftvalue: 100,
+      image: "",
+      valideupto: "10-09-2021 To 30-11-2021",
       status: "Active",
     },
     {
-      title: "Festival Discount",
-      offervalue: 200,
-      offercode: "FD200",
-      valideupto: "01-11-2021 To 31-12-2021",
-      owner: "Admin",
+      id: 2,
+      title: "Bike Service",
+      giftvalue: 150,
+      image: "",
+      valideupto: "01-10-2021 To 31-12-2021",
       status: "Inactive",
     },
   ]);
@@ -27,30 +27,25 @@ export default function Offer() {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-    const router = useRouter(); 
+  const router = useRouter(); 
 
-  // 🔄 Toggle Status
+  // Toggle Active / Inactive status
   const toggleStatus = (index) => {
     setOfferlist((prevList) =>
       prevList.map((offer, i) =>
         i === index
-          ? {
-              ...offer,
-              status: offer.status === "Active" ? "Inactive" : "Active",
-            }
+          ? { ...offer, status: offer.status === "Active" ? "Inactive" : "Active" }
           : offer
       )
     );
   };
 
-  // 🔍 Search filter
+  // Filter based on search
   const filteredOffers = offerlist.filter(
-    (offer) =>
-      offer.title.toLowerCase().includes(search.toLowerCase()) ||
-      offer.offercode.toLowerCase().includes(search.toLowerCase())
+    (offer) => offer.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📄 Pagination logic
+  // Pagination
   const totalPages = Math.ceil(filteredOffers.length / entries);
   const startIndex = (currentPage - 1) * entries;
   const endIndex = Math.min(startIndex + entries, filteredOffers.length);
@@ -67,24 +62,27 @@ export default function Offer() {
   return (
     <Layout>
       <div className={styles.container}>
-        {/* Header */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Offers</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Offers</span>
+            <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Gift</span>
           </div>
         </div>
 
-        {/* Card */}
         <div className={styles.card}>
-          {/* Card Header */}
           <div className={styles.header}>
-            <h3>Offers</h3>
+            <h3>Gift</h3>
             <button
-              className={styles.addbtn}
-              onClick={() => router.push("/admin/add-offer")}
+              className={styles.addBtn}
+              onClick={() => router.push("/admin/add-best-offer")}
             >
               + Add New
+            </button>
+            <button
+              className={styles.sendbtn}
+              onClick={() => router.push("/admin/send-gift")}
+            >
+              Send Gift
             </button>
           </div>
 
@@ -127,10 +125,9 @@ export default function Offer() {
             <thead>
               <tr>
                 <th>Title</th>
-                <th>Offer Value</th>
-                <th>Offer Code</th>
+                <th>Gift Value</th>
+                <th>Image</th>
                 <th>Valid Upto</th>
-                <th>Owner</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -138,12 +135,17 @@ export default function Offer() {
             <tbody>
               {currentOffers.length > 0 ? (
                 currentOffers.map((offer, index) => (
-                  <tr key={index}>
+                  <tr key={offer.id}>
                     <td>{offer.title}</td>
-                    <td>{offer.offervalue}</td>
-                    <td>{offer.offercode}</td>
+                    <td>{offer.giftvalue}</td>
+                    <td>
+                      {offer.image ? (
+                        <img src={offer.image} alt={offer.title} width="50" />
+                      ) : (
+                        "-"
+                      )}
+                    </td>
                     <td>{offer.valideupto}</td>
-                    <td>{offer.owner}</td>
                     <td>
                       <span
                         className={`${styles.status} ${
@@ -156,16 +158,14 @@ export default function Offer() {
                       </span>
                     </td>
                     <td>
- <button
-  className={styles.editBtn}
-  onClick={() =>
-    router.push(
-      `/admin/edit-offer/?title=${encodeURIComponent(offer.title)}&offervalue=${offer.offervalue}&offercode=${offer.offercode}&valideupto=${encodeURIComponent(offer.valideupto)}&owner=${encodeURIComponent(offer.owner)}`
-    )
-  }
->
-  Edit
-</button>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() =>
+                          router.push(`/admin/send-gift/${offer.id}`)
+                        }
+                      >
+                        Edit
+                      </button>
                       <button
                         className={
                           offer.status === "Active"
@@ -181,7 +181,7 @@ export default function Offer() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: "center" }}>
+                  <td colSpan="6" style={{ textAlign: "center" }}>
                     No entries found
                   </td>
                 </tr>
@@ -194,9 +194,7 @@ export default function Offer() {
             <span>
               {filteredOffers.length === 0
                 ? "No entries found"
-                : `Showing ${startIndex + 1} to ${endIndex} of ${
-                    filteredOffers.length
-                  } entries`}
+                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredOffers.length} entries`}
             </span>
             <div className={styles.paginationControls}>
               <button
@@ -216,7 +214,7 @@ export default function Offer() {
               </button>
             </div>
           </div>
-        </div>  
+        </div>
       </div>
     </Layout>
   );

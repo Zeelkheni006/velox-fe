@@ -1,342 +1,321 @@
-"use client";
+  "use client";
 
-import styles from '../styles/services.module.css';
-import { useRouter } from 'next/navigation';
-import Layout from "../pages/page";
-import { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faEdit, faTrash, faCircleCheck, faCircleXmark,
-  faImage, faFileAlt, faQuestionCircle
-} from '@fortawesome/free-solid-svg-icons';
+  import styles from '../styles/services.module.css';
+  import { useRouter } from 'next/navigation';
+  import Layout from "../pages/page";
+  import { useState, useEffect } from 'react';
+  import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+  import {
+    faEdit, faTrash, faCircleCheck, faCircleXmark,
+    faImage, faFileAlt, faQuestionCircle
+  } from '@fortawesome/free-solid-svg-icons';
 
-export default function ServicesPage() {
-  const router = useRouter();
+  // ✅ sahi import karo
+  import { getServices } from "../../api/admin-service/category-list";
 
-  // Main data state
-  const [servicesList, setServicesList] = useState([
-    {
-      displayNumber: 17,
-      title: "BRIDAL FACIAL",
-      category: "Women Beauty Care",
-      subCategory: "Facial",
-      image: "/icon/spa2.png",
-      time: "1 Hour 0 Minute",
-      status: "ACTIVE"
-    },
-    {
-      displayNumber: 15,
-      title: "Charcoal Facial",
-      category: "Women Beauty Care",
-      subCategory: "Facial",
-      image: "/icon/spa2.png",
-      time: "1 Hour 0 Minute",
-      status: "ACTIVE"
-    },
-    {
-      displayNumber: 9,
-      title: "DIAMOND PACKAGE",
-      category: "Women Beauty Care",
-      subCategory: "Special Packages",
-      image: "/icon/spa2.png",
-      time: "1 Hour 0 Minute",
-      status: "ACTIVE"
-    },
-  ]);
+  export default function ServicesPage() {
+    const router = useRouter();
 
-  const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+    const [servicesList, setServicesList] = useState([]);
+    const [search, setSearch] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [entriesPerPage, setEntriesPerPage] = useState(10);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  // Filtered list based on search
+    // 🔹 Fetch data from API
+useEffect(() => {
+  const fetchServices = async () => {
+    setLoading(true);
+    const res = await getServices();
+    setServicesList(res?.data?.services || []);
+    setLoading(false);
+  };
+  fetchServices();
+
+  const handleFocus = () => {
+    fetchServices();
+  };
+  window.addEventListener('focus', handleFocus);
+
+  return () => window.removeEventListener('focus', handleFocus);
+}, []);
+
+    // 🔹 Search filter
   const filteredServices = servicesList.filter(service =>
-    service.title.toLowerCase().includes(search.toLowerCase()) ||
-    service.category.toLowerCase().includes(search.toLowerCase()) ||
-    service.subCategory.toLowerCase().includes(search.toLowerCase())
+    (service.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
+    (service.category?.toLowerCase() || "").includes(search.toLowerCase()) ||
+    (service.sub_category?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
-  // ✅ Apply sorting on filtered list
-  const sortedServices = [...filteredServices];
-  if (sortConfig.key) {
-    sortedServices.sort((a, b) => {
-      let aVal = a[sortConfig.key];
-      let bVal = b[sortConfig.key];
+    // 🔹 Sorting
+    const sortedServices = [...filteredServices];
+    if (sortConfig.key) {
+      sortedServices.sort((a, b) => {
+        let aVal = a[sortConfig.key];
+        let bVal = b[sortConfig.key];
 
-      // Status sorting (ACTIVE before INACTIVE)
-      if (sortConfig.key === 'status') {
-        aVal = aVal === 'ACTIVE' ? 1 : 0;
-        bVal = bVal === 'ACTIVE' ? 1 : 0;
-      } else {
-        aVal = aVal.toString().toLowerCase();
-        bVal = bVal.toString().toLowerCase();
-      }
+        if (sortConfig.key === 'status') {
+          aVal = aVal === 'ACTIVE' ? 1 : 0;
+          bVal = bVal === 'ACTIVE' ? 1 : 0;
+        } else {
+          aVal = aVal?.toString().toLowerCase();
+          bVal = bVal?.toString().toLowerCase();
+        }
 
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
-
-  // Pagination
-  const totalPages = Math.ceil(sortedServices.length / entriesPerPage);
-  const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = Math.min(startIndex + entriesPerPage, sortedServices.length);
-  const currentItems = sortedServices.slice(startIndex, endIndex);
-
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(`.${styles.action}`)) {
-        setOpenDropdownIndex(null);
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
-  const handleToggleStatus = (index) => {
-    const originalIndex = servicesList.findIndex(s => s.displayNumber === currentItems[index].displayNumber);
-    if (originalIndex !== -1) {
-      const updated = [...servicesList];
-      updated[originalIndex].status = updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      setServicesList(updated);
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
     }
-    setOpenDropdownIndex(null);
-  };
 
-  const handleDelete = (index) => {
-    const originalIndex = servicesList.findIndex(s => s.displayNumber === currentItems[index].displayNumber);
-    if (originalIndex !== -1) {
-      const updated = [...servicesList];
-      updated.splice(originalIndex, 1);
-      setServicesList(updated);
-    }
-    setOpenDropdownIndex(null);
-  };
+    // 🔹 Pagination
+    const totalPages = Math.ceil(sortedServices.length / entriesPerPage);
+    const startIndex = (currentPage - 1) * entriesPerPage;
+    const endIndex = Math.min(startIndex + entriesPerPage, sortedServices.length);
+    const currentItems = sortedServices.slice(startIndex, endIndex);
 
-  const handleSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
-    else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
-    else direction = 'asc';
+    // 🔹 Dropdown close on outside click
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (!e.target.closest(`.${styles.action}`)) {
+          setOpenDropdownIndex(null);
+        }
+      };
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
 
-    setSortConfig({ key: direction ? key : null, direction });
-  };
+    // 🔹 Toggle status (UI only)
+    const handleToggleStatus = (index) => {
+      const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
+      if (originalIndex !== -1) {
+        const updated = [...servicesList];
+        updated[originalIndex].status =
+          updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+        setServicesList(updated);
+      }
+      setOpenDropdownIndex(null);
+    };
 
-  const SortArrow = ({ direction }) => (
-    <span style={{ marginLeft: '5px', fontSize: '12px' }}>
-      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
-    </span>
-  );
+    // 🔹 Delete (UI only)
+    const handleDelete = (index) => {
+      const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
+      if (originalIndex !== -1) {
+        const updated = [...servicesList];
+        updated.splice(originalIndex, 1);
+        setServicesList(updated);
+      }
+      setOpenDropdownIndex(null);
+    };
 
-  return (
-    <Layout>
-      <div className={styles.container}>
-        <div className={styles.headerContainer}>
-          <div>
-            <span className={styles.breadcrumb}>Category</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Category</span>
-          </div>
-        </div>
+    const handleSort = (key) => {
+      let direction = 'asc';
+      if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+      else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+      else direction = 'asc';
+      setSortConfig({ key: direction ? key : null, direction });
+    };
 
-        <div className={styles.card}>
-          <h5 className={styles.title}>Services</h5>
-           <button
-            className={styles.addbtn}
-            onClick={() => router.push('/admin/add-services')}
-          >
-            + Add new
-          </button>
-          <div className={styles.showEntries}>
-            <label>
-              Show{" "}
-              <select
-                className={styles.select1}
-                value={entriesPerPage}
-                onChange={(e) => {
-                  setEntriesPerPage(Number(e.target.value));
-                  setCurrentPage(1); // Reset to first page
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>{" "}
-              entries
-            </label>
+    const SortArrow = ({ direction }) => (
+      <span style={{ marginLeft: '5px', fontSize: '12px' }}>
+        {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+      </span>
+    );
 
-            <label className={styles.searchLabel}>
-              Search:{" "}
-              <input
-                type="text"
-                placeholder="Search..."
-                className={styles.search}
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1); // Reset to first page when searching
-                }}
-              />
-            </label>
+
+    return (
+      <Layout>
+        <div className={styles.container}>
+          <div className={styles.headerContainer}>
+            <div>
+              <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+              <span className={styles.breadcrumbActive}>Services</span>
+            </div>
           </div>
 
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Display Number
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Title
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Category
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Sub Category
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Image
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Time
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Status
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-                 <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
-                  Action
-                  <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.length > 0 ? (
-                currentItems.map((service, index) => (
-                  <tr key={index}>
-                    <td>{service.displayNumber}</td>
-                    <td>{service.title}</td>
-                    <td>{service.category}</td>
-                    <td>{service.subCategory}</td>
-                    <td>
-                      <img
-                        src={service.image}
-                        alt={service.title}
-                        className={styles.icon}
-                      />
-                    </td>
-                    <td>{service.time}</td>
-                    <td>
-                      <span
-                        className={`${styles.status} ${
-                          service.status === "ACTIVE"
-                            ? styles.active
-                            : styles.inactive
-                        }`}
-                      >
-                        {service.status}
-                      </span>
-                    </td>
-                   <td className={styles.action}>
-  <div 
-    className={styles.dropdownTrigger} 
-    onClick={() => setOpenDropdownIndex(openDropdownIndex === index ? null : index)}
-  >
-    ⋮
-  </div>
-    {openDropdownIndex === index && (
-    <div className={styles.dropdownMenu}>
-      <ul>
-          <li
-  onClick={() => {
-    localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push(`/admin/edit-services`);
-  }}
->
-    <FontAwesomeIcon icon={faEdit} /> Edit
-</li>
-        <li onClick={() => handleDelete(index)}>    <FontAwesomeIcon icon={faTrash} /> Delete</li>
-   <li onClick={() => handleToggleStatus(index)}>
-    <FontAwesomeIcon icon={service.status === "ACTIVE" ? faCircleXmark : faCircleCheck} /> 
-    {service.status === "ACTIVE" ? "Inactivate" : "Activate"}
-  </li>
-       <li
-  onClick={() => {
-    localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push("/admin/manage-media");
-  }}
-> <FontAwesomeIcon icon={faImage} /> Manage Media</li>
-         <li
-  onClick={() => {
-    localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push("/admin/service_specification");
-  }}
->  <FontAwesomeIcon icon={faFileAlt} /> Specifications</li>
+          <div className={styles.card}>
+            <h5 className={styles.title}>Services</h5>
+            <button
+              className={styles.addbtn}
+              onClick={() => router.push('/admin/add-services')}
+            >
+              + Add new
+            </button>
+
+            {/* Search & Show entries */}
+            <div className={styles.showEntries}>
+              <label>
+                Show{" "}
+                <select
+                  className={styles.select1}
+                  value={entriesPerPage}
+                  onChange={(e) => {
+                    setEntriesPerPage(Number(e.target.value));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                </select>{" "}
+                entries
+              </label>
+
+              <label className={styles.searchLabel}>
+                Search:{" "}
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className={styles.search}
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </label>
+            </div>
+
+            {/* Table */}
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
+                    #
+                    <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
+                  </th>
+                  <th onClick={() => handleSort('title')}>Title</th>
+                  <th>Category</th>
+                  <th>Sub Category</th>
+                  <th>Image</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr><td colSpan="8" style={{ textAlign: "center" }}>Loading services...</td></tr>
+                ) : currentItems.length > 0 ? (
+                  currentItems.map((service, index) => (
+                    <tr key={index}>
+                      <td>{startIndex + index + 1}</td>
+                      <td>{service.title}</td>
+                      <td>{service.category}</td>
+                      <td>{service.sub_category}</td>
+                      <td>
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.image}`}
+                          alt={service.title}
+                          className={styles.icon}
+                          style={{ width: "40px", height: "40px" }}
+                        />
+                      </td>
+                      <td>{service.duration}</td>
+                      <td>
+                        <span className={`${styles.status} ${service.status === "INACTIVE" ? styles.inactive : styles.active}`}>
+                          {service.status || "ACTIVE"}
+                        </span>
+                      </td>
+                      <td className={styles.action}>
+                        <div
+                          className={styles.dropdownTrigger}
+                          onClick={() => setOpenDropdownIndex(openDropdownIndex === index ? null : index)}
+                        >
+                          ⋮
+                        </div>
+                        {openDropdownIndex === index && (
+                          <div className={styles.dropdownMenu}>
+                            <ul>
         <li
   onClick={() => {
     localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push("/admin/service_faq");
+    router.push(
+      `/admin/edit-services?sub_category_id=${service.sub_category_id}` +
+      `&title=${encodeURIComponent(service.title)}` +
+      `&logo=${encodeURIComponent(service.logo)}` +
+      `&description=${encodeURIComponent(service.description)}` +
+      `&category=${encodeURIComponent(service.category)}` +
+      `&sub_category=${encodeURIComponent(service.sub_category)}` +
+      `&duration=${encodeURIComponent(service.duration)}`
+    );
   }}
-> <FontAwesomeIcon icon={faQuestionCircle} /> FAQ</li>
-      </ul>
-    </div>
-  )}
-  </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="8" style={{ textAlign: "center" }}>
-                    No services found.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+>
+  <FontAwesomeIcon icon={faEdit} /> Edit
+</li>
+                              <li onClick={() => handleDelete(index)}>
+                                <FontAwesomeIcon icon={faTrash} /> Delete
+                              </li>
+                              <li onClick={() => handleToggleStatus(index)}>
+                                <FontAwesomeIcon icon={service.status === "ACTIVE" ? faCircleXmark : faCircleCheck} />
+                                {service.status === "ACTIVE" ? "Inactivate" : "Activate"}
+                              </li>
+                              <li
+                                onClick={() => {
+                                  localStorage.setItem("selectedService", JSON.stringify(service));
+                                  router.push("/admin/manage-media");
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faImage} /> Manage Media
+                              </li>
+                              <li
+                                onClick={() => {
+                                  localStorage.setItem("selectedService", JSON.stringify(service));
+                                  router.push("/admin/service_specification");
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faFileAlt} /> Specifications
+                              </li>
+                              <li
+                                onClick={() => {
+                                  localStorage.setItem("selectedService", JSON.stringify(service));
+                                  router.push("/admin/service_faq");
+                                }}
+                              >
+                                <FontAwesomeIcon icon={faQuestionCircle} /> FAQ
+                              </li>
+                            </ul>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan="8" style={{ textAlign: "center" }}>No services found.</td></tr>
+                )}
+              </tbody>
+            </table>
 
-          {/* Pagination Footer */}
-          <div className={styles.pagination}>
-            <span>
-              {filteredServices.length === 0 ? (
-                "No entries found"
-              ) : (
-                `Showing ${startIndex + 1} to ${endIndex} of ${filteredServices.length} entries`
-              )}
-            </span>
+            {/* Pagination */}
+            <div className={styles.pagination}>
+              <span>
+                {filteredServices.length === 0
+                  ? "No entries found"
+                  : `Showing ${startIndex + 1} to ${endIndex} of ${filteredServices.length} entries`}
+              </span>
 
-            <div className={styles.paginationControls}>
-              <button
-                className={styles.paginationButton}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-
-              <span className={styles.pageNumber}>{currentPage}</span>
-
-              <button
-                className={styles.paginationButton}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+              <div className={styles.paginationControls}>
+                <button
+                  className={styles.paginationButton}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span className={styles.pageNumber}>{currentPage}</span>
+                <button
+                  className={styles.paginationButton}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Layout>
-  );
-}
+      </Layout>
+    );
+  }

@@ -202,9 +202,20 @@ Best Services
       onClose(); // optional: close sidebar on mobile
     }}>
       Offer
-    </div><br />Best Offer</div>}
+    </div><div onClick={() => {
+      router.push('/admin/best-offer'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+    Best Offer
+    </div></div>}
 
-      <div className={styles.menuItem}><FaGift /><span>Gift</span></div>
+               <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/gift'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaGift /><span>Gift</span></div>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('rating')}>
         <FaStar /><span>Rating</span>{openMenus.rating ? (

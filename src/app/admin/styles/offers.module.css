@@ -176,3 +176,173 @@
     padding: 6px 12px;
     border-radius: 4px;
 }
+
+
+/* add offer */
+
+.addoffercontainer {
+    padding: 30px;
+    background-color: #f4f7fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.breadcrumbs {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.formCard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+.pageTitle {
+    font-size: 19px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: left;
+    color: #777;
+}
+
+.globalText {
+    margin-top: 10px;
+}
+
+.globalCheckbox {
+    text-align: left;
+    font-size: 15px;
+}
+
+.columns {
+    display: flex;
+    gap: 24px;
+}
+
+.colLeft {
+    flex: 1;
+}
+
+.colRight {
+    flex: 1;
+}
+
+.fieldLabel {
+    display: block;
+    margin: 10px 0 6px;
+    font-weight: 500;
+    font-size: 15px;
+    color: #888;
+    text-align: left;
+}
+
+.addinput,
+.addselect,
+.textarea,
+.fileInput {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.select {
+    appearance: none;
+}
+
+.textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.fileInput {
+    padding: 6px 10px;
+}
+
+.bannerHint {
+    font-size: 12px;
+    color: #555;
+    margin-top: 6px;
+    text-align: left;
+}
+
+.fieldLabelCheckbox {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.checkboxLabel {
+    font-size: 14px;
+}
+
+.formActionsLeft {
+    margin-top: 18px;
+}
+
+.submitBtn {
+    background-color: #477ef3;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 600px;
+}
+
+.submitBtn:hover {
+    background-color: #709cfd;
+}
+
+.descHint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    text-align: left;
+}
+
+
+/* Responsive */
+
+@media (max-width:900px) {
+    .columns {
+        flex-direction: column
+    }
+    .colRight {
+        width: 100%
+    }
+}
+
+.sendbtn {
+    background-color: #1f3053;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 50px;
+}
+
+.addBtn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-left: 1100px;
+}
+
+.addBtn:hover {
+    background-color: #477ef3;
+}

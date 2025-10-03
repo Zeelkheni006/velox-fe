@@ -18,10 +18,11 @@ export default function OrderViewPage({ params }) {
     total_amount: searchParams.get('total_amount'),
     city: searchParams.get('city'),
     status: searchParams.get('status'),
-    payment: searchParams.get('payment'),
+    payment: searchParams.get('payment')|| "-",
     amount: searchParams.get('amount'),
-    email: searchParams.get('email'),
-    date: searchParams.get('date'),
+    email: searchParams.get('email')|| "-",
+    date: searchParams.get('date')|| "-",
+    date_time:searchParams.get('date_time')||"-",
     billing_name: searchParams.get('billing_name') || user_name,
     billing_address: searchParams.get('billing_address') || "Not Provided",
     billing_contact: searchParams.get('billing_contact') || "Not Provided",
@@ -30,7 +31,7 @@ export default function OrderViewPage({ params }) {
   return (
     <Layout>
       <div className={styles.viewcontainer}>
-        <h2 className={styles.viewtitle}>Orders View</h2>
+        <h2 className={styles.viewtitle}>Unallocated Orders View</h2>
 
         {/* Order + Billing side by side */}
         <div className={styles.row}>
@@ -90,20 +91,39 @@ export default function OrderViewPage({ params }) {
         </div>
 
         {/* Services Ordered */}
-        <div className={styles.viewcard1}>
+        <div className={styles.unallocatedviewcard}>
           <h3 className={styles.cardHeader}>Service Ordered</h3>
+          <lable>Service</lable>
           <table className={styles.table}>
             <thead>
               <tr>
                 <th>Service</th>
                 <th>Price</th>
+                <th>OrderDate&time</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>{order.services}</td>
                 <td>{order.total_amount}</td>
+                <td>{order.date_time}</td>
               </tr>
+            </tbody>
+          </table>
+          </div>
+ <div className={styles.unallocatedviewcard}>
+         <lable>Packages</lable>
+             <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>package</th>
+                <th>Discount Value</th>
+                <th>Package Price</th>
+                <th>Services</th>
+              </tr>
+            </thead>
+            <tbody>
+              
             </tbody>
           </table>
         </div>
