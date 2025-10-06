@@ -224,7 +224,15 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.rating && <div className={styles.subMenu}>Service Rating<br/>Testimonial</div>}
+      {openMenus.rating && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/service-rating'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>
+      Service Rating
+    </div><div onClick={() => {
+      router.push('/admin/testimonial'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Testimonial</div></div>}
 
       <div className={styles.sectionTitle}>ACCOUNTS</div>
       <div className={styles.menuItem} onClick={() => toggleMenu('accounts')}>
@@ -234,7 +242,10 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.accounts && <div className={styles.subMenu}>Income<br />Franchices Fees<br/>Franchise Outstanding</div>}
+      {openMenus.accounts && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/income'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Income</div><br />Franchices Fees<br/>Franchise Outstanding</div>}
 
       <div className={styles.sectionTitle}>PAYMENTS</div>
       <div className={styles.menuItem}><FaCreditCard /><span>Payments</span></div>

@@ -4,17 +4,22 @@ import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styles from '../styles/services.module.css';
 import Layout from '../pages/page';
-import { updateService } from '../../api/admin-service/category-list';
-import { useRouter } from 'next/navigation';
+import { updateService, getCategoriesWithSubcategories } from '../../api/admin-service/category-list';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
-export default function EditService({ params }) {
+export default function EditService() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const serviceId = searchParams.get('service_id');
+
   const [formData, setFormData] = useState({
+    id: serviceId || '',
     title: '',
     category_id: '',
-    sub_category_id: params?.sub_category_id || '',
+    sub_category_id: '',
     price: '',
     displayNumber: '',
     image: null,
@@ -25,74 +30,100 @@ export default function EditService({ params }) {
 
   const [description, setDescription] = useState('');
   const [longDescription, setLongDescription] = useState('');
+  const [categories, setCategories] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+const subCategoryId = searchParams.get('sub_category_id');
   const descriptionEditor = useRef(null);
   const longDescriptionEditor = useRef(null);
 
-  // No API fetch on mount
-  useEffect(() => setMounted(true), []);
+  // Load categories
+  useEffect(() => {
+    async function fetchCategories() {
+      const cats = await getCategoriesWithSubcategories();
+      setCategories(cats);
+    }
+    fetchCategories();
+  }, []);
 
-  // Handle form input changes
+  // Pre-fill form from localStorage
+  useEffect(() => {
+    setMounted(true);
+    const savedService = localStorage.getItem('selectedService');
+    if (savedService) {
+      const service = JSON.parse(savedService);
+      setFormData({
+        id: service.id || '',
+        title: service.title || '',
+        category_id: service.category_id || '',
+        sub_category_id: service.sub_category_id || '',
+        price: service.price || '',
+        displayNumber: service.displayNumber || '',
+        image: service.image || null,
+        banner: service.banner || null,
+        hours: service.duration ? service.duration.split(' ')[0] : '',
+        minutes: service.duration ? service.duration.split(' ')[2] : '',
+      });
+      setDescription(service.description || '');
+      setLongDescription(service.long_description || '');
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
-
-    if (type === "file") {
+    if (type === 'file') {
       setFormData(prev => ({ ...prev, [name]: files[0] || null }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
+      // Clear sub_category if category changes
+      if(name === 'category_id') setFormData(prev => ({ ...prev, sub_category_id: '' }));
     }
   };
 
-  // Submit updated service
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.id) return alert('Service ID missing. Cannot update.');
 
-  if (!formData.sub_category_id) {
-    alert("Sub Category ID missing. Cannot update.");
-    return;
-  }
+    try {
+      setLoading(true);
 
-  try {
-    setLoading(true);
+      const convertToBase64 = (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (err) => reject(err);
+        });
 
-    const convertToBase64 = (file) =>
-      new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (err) => reject(err);
-      });
+      const payload = {
+        title: formData.title,
+        description,
+        long_description: longDescription,
+        category_id: Number(formData.category_id),
+        sub_category_id: Number(formData.sub_category_id),
+        price: Number(formData.price),
+        duration: `${formData.hours || 0} Hour ${formData.minutes || 0} Minute`,
+        image: formData.image instanceof File ? await convertToBase64(formData.image) : formData.image,
+        banner: formData.banner instanceof File ? await convertToBase64(formData.banner) : formData.banner,
+      };
 
-    const payload = {
-      title: formData.title,
-      description,
-      long_description: longDescription,
-      category_id: Number(formData.category_id),
-      sub_category_id: Number(formData.sub_category_id), // <-- main id
-      price: Number(formData.price),
-      duration: `${formData.hours || 0} Hour ${formData.minutes || 0} Minute`,
-      image: formData.image instanceof File ? await convertToBase64(formData.image) : formData.image,
-      banner: formData.banner instanceof File ? await convertToBase64(formData.banner) : formData.banner,
-    };
+      const result = await updateService(formData.id, payload);
 
-    // 🔥 API call with sub_category_id as path param
-    const result = await updateService(formData.sub_category_id, payload);
-
-    if (result.success) {
-      alert("Service updated successfully!");
-      router.push("/admin/services");
-    } else {
-      alert("Failed to update service: " + (result.message || "Unknown error"));
+      if (result.success) {
+        alert('Service updated successfully!');
+          router.push('/admin/services?updated=true');
+        router.refresh();
+      } else {
+        alert('Failed to update service: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error occurred while updating the service.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error(err);
-    alert("Error occurred while updating the service.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <Layout>
@@ -108,24 +139,34 @@ const handleSubmit = async (e) => {
           <form onSubmit={handleSubmit}>
             {/* CATEGORY */}
             {mounted && (
-              <select name="category_id" value={formData.category_id ?? ""} onChange={handleChange}>
+              <select
+                name="category_id"
+                value={formData.category_id ?? ''}
+                onChange={handleChange}
+              >
                 <option value="">Select Category</option>
-                <option value="1">Women Beauty Care</option>
-                <option value="2">AC Service</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.title}</option>
+                ))}
               </select>
             )}
 
             {/* SUB CATEGORY */}
             {mounted && (
-              <>
-                <label>SUB CATEGORY</label>
-                <select name="sub_category_id" value={formData.sub_category_id} onChange={handleChange}>
-                  <option value="">Select Sub Category</option>
-                  <option value="10">Special Packages</option>
-                  <option value="11">Facial</option>
-                  <option value="12">Split AC</option>
-                </select>
-              </>
+              <> <label>SUB CATEGORY</label>
+              <select
+                name="sub_category_id"
+                value={formData.sub_category_id}
+                onChange={handleChange}
+              >
+                <option value="">Select Sub Category</option>
+                {categories
+                  .find(c => c.id === Number(formData.category_id))
+                  ?.subcategories.map(sub => (
+                    <option key={sub.id} value={sub.id}>{sub.title}</option>
+                  ))}
+              </select>
+              </> 
             )}
 
             {/* TITLE */}
@@ -171,13 +212,13 @@ const handleSubmit = async (e) => {
             <div className={styles.flexRow}>
               {mounted && (
                 <div className={styles.flex1}>
-                  <label htmlFor="price">PRICE</label>
+                  <label>PRICE</label>
                   <input type="text" name="price" value={formData.price} onChange={handleChange} />
                 </div>
               )}
               {mounted && (
                 <div className={styles.flex1}>
-                  <label htmlFor="displayNumber">DISPLAY NUMBER</label>
+                  <label>DISPLAY NUMBER</label>
                   <input type="text" name="displayNumber" value={formData.displayNumber} onChange={handleChange} />
                 </div>
               )}
@@ -187,29 +228,25 @@ const handleSubmit = async (e) => {
             <div className={styles.flexRow}>
               {mounted && (
                 <div className={styles.flex1}>
-                  <label htmlFor="hours">HOURS</label>
+                  <label>HOURS</label>
                   <select name="hours" value={formData.hours} onChange={handleChange}>
                     <option value="">Select Hours</option>
-                    {[...Array(24).keys()].map(h => (
-                      <option key={h} value={h}>{h}</option>
-                    ))}
+                    {[...Array(24).keys()].map(h => <option key={h} value={h}>{h}</option>)}
                   </select>
                 </div>
               )}
               {mounted && (
                 <div className={styles.flex1}>
-                  <label htmlFor="minutes">MINUTES</label>
+                  <label>MINUTES</label>
                   <select name="minutes" value={formData.minutes} onChange={handleChange}>
                     <option value="">Select Minutes</option>
-                    {[...Array(60).keys()].map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
+                    {[...Array(60).keys()].map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
               )}
             </div>
 
-            {/* DESCRIPTION EDITOR */}
+            {/* DESCRIPTION */}
             <div className={styles.flex1}>
               <label htmlFor="description">DESCRIPTION</label>
               {mounted && (
@@ -220,26 +257,44 @@ const handleSubmit = async (e) => {
                     readonly: false,
                     height: 200,
                     toolbarSticky: false,
-                      buttons: [
-                  'undo', 'redo', '|',
-          'bold', 'italic', 'underline', 'strikethrough', '|',
-          'backcolor', '|',
-          'ul', 'ol', '|',
-          'font', 'fontsize', 'brush', '|',
-          'align', '|',
-          'table', 'link', 'image', 'video', '|',
-          'horizontalrule', 'source', '|',
-          'help'
-              ]
+                    buttons: [
+                      'undo',
+                      'redo',
+                      '|',
+                      'bold',
+                      'italic',
+                      'underline',
+                      'strikethrough',
+                      '|',
+                      'backcolor',
+                      '|',
+                      'ul',
+                      'ol',
+                      '|',
+                      'font',
+                      'fontsize',
+                      'brush',
+                      '|',
+                      'align',
+                      '|',
+                      'table',
+                      'link',
+                      'image',
+                      'video',
+                      '|',
+                      'horizontalrule',
+                      'source',
+                      '|',
+                      'help',
+                    ],
                   }}
                   tabIndex={1}
                   onBlur={(newContent) => setDescription(newContent)}
                 />
               )}
-              <small className={styles.note}>Max file size allowed: 500Kb.</small>
             </div>
 
-            {/* LONG DESCRIPTION EDITOR */}
+            {/* LONG DESCRIPTION */}
             <div className={styles.flex1}>
               <label htmlFor="longDescription">LONG DESCRIPTION</label>
               {mounted && (
@@ -250,33 +305,50 @@ const handleSubmit = async (e) => {
                     readonly: false,
                     height: 200,
                     toolbarSticky: false,
-                      buttons: [
-                  'undo', 'redo', '|',
-          'bold', 'italic', 'underline', 'strikethrough', '|',
-          'backcolor', '|',
-          'ul', 'ol', '|',
-          'font', 'fontsize', 'brush', '|',
-          'align', '|',
-          'table', 'link', 'image', 'video', '|',
-          'horizontalrule', 'source', '|',
-          'help'
-              ]
+                    buttons: [
+                      'undo',
+                      'redo',
+                      '|',
+                      'bold',
+                      'italic',
+                      'underline',
+                      'strikethrough',
+                      '|',
+                      'backcolor',
+                      '|',
+                      'ul',
+                      'ol',
+                      '|',
+                      'font',
+                      'fontsize',
+                      'brush',
+                      '|',
+                      'align',
+                      '|',
+                      'table',
+                      'link',
+                      'image',
+                      'video',
+                      '|',
+                      'horizontalrule',
+                      'source',
+                      '|',
+                      'help',
+                    ],
                   }}
                   tabIndex={2}
                   onBlur={(newContent) => setLongDescription(newContent)}
                 />
               )}
-              <small className={styles.note}>Max file size allowed: 500Kb.</small>
             </div>
 
             {/* SUBMIT BUTTON */}
-          
-    <button type="submit" className={styles.submitButton} disabled={loading}>
-              {loading ? "Updating..." : "Update"}
+            <button type="submit" className={styles.submitButton} disabled={loading}>
+              {loading ? 'Updating...' : 'Update'}
             </button>
           </form>
         </div>
-        </div>
-      </Layout>
-    );  
-  }
+      </div>
+    </Layout>
+  );
+}

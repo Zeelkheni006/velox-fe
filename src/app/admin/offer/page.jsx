@@ -69,11 +69,14 @@ export default function Offer() {
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.headerContainer}>
-          <div>
-            <span className={styles.breadcrumb}>Offers</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Offers</span>
-          </div>
-        </div>
+  <span className={styles.pageTitle}>Offer</span>
+  <span className={styles.separator}>|</span>
+  <div className={styles.breadcrumb}>
+    <span className={styles.homeIcon}>🏠</span>
+    &nbsp;›&nbsp;
+    <span className={styles.activespan}>Offer</span>
+  </div>
+</div>
 
         {/* Card */}
         <div className={styles.card}>

@@ -3,14 +3,20 @@ import { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/offers.module.css";
 import { useRouter } from "next/navigation"; 
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+
+
 
 export default function Gift() {
+  const searchParams = useSearchParams();
+const giftId = searchParams.get("id");
   const [offerlist, setOfferlist] = useState([
     {
       id: 1,
       title: "Car service",
       giftvalue: 100,
-      image: "",
+      image: "/public/images/AC Service and Repair.webp",
       valideupto: "10-09-2021 To 30-11-2021",
       status: "Active",
     },
@@ -139,11 +145,17 @@ export default function Gift() {
                     <td>{offer.title}</td>
                     <td>{offer.giftvalue}</td>
                     <td>
-                      {offer.image ? (
-                        <img src={offer.image} alt={offer.title} width="50" />
-                      ) : (
-                        "-"
-                      )}
+                     {offer.image ? (
+  <Image
+    src={offer.image}
+    alt={offer.title}
+    width={50}
+    height={50}
+    objectFit="cover"
+  />
+) : (
+  "-"
+)}
                     </td>
                     <td>{offer.valideupto}</td>
                     <td>
@@ -158,14 +170,15 @@ export default function Gift() {
                       </span>
                     </td>
                     <td>
-                      <button
-                        className={styles.editBtn}
-                        onClick={() =>
-                          router.push(`/admin/send-gift/${offer.id}`)
-                        }
-                      >
-                        Edit
-                      </button>
+                   <button
+  className={styles.editBtn}
+  onClick={() => {
+    localStorage.setItem("selectedGift", JSON.stringify(offer));
+    router.push(`/admin/edit-gift?id=${offer.id}`);
+  }}
+>
+  Edit
+</button>
                       <button
                         className={
                           offer.status === "Active"

@@ -1,0 +1,120 @@
+    .container {
+        max-width: 1500px;
+        margin: 50px auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        margin-left: 10px;
+    }
+    
+    .headerContainer {
+        background-color: #ffffff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 24px;
+        border-radius: 8px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 24px;
+    }
+    
+    .breadcrumb {
+        font-size: 18px;
+        color: #6b7280;
+    }
+    
+    .breadcrumbActive {
+        font-size: 14px;
+        color: #2563eb;
+        font-weight: 500;
+    }
+    
+    .pageTitle {
+        font-size: 23px;
+        font-weight: bold;
+        margin-top: 20px;
+        color: #777;
+    }
+    
+    .separator {
+        color: #555;
+    }
+    
+    .homeIcon {
+        margin-right: 5px;
+    }
+    
+    .activespan {
+        font-size: 19px;
+        font-weight: 600;
+        color: #477ef3;
+    }
+    
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .homeIcon {
+        font-size: 18px;
+        margin-right: 4px;
+        color: #555;
+    }
+    
+    .breadcrumb {
+        font-size: 18px;
+        color: #6b7280;
+    }
+    
+    .breadcrumbActive {
+        font-size: 13px;
+        color: #2563eb;
+        font-weight: 500;
+    }
+    
+    .pageTitle {
+        font-size: 23px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        width: 900px;
+    }
+    
+    .cardHeader {
+        background-color: #34495e;
+        color: #fff;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: 600;
+        text-align: left;
+    }
+    
+    .cardBody {
+        padding: 20px;
+    }
+    
+    .row {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 0;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: left;
+        font-size: 16px;
+    }
+    
+    .row:last-child {
+        border-bottom: none;
+    }
+    
+    .totalRow {
+        font-weight: bold;
+        color: #2c3e50;
+    }

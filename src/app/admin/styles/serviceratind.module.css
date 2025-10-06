@@ -47,26 +47,15 @@
     font-weight: 1px;
 }
 
-.addbtn {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 15px;
+.header h2 {
+    font-size: 19px;
+    font-weight: 100px;
 }
 
-.addbtn:hover {
-    background-color: #477ef3;
-}
-
-.controls {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 0;
-    align-items: center;
-    font-size: 15px;
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
 .select {
@@ -76,10 +65,26 @@
     border-radius: 5px;
 }
 
-.search {
-    padding: 6px 12px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+.addBtn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background-color: #477ef3;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
 }
 
 .table {
@@ -119,20 +124,20 @@
     color: #f44336;
 }
 
-.inactiveBtn {
-    background-color: #d9534f;
-}
-
-.inactiveBtn:hover {
-    background-color: #e26561;
-}
-
 .activeBtn {
     background-color: #5cb85c;
 }
 
 .activeBtn:hover {
     background-color: #6fc76f;
+}
+
+.inactiveBtn {
+    background-color: #d9534f;
+}
+
+.inactiveBtn:hover {
+    background-color: #e26561;
 }
 
 .editBtn {
@@ -150,6 +155,20 @@
     font-size: 12px;
     cursor: pointer;
     min-width: 70px;
+}
+
+.filledStar {
+    color: gold;
+    /* Yellow color for filled stars */
+    font-size: 18px;
+    margin-right: 2px;
+}
+
+.emptyStar {
+    color: lightgray;
+    /* Gray for empty stars */
+    font-size: 18px;
+    margin-right: 2px;
 }
 
 .pagination {
@@ -177,176 +196,158 @@
     border-radius: 4px;
 }
 
-
-/* add offer */
-
-.addoffercontainer {
-    padding: 30px;
-    background-color: #f4f7fa;
-    min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    width: 1900px;
-}
-
-.breadcrumbs {
-    margin-top: 20px;
-    text-align: left;
-}
-
-.formCard {
+.addcontainer {
+    width: 1800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
     background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    width: 1500px;
-    margin-top: 20px;
 }
 
-.pageTitle {
-    font-size: 19px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.addtitle {
     text-align: left;
-    color: #777;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #888;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.globalText {
+.addform label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 10px;
+    text-align: left;
+    color: #888;
+    font-size: 15px;
+}
+
+.addcontainer select {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.addstars {
+    display: flex;
+    gap: 5px;
+    font-size: 24px;
+}
+
+.addstar {
+    cursor: pointer;
+    color: lightgray;
+    transition: color 0.2s;
+}
+
+.addstar.filled {
+    color: gold;
+}
+
+.addsubmitBtn {
+    background-color: #4078f3;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-right: 1500px;
+}
+
+.addsubmitBtn:hover {
+    background-color: #477ef3;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.addbreadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.addbreadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+
+/* view descrption css */
+
+.viewDescription {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalBox {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modalBox h3 {
+    color: #888;
+}
+
+.modalBox p {
     margin-top: 10px;
 }
 
-.globalCheckbox {
-    text-align: left;
-    font-size: 15px;
-}
-
-.columns {
-    display: flex;
-    gap: 24px;
-}
-
-.colLeft {
-    flex: 1;
-}
-
-.colRight {
-    flex: 1;
-}
-
-.fieldLabel {
-    display: block;
-    margin: 10px 0 6px;
-    font-weight: 500;
-    font-size: 15px;
-    color: #888;
-    text-align: left;
-}
-
-.addinput,
-.addselect,
-.textarea,
-.fileInput {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+.modalText {
+    margin-top: 10px;
+    color: #333;
     font-size: 14px;
-    box-sizing: border-box;
+    line-height: 1.5;
+    min-height: 50px;
 }
 
-.select {
-    appearance: none;
-}
-
-.textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-.fileInput {
-    padding: 6px 10px;
-}
-
-.bannerHint {
-    font-size: 12px;
-    color: #555;
-    margin-top: 6px;
-    text-align: left;
-}
-
-.fieldLabelCheckbox {
-    margin-top: 12px;
+.modalFooter {
+    margin-top: 25px;
     display: flex;
-    gap: 10px;
-    align-items: center;
+    justify-content: flex-start;
 }
 
-.checkboxLabel {
-    font-size: 14px;
-}
-
-.formActionsLeft {
-    margin-top: 18px;
-}
-
-.submitBtn {
-    background-color: #477ef3;
-    color: #fff;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 600px;
-}
-
-.submitBtn:hover {
-    background-color: #709cfd;
-}
-
-.descHint {
-    margin-top: 8px;
-    font-size: 12px;
-    color: #666;
-    text-align: left;
-}
-
-
-/* Responsive */
-
-@media (max-width:900px) {
-    .columns {
-        flex-direction: column
-    }
-    .colRight {
-        width: 100%
-    }
-}
-
-.sendbtn {
-    background-color: #1f3053;
-    color: #fff;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-right: 50px;
-}
-
-.sendbtn:hover {
-    background-color: #2f3f5f;
-}
-
-.addBtn {
-    background-color: #2563eb;
+.closeBtn {
+    background-color: #253e58;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 8px 18px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 15px;
-    margin-left: 1100px;
+    font-size: 14px;
 }
 
-.addBtn:hover {
-    background-color: #477ef3;
+.closeBtn:hover {
+    background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

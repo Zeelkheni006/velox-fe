@@ -171,6 +171,30 @@ export default function Offer() {
     )}
   </tbody>
 </table>
+  <div className={styles.pagination}>
+            <span>
+              {filteredOffers.length === 0
+                ? "No entries found"
+                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredOffers.length} entries`}
+            </span>
+            <div className={styles.paginationControls}>
+              <button
+                className={styles.paginationButton}
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span className={styles.pageNumber}>{currentPage}</span>
+              <button
+                className={styles.paginationButton}
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
           </div>
         </div>
     </Layout>
