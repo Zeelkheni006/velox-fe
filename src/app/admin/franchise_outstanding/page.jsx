@@ -2,51 +2,28 @@
 
 import React, { useState } from 'react';
 import styles from '../styles/franchiseFees.module.css';
-import Layout from '../pages/page'; // adjust path if needed
+import Layout from '../pages/page'; // Adjust path if needed
 
-export default function FranchiseFees({ data }) {
-  // Sample data if no API data is passed
-  const sample = [
-    {
-      id: 1,
-      user: 'Ravi Patel',
-      franchiseName: 'Shree Auto Care',
-      email: 'ravi@example.com',
-      mobile: '+91-9876543210',
-      commission: '5%',
-    },
-    {
-      id: 2,
-      user: 'Meena Shah',
-      franchiseName: 'Meena Car Service',
-      email: 'meena@example.com',
-      mobile: '+91-9123456780',
-      commission: '7.5%',
-    },
-    {
-      id: 3,
-      user: 'Jay Desai',
-      franchiseName: 'AutoFix Hub',
-      email: 'jay@example.com',
-      mobile: '+91-9823412390',
-      commission: '6%',
-    },
+export default function FranchiseOutstandingPage({ data }) {
+  // Sample fallback data
+  const sampleData = [
+    { id: 1, franchiseName: 'Shree Auto Care', outstanding: '0 CREDIT' },
+    { id: 2, franchiseName: 'Meena Car Service', outstanding: '0 CREDIT' },
+    { id: 3, franchiseName: 'AutoFix Hub', outstanding: '0 CREDIT' },
   ];
 
-  const allRows = Array.isArray(data) && data.length ? data : sample;
+  const rows = Array.isArray(data) && data.length ? data : sampleData;
 
   // 🔹 States for search, entries, and pagination
   const [search, setSearch] = useState('');
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 🔹 Filter logic
-  const filteredRows = allRows.filter(
+  // 🔹 Filter logic (only filters by franchiseName and outstanding)
+  const filteredRows = rows.filter(
     (r) =>
-      r.user.toLowerCase().includes(search.toLowerCase()) ||
       r.franchiseName.toLowerCase().includes(search.toLowerCase()) ||
-      r.email.toLowerCase().includes(search.toLowerCase()) ||
-      r.mobile.includes(search)
+      r.outstanding.toLowerCase().includes(search.toLowerCase())
   );
 
   // 🔹 Pagination logic
@@ -67,17 +44,17 @@ export default function FranchiseFees({ data }) {
   return (
     <Layout>
       <div className={styles.container}>
-        {/* Breadcrumb Section */}
+        {/* Header Section */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Franchise Fees</span> &gt;{' '}
-            <span className={styles.breadcrumbActive}>Franchise Fees</span>
+            <span className={styles.breadcrumb}>Home</span> &gt;{' '}
+            <span className={styles.breadcrumbActive}>Franchise Outstandings</span>
           </div>
         </div>
 
-        {/* Card Section */}
+        {/* Main Card */}
         <div className={styles.card}>
-          <h1 className={styles.title}>Franchise Fees</h1>
+          <h1 className={styles.title}>Franchise Outstandings</h1>
 
           {/* Controls */}
           <div className={styles.controls}>
@@ -118,26 +95,22 @@ export default function FranchiseFees({ data }) {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>User</th>
                   <th>Franchise Name</th>
-                  <th>Email</th>
-                  <th>Mobile Number</th>
-                  <th>Commission</th>
+                  <th>Outstanding Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedRows.map((r) => (
                   <tr key={r.id}>
-                    <td>{r.user}</td>
                     <td>{r.franchiseName}</td>
-                    <td>{r.email}</td>
-                    <td>{r.mobile}</td>
-                    <td>{r.commission}</td>
+                    <td>
+                      <span className={styles.amountBadge}>{r.outstanding}</span>
+                    </td>
                   </tr>
                 ))}
                 {paginatedRows.length === 0 && (
                   <tr>
-                    <td colSpan="5" className={styles.noData}>
+                    <td colSpan="2" className={styles.noData}>
                       No matching records found
                     </td>
                   </tr>

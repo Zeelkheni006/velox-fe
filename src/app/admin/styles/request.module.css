@@ -1,0 +1,253 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 22px;
+    color: #888;
+    font-weight: 500px;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.filters select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 300px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.nameCell {
+    background-color: #0070f3;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.viewMsgBtn,
+.viewLogsBtn,
+.deleteBtn {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.viewMsgBtn {
+    background-color: #6a8cfc;
+    color: white;
+}
+
+.viewMsgBtn:hover,
+.viewLogsBtn:hover {
+    background-color: #6186ff;
+}
+
+.viewLogsBtn {
+    background-color: #6488fd;
+    color: white;
+}
+
+.deleteBtn {
+    background-color: #f44336;
+    color: white;
+}
+
+.deleteBtn:hover {
+    background-color: #fa5a4f;
+}
+
+.statusBtn {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #ccf5f8;
+    font-weight: 500;
+    color: #00bcd4;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* Modal Styles */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    height: 200px;
+    margin-top: -500px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.modalHeader h3 {
+    color: #888;
+}
+
+.modalBody {
+    font-size: 16px;
+    color: #333;
+    margin-top: 20px;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    background-color: rgb(212, 212, 212);
+    border-radius: 50px;
+}
+
+.closeBtn:hover {
+    background-color: rgb(187, 187, 187);
+}
+
+
+/* Bottom Close button */
+
+.closeBtnBottom {
+    background-color: #263e58;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 20px;
+}
+
+.closeBtnBottom:hover {
+    background-color: #0056b3;
+}

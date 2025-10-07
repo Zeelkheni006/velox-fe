@@ -245,10 +245,22 @@ Best Services
       {openMenus.accounts && <div className={styles.subMenu}><div onClick={() => {
       router.push('/admin/income'); // 🔁 change this path to your actual staff page
       onClose(); // optional: close sidebar on mobile
-    }}>Income</div><br />Franchices Fees<br/>Franchise Outstanding</div>}
+    }}>Income</div><div onClick={() => {
+      router.push('/admin/franchise_fees'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Franchices Fees</div><div onClick={() => {
+      router.push('/admin/franchise_outstanding'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Franchise Outstanding</div></div>}
 
       <div className={styles.sectionTitle}>PAYMENTS</div>
-      <div className={styles.menuItem}><FaCreditCard /><span>Payments</span></div>
+      <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/payments'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaCreditCard /><span>Payments</span></div>
       <div className={styles.menuItem} onClick={() => toggleMenu('credit')}>
         <FaCreditCard /><span>Credit</span>{openMenus.credit ? (
           <FaChevronDown className={styles.arrow} />  // Show up arrow when open
@@ -256,10 +268,22 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.credit && <div className={styles.subMenu}>Credit Plans<br />Custome plans</div>}
+      {openMenus.credit && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/credit-plan'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Credit Plans</div><div onClick={() => {
+      router.push('/admin/custome-plan'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Custome plans</div></div>}
 
       <div className={styles.sectionTitle}>MANAGE CONTENT</div>
-      <div className={styles.menuItem}><FaNewspaper /><span>News Letter</span></div>
+           <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/news-latter'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaNewspaper /><span>News Letter</span></div>
       <div
   className={styles.menuItem}
   onClick={() => {
@@ -267,7 +291,13 @@ Best Services
     onClose(); // this closes the sidebar if it's on mobile
   }}
 ><FaImage /><span>Slider</span></div>
-      <div className={styles.menuItem}><FaExchangeAlt /><span>Referral Program</span></div>
+            <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/referral-program'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaExchangeAlt /><span>Referral Program</span></div>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('quotes')}>
         <FaQuoteRight /><span>Request Quotes</span>{openMenus.quotes ? (
@@ -276,7 +306,10 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.quotes && <div className={styles.subMenu}>Request<br />Followups</div>}
+      {openMenus.quotes && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/request'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Request</div><br />Followups</div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('pages')}>
         <FaGlobe /><span>Manage Pages</span>{openMenus.pages ? (

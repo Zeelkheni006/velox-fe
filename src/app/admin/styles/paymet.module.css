@@ -1,0 +1,261 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.titleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 500;
+    text-align: left;
+    color: #888;
+}
+
+.addBtn {
+    background-color: #2563eb;
+    /* Blue */
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.addBtn:hover {
+    background-color: #1d4ed8;
+}
+
+.tableWrap {
+    overflow-x: auto;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+    padding: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+.table tr:hover {
+    background-color: #f9fafb;
+}
+
+.editBtn {
+    background-color: #fab637;
+    /* Green */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+.editBtn:hover {
+    background-color: #f8ce42;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* add pyment  */
+
+.addcontainer {
+    padding: 20px;
+    background: #f9fafb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addheaderContainer {
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #555;
+    text-align: left;
+}
+
+.addbreadcrumb {
+    font-weight: 500;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #6f89ff;
+}
+
+.addcard {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin: 0 auto;
+}
+
+.addtitle {
+    font-size: 22px;
+    font-weight: 500;
+    color: #888;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.addform {
+    display: flex;
+    flex-direction: column;
+}
+
+.addformGroup {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.addformGroup label {
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.addformGroup input,
+.addformGroup select,
+.addformGroup textarea {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    outline: none;
+}
+
+.addformGroup textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.submitBtn {
+    background-color: #4a5cff;
+    color: #fff;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s all;
+    width: 100px;
+}
+
+.submitBtn:hover {
+    background-color: #1d4ed8;
+}

@@ -1,0 +1,241 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header h2 {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #888;
+}
+
+.sendBtn {
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.sendBtn:hover {
+    background-color: #005bb5;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.table th {
+    background-color: #f4f4f4;
+}
+
+.deleteBtn {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.deleteBtn:hover {
+    background-color: rgb(163, 56, 56);
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.addcontainer {
+    width: 1800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #f8f8f8;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addheaderContainer {
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #555;
+    text-align: left;
+}
+
+.addbreadcrumb {
+    font-weight: 500;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #6f89ff;
+}
+
+.addcontainer h3 {
+    margin-bottom: 20px;
+    text-align: left;
+    color: #888;
+    font-weight: 500px;
+}
+
+.addform {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addlabel {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    text-align: left;
+    color: #888;
+    font-weight: 400px;
+}
+
+.addinput {
+    margin-top: 5px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.quill {
+    margin-top: 5px;
+    height: 200px;
+}
+
+.addform {
+    text-align: left;
+    font-size: 14px;
+}
+
+.submitBtn {
+    width: 120px;
+    padding: 10px;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.submitBtn:hover {
+    background-color: #005bb5;
+}

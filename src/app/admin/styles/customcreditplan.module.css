@@ -1,0 +1,123 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.homeIcon {
+    margin-right: 5px;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.cardTitle {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #888;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #333;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formGroup label {
+    font-weight: 400;
+    color: #888;
+    text-align: left;
+    font-size: 14px;
+}
+
+.formGroup select {
+    padding: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.formGroup select,
+.formGroup input {
+    padding: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+.submitBtn {
+    width: 100px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 10px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.submitBtn:hover {
+    background-color: #0056b3;
+}
+
+.readOnlyInput {
+    background-color: #f1f1f1;
+    color: #555;
+    cursor: not-allowed;
+}
+
+.customPlanCheck {
+    font-size: 14px;
+}
