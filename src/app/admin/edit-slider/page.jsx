@@ -74,7 +74,7 @@ export default function AddSlider() {
          <div className="headerContainer">
             <div>
                                 <span className="breadcrumb">Slider</span> &gt;{' '}
-                                <span className="breadcrumbActive">Add Slider</span>
+                                <span className="breadcrumbActive">Edit Slider</span>
                               </div>
          
         </div>
@@ -90,7 +90,7 @@ export default function AddSlider() {
                     </div>
                   )}
         <form className="add-slider-form" onSubmit={handleSubmit}>
-            <h2>Add Slider</h2>
+            <h2>Edit Slider</h2>
           <label>Titel
           <input
             type="text"

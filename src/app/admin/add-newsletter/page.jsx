@@ -23,15 +23,18 @@ export default function SendNewsletter() {
   return (
     <Layout>
       <div className={styles.addcontainer}>
-        <div className={styles.addheaderContainer}>
-                  <div>
-                    <span className={styles.addbreadcrumb}>News Letter</span> &gt;{' '}
-                    <span className={styles.addbreadcrumbActive}>Add News Letter</span>
-                  </div>
-                </div>
-        <h3>Send News Letter</h3>
-
+         <div className="headerContainer">
+            <div>
+                                <span className="breadcrumb">Slider</span> &gt;{' '}
+                                <span className="breadcrumbActive">Add Slider</span>
+                              </div>
+         
+        </div>
+        
+ <div className="addcontent">
+          <div className="addright">
         <form className={styles.addform} onSubmit={handleSubmit}>
+          <h3>Send News Letter</h3>
           {/* Send All Users Checkbox */}
           <label className={styles.checkboxLabel}>
             <input
@@ -90,6 +93,8 @@ export default function SendNewsletter() {
             SUBMIT
           </button>
         </form>
+      </div>
+      </div>
       </div>
     </Layout>
   );

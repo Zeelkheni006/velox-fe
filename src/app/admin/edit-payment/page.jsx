@@ -50,11 +50,12 @@ export default function EditPaymentPage() {
   return (
     <Layout>
       <div className={styles.addcontainer}>
-        <div className={styles.addheaderContainer}>
-          <div>
-            <span className={styles.addbreadcrumb}>Payment</span> &gt;{' '}
-            <span className={styles.addbreadcrumbActive}>Edit Payment</span>
-          </div>
+          <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Payment</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Edit Payment</span>
+                              </div>
+         
         </div>
 
         <div className={styles.addcard}>

@@ -64,15 +64,17 @@ export default function AddTestimonial() {
     <Layout>
      
     <div className={styles.addcontainer}>
-        <div className={styles.addheaderContainer}>
-                 <div>
-                   <span className={styles.addbreadcrumb}>Testimonial</span> &gt;{" "}
-                   <span className={styles.addbreadcrumbActive}>Add Testimonial</span>
-                 </div>
-               </div>  
-      <h1 className={styles.addpageTitle}>Add Testimonial</h1>
+            <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Testimonial</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Add Testimonial</span>
+                              </div>
+         
+        </div>  
+      
 
       <form className={styles.addform} onSubmit={handleSubmit}>
+        <h1 className={styles.addpageTitle}>Add Testimonial</h1>
         <label className={styles.addlabel}>
           Title
           <input

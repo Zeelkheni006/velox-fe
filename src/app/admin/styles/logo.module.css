@@ -1,0 +1,135 @@
+.container {
+    display: flex;
+    justify-content: flex-start;
+    /* align to left */
+    align-items: flex-start;
+    gap: 10px;
+    /* smaller gap */
+    flex-wrap: nowrap;
+    /* keep in one row */
+    padding: 40px 20px;
+    background-color: #f8fafb;
+    margin-top: -300px;
+    /* allow horizontal scroll if needed */
+}
+
+.card {
+    background-color: #f9fbfc;
+    border: 1px solid #00c2cb;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    width: 52%;
+    /* wider box */
+    min-width: 300px;
+    /* ensures box doesn’t shrink too much */
+    text-align: center;
+    padding: 30px 20px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    height: 300px;
+    /* prevents shrinking */
+}
+
+.headerContainer {
+    width: 100%;
+    /* full width */
+    background-color: #ffffff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    height: 70px;
+    margin-top: 30px;
+}
+
+.breadcrumb {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 16px;
+    color: #2563eb;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+.card:hover {
+    box-shadow: 0 5px 12px rgba(0, 194, 203, 0.3);
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.cardTitle {
+    display: inline-block;
+    background-color: #baf7ff;
+    color: #10cbd8;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.fileInput {
+    display: block;
+    margin: 15px auto;
+    margin-top: 50px;
+}
+
+.line {
+    margin: 20px 0;
+    border: 0.5px solid #e0e0e0;
+}
+
+.submitBtn {
+    background-color: #00c2cb;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 15px;
+}
+
+.submitBtn:hover {
+    background-color: #00aab3;
+}
+
+
+/* Optional: better layout for mobile view */
+
+@media (max-width: 992px) {
+    .card {
+        width: 45%;
+    }
+}
+
+@media (max-width: 600px) {
+    .card {
+        width: 90%;
+    }
+}

@@ -71,16 +71,18 @@ export default function EditTestimonial() {
   return (
     <Layout>
       
-<div className={styles.editcontainer}>
-    <div className={styles.addheaderContainer}>
-              <div>
-                <span className={styles.addbreadcrumb}>Testimonial</span> &gt;{" "}
-                <span className={styles.addbreadcrumbActive}>Edit Testimonial</span>
-              </div>
-            </div>
-        <h1 className={styles.addpageTitle}>Edit Testimonial</h1>
+<div className={styles.addcontainer}>
+        <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Testimonial</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Add Testimonial</span>
+                              </div>
+         
+        </div>
+        
 
         <form className={styles.addform} onSubmit={handleSubmit}>
+          <h1 className={styles.addpageTitle}>Edit Testimonial</h1>
           <label className={styles.addlabel}>
             Title
             <input

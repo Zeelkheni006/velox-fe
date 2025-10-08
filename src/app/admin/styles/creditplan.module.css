@@ -225,13 +225,19 @@
 /* addCreditPlan.module.css */
 
 .addcontainer {
-    width: 1500px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 30px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addcontent {
+    display: flex;
+    gap: 20px;
+}
+
+.addright {
+    flex: 3;
 }
 
 .addheaderContainer {
@@ -251,35 +257,40 @@
 }
 
 .addtitle {
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 500;
     margin-bottom: 20px;
     color: #888;
     text-align: left;
 }
 
 .addform {
-    display: flex;
-    flex-direction: column;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
 }
 
 .addform label {
+    display: flex;
+    flex-direction: column;
     font-weight: 400;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    color: #888;
     text-align: left;
+    color: #888;
     font-size: 15px;
+    margin-bottom: 10px;
 }
 
 .addform input[type="text"],
 .addform select,
 .addform input[type="file"] {
-    padding: 10px;
-    font-size: 14px;
-    border-radius: 5px;
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
     border: 1px solid #ccc;
-    outline: none;
+    border-radius: 4px;
 }
 
 .addform input[type="text"]:focus,
@@ -306,6 +317,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     align-self: flex-start;
+    margin-right: 1400px;
     /* Left side */
 }
 

@@ -309,7 +309,10 @@ Best Services
       {openMenus.quotes && <div className={styles.subMenu}><div onClick={() => {
       router.push('/admin/request'); // 🔁 change this path to your actual staff page
       onClose(); // optional: close sidebar on mobile
-    }}>Request</div><br />Followups</div>}
+    }}>Request</div><div onClick={() => {
+      router.push('/admin/followup'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Followups</div></div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('pages')}>
         <FaGlobe /><span>Manage Pages</span>{openMenus.pages ? (
@@ -318,7 +321,16 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.pages && <div className={styles.subMenu}>About Us<br />Blogs<br />Contact Us</div>}
+      {openMenus.pages && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/admin-about'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>About Us</div><div onClick={() => {
+      router.push('/admin/admin-blog'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Blogs</div><div onClick={() => {
+      router.push('/admin/admin-contact'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Contact Us</div></div>}
 
       <div className={styles.sectionTitle}>OTHERS</div>
       <div className={styles.menuItem} onClick={() => toggleMenu('settings')}>
@@ -328,9 +340,18 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.settings && <div className={styles.subMenu}>Logo</div>}
+      {openMenus.settings && <div className={styles.subMenu}><div onClick={() => {
+      router.push('/admin/general-settings-logo'); // 🔁 change this path to your actual staff page
+      onClose(); // optional: close sidebar on mobile
+    }}>Logo</div></div>}
 
-      <div className={styles.menuItem}><FaTrash /><span>Clear Cache</span></div>
+       <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/dashboard'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+><FaTrash /><span>Clear Cache</span></div>
       
     </div>
   );

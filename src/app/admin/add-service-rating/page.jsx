@@ -34,12 +34,16 @@ export default function AddServiceRating() {
   return (
     <Layout>
       <div className={styles.addcontainer}>
-           <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Service Rating</span> &gt;{" "}
-          <span className={styles.addbreadcrumbActive}>Add Service Rating</span>
+              <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Service Rating</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Add Rating</span>
+                              </div>
+         
         </div>
-        <h2 className={styles.addtitle}>Add Service Rating</h2>
+       
         <form className={styles.addform} onSubmit={handleSubmit}>
+           <h2 className={styles.addtitle}>Add Service Rating</h2>
           <label>
             User:
             <select value={user} onChange={(e) => setUser(e.target.value)}>

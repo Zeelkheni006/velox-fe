@@ -49,9 +49,12 @@ const AddRole = () => {
   return (
     <Layout>
       <div className={styles.container1}>
-        <div className={styles.breadcrumb}>
-          <span>Add Role</span> &gt; <span>Manage Roles</span> &gt;{" "}
-          <span className={styles.active}>Add Role</span>
+          <div className={styles.headerContainer}>
+            <div>
+            
+           <span className={styles.breadcrumb}>Blog</span> &gt;{" "} 
+           <span className={styles.breadcrumbActive}>Blog List</span>
+            </div>
         </div>
 
         <div className={styles.card1}>

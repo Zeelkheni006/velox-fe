@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/request.module.css";
 
@@ -10,8 +10,15 @@ export default function RequestPage() {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const [modalMessage, setModalMessage] = useState(""); // modal content
-  const [isModalOpen, setIsModalOpen] = useState(false); // modal visibility
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openActionId, setOpenActionId] = useState(null);
+
+  // follow-up modal
+  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
+  const [followUpMessage, setFollowUpMessage] = useState("");
+  const [followUpDate, setFollowUpDate] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   const requests = [
     {
@@ -24,6 +31,7 @@ export default function RequestPage() {
       visitDate: "2025-10-07",
       visitTime: "10:30 AM",
       status: "New",
+      type: "Service A",
     },
     {
       id: 2,
@@ -35,14 +43,16 @@ export default function RequestPage() {
       visitDate: "2025-10-08",
       visitTime: "2:00 PM",
       status: "Pending",
+      type: "Service B",
     },
   ];
 
+  // Filter logic
   const filteredRequests = useMemo(() => {
     return requests.filter((req) => {
       const matchesType =
         requestType === "" ||
-        req.message.toLowerCase().includes(requestType.toLowerCase());
+        req.type.toLowerCase().includes(requestType.toLowerCase());
       const matchesStatus = status === "" || req.status === status;
       const matchesSearch =
         search === "" ||
@@ -61,20 +71,77 @@ export default function RequestPage() {
   const handleNextPage = () =>
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  const handleDelete = (id) => {
-    alert(`Delete request with ID: ${id}`);
-  };
-
+  // View message modal
   const openModal = (message) => {
     setModalMessage(message);
     setIsModalOpen(true);
   };
-
   const closeModal = () => setIsModalOpen(false);
 
+  // Dropdown
+  const toggleActionMenu = (id) => {
+    setOpenActionId((prev) => (prev === id ? null : id));
+  };
+  const handleDropdownClick = (e) => e.stopPropagation();
+
+  useEffect(() => {
+    const handleClickOutside = () => setOpenActionId(null);
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, []);
+
+  const handleDelete = (id) => {
+    alert(`Delete request with ID: ${id}`);
+  };
+
+  // Follow-up Modal controls
+  const openFollowUpModal = (req) => {
+    setSelectedRequest(req);
+    setFollowUpMessage("");
+    setFollowUpDate("");
+    setIsFollowUpOpen(true);
+    setOpenActionId(null);
+  };
+  const closeFollowUpModal = () => setIsFollowUpOpen(false);
+
+  const handleFollowUpSubmit = () => {
+    if (!followUpMessage || !followUpDate) {
+      alert("Please fill out both message and date fields.");
+      return;
+    }
+    alert(
+      `Follow-up submitted for ${selectedRequest.name}\nMessage: ${followUpMessage}\nDate: ${followUpDate}`
+    );
+    setIsFollowUpOpen(false);
+  };
+  const [isReferOpen, setIsReferOpen] = useState(false);
+  const [selectedFranchise, setSelectedFranchise] = useState("");
+  const [referMessage, setReferMessage] = useState("");
+
+  const openReferModal = (req) => {
+    setSelectedRequest(req);
+    setSelectedFranchise("");
+    setReferMessage("");
+    setIsReferOpen(true);
+    setOpenActionId(null);
+  };
+
+  const closeReferModal = () => setIsReferOpen(false);
+
+  const handleReferSubmit = () => {
+    if (!selectedFranchise || !referMessage) {
+      alert("Please select a franchise and enter a message.");
+      return;
+    }
+    alert(
+      `Referred ${selectedRequest.name} to ${selectedFranchise}\nMessage: ${referMessage}`
+    );
+    setIsReferOpen(false);
+  };
   return (
     <Layout>
       <div className={styles.container}>
+        {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
             <span className={styles.breadcrumb}>Request</span> &gt;{" "}
@@ -82,24 +149,21 @@ export default function RequestPage() {
           </div>
         </div>
 
+        {/* Main Card */}
         <div className={styles.card}>
           {/* Title & Filters */}
           <div className={styles.header}>
             <h2>Request Quotes</h2>
             <div className={styles.filters}>
               <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                value={requestType}
+                onChange={(e) => setRequestType(e.target.value)}
               >
                 <option value="">Select Request Type</option>
-                <option value="New">New</option>
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
+                <option value="Service A">Service A</option>
+                <option value="Service B">Service B</option>
               </select>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
+              <select value={status} onChange={(e) => setStatus(e.target.value)}>
                 <option value="">Select Status</option>
                 <option value="New">New</option>
                 <option value="Pending">Pending</option>
@@ -154,7 +218,6 @@ export default function RequestPage() {
                 <th>Request Message</th>
                 <th>Visit Date & Time</th>
                 <th>Status</th>
-                <th>View Logs</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -180,19 +243,46 @@ export default function RequestPage() {
                   <td>
                     <span className={styles.statusBtn}>{req.status}</span>
                   </td>
-                  <td>
-                    <button className={styles.viewLogsBtn}>View Logs</button>
-                  </td>
-                  <td>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => handleDelete(req.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+                 <td className={styles.actionCell} onClick={handleDropdownClick}>
+  <button
+    className={styles.deleteBtn}
+    onClick={(e) => {
+      e.stopPropagation();
+      handleDelete(req.id);
+    }}
+  >
+    Delete
+  </button>
+
+  <button
+    className={styles.viewLogsBtn}
+    onClick={(e) => {
+      e.stopPropagation();
+      toggleActionMenu(req.id);
+    }}
+  >
+    Action ▾
+  </button>
+
+  {openActionId === req.id && (
+    <div className={styles.actionDropdown}>
+      <button onClick={() => openFollowUpModal(req)}>Follow Up</button>
+      <button onClick={() => openReferModal(req)}>Refer</button>
+      <button onClick={() => handleDelete(req.id)}>Delete</button>
+      <button onClick={() => setOpenActionId(null)}>Cancel</button>
+    </div>
+  )}
+</td>
                 </tr>
               ))}
+
+              {currentRequests.length === 0 && (
+                <tr>
+                  <td colSpan="9" className={styles.noData}>
+                    No entries found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
 
@@ -223,30 +313,109 @@ export default function RequestPage() {
           </div>
         </div>
 
-        {/* Modal */}
-     {isModalOpen && (
+        {/* Message Modal */}
+        {isModalOpen && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContent}>
+              <div className={styles.modalHeader}>
+                <h3>Message</h3>
+                <button className={styles.closeBtn} onClick={closeModal}>
+                  &times;
+                </button>
+              </div>
+              <div className={styles.modalBody}>{modalMessage}</div>
+              <div style={{ textAlign: "right", marginTop: "10px" }}>
+                <button className={styles.closeBtnBottom} onClick={closeModal}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Follow Up Modal */}
+        {isFollowUpOpen && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.followUpModal}>
+              <div className={styles.modalHeader}>
+                <h3>Follow Up</h3>
+              </div>
+              <div className={styles.modalBody}>
+                <label>Message:</label>
+                <textarea
+                  className={styles.textArea}
+                  value={followUpMessage}
+                  onChange={(e) => setFollowUpMessage(e.target.value)}
+                  placeholder="Enter follow up message"
+                />
+
+                <label>Date:</label>
+                <input
+                  type="date"
+                  className={styles.inputDate}
+                  value={followUpDate}
+                  onChange={(e) => setFollowUpDate(e.target.value)}
+                />
+              </div>
+              <div className={styles.modalFooter}>
+                <button
+                  className={styles.submitBtn}
+                  onClick={handleFollowUpSubmit}
+                >
+                  Submit
+                </button>
+                <button className={styles.closeBtnBottom} onClick={closeFollowUpModal}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Refer Modal */}
+{isReferOpen && (
   <div className={styles.modalOverlay}>
-    <div className={styles.modalContent}>
-      {/* Modal Header */}
+    <div className={styles.referModal}>
       <div className={styles.modalHeader}>
-        <h3>Message</h3>
-        <button className={styles.closeBtn} onClick={closeModal}>
-          &times;
-        </button>
+        <h3>Franchise</h3>
       </div>
 
-      {/* Modal Body */}
-      <div className={styles.modalBody}>{modalMessage}</div>
+      <div className={styles.modalBody}>
+        {/* Franchise Select */}
+        <label>Select Franchise:</label>
+        <select
+          className={styles.inputSelect}
+          value={selectedFranchise}
+          onChange={(e) => setSelectedFranchise(e.target.value)}
+        >
+          <option value="">-- Select Franchise --</option>
+          <option value="Franchise A">Franchise A</option>
+          <option value="Franchise B">Franchise B</option>
+          <option value="Franchise C">Franchise C</option>
+        </select>
 
-      {/* Optional Close Button at Bottom */}
-      <div style={{ textAlign: "right", marginTop: "10px" }}>
-        <button className={styles.closeBtnBottom} onClick={closeModal}>
+        {/* Message Box */}
+        <label>Message:</label>
+        <textarea
+          className={styles.textArea}
+          placeholder="Enter your message..."
+          value={referMessage}
+          onChange={(e) => setReferMessage(e.target.value)}
+        />
+      </div>
+
+      {/* Buttons on right */}
+      <div className={styles.modalFooter}>
+        <button className={styles.submitBtn} onClick={handleReferSubmit}>
+          Submit
+        </button>
+        <button className={styles.closeBtnBottom} onClick={closeReferModal}>
           Close
         </button>
       </div>
     </div>
   </div>
 )}
+
       </div>
     </Layout>
   );

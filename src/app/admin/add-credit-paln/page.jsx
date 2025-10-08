@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef,useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import styles from '../styles/creditplan.module.css';
 import Layout from '../pages/page';
@@ -19,6 +19,7 @@ export default function AddCreditPlanPage() {
   const [validityType, setValidityType] = useState('Days');
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
+  const [mounted, setMounted] = useState(false);
 
   // Handle image validation
   const handleImageChange = (e) => {
@@ -46,7 +47,9 @@ export default function AddCreditPlanPage() {
       }
     };
   };
-
+ useEffect(() => {
+    setMounted(true);
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
@@ -67,15 +70,20 @@ export default function AddCreditPlanPage() {
     <Layout>
       <div className={styles.addcontainer}>
         {/* Breadcrumb */}
-        <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Credit Plan</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Add Credit Plan</span>
+           <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Credit Plan</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Add Credit Plan</span>
+                              </div>
+         
         </div>
 
-        <h1 className={styles.addtitle}>Add Credit Plan</h1>
-
+       
+ <div className="addcontent">
+          <div className="addright">
         <form className={styles.addform} onSubmit={handleSubmit}>
-          <label>Title</label>
+           <h1 className={styles.addtitle}>Add Credit Plan</h1>
+          <label>Title
           <input
             type="text"
             placeholder="Title"
@@ -83,8 +91,8 @@ export default function AddCreditPlanPage() {
             onChange={(e) => setTitle(e.target.value)}
             required
           />
-
-          <label>Credit Value</label>
+</label>
+          <label>Credit Value
           <input
             type="text"
             placeholder="Credit Value"
@@ -92,8 +100,8 @@ export default function AddCreditPlanPage() {
             onChange={(e) => setCreditValue(e.target.value)}
             required
           />
-
-          <label>Credit Price</label>
+</label>
+          <label>Credit Price
           <input
             type="text"
             placeholder="Credit Price"
@@ -101,8 +109,8 @@ export default function AddCreditPlanPage() {
             onChange={(e) => setCreditPrice(e.target.value)}
             required
           />
-
-          <label>Real Price</label>
+</label>
+          <label>Real Price
           <input
           type="text"
             placeholder="Real Price"
@@ -110,8 +118,8 @@ export default function AddCreditPlanPage() {
             onChange={(e) => setRealPrice(e.target.value)}
             required
           />
-
-          <label>Validity Value</label>
+</label>
+          <label>Validity Value
           <input
             type="text"
             placeholder="Validity Value"
@@ -119,8 +127,8 @@ export default function AddCreditPlanPage() {
             onChange={(e) => setValidityValue(e.target.value)}
             required
           />
-
-          <label>Validity Type</label>
+</label>
+          <label>Validity Type
           <select
             value={validityType}
             onChange={(e) => setValidityType(e.target.value)}
@@ -128,42 +136,49 @@ export default function AddCreditPlanPage() {
             <option value="Days">Days</option>
             <option value="Months">Months</option>
           </select>
-
-          <label>Image</label>
+</label>
+          <label>Image
           <input
             type="file"
             accept="image/png, image/jpeg, image/jpg"
             onChange={handleImageChange}
           />
+          </label>
           <span>
             Only allowed jpg, png, jpeg format. Image resolution must be 300*200. Max file size allowed: 2MB
           </span>
 
-          <label>Description</label>
-          <JoditEditor
-            ref={editor}
-            value={description}
-             className={styles.text}
-            config={{
-              readonly: false,
-              height: 300,
-              buttons: [
-                  "undo","redo", "|",
-                      "bold", "italic", "underline", "|",
-                      "ul", "ol", "|",
-                      "font", "fontsize","brush","|",
-                      "align", "|",
-                      "table", "link", "image", "video", "|",
-                      "source",
-              ],
-            }}
-            onChange={(newContent) => setDescription(newContent)}
-          />
+          <label>Description
+        {mounted && (
+  <JoditEditor
+    ref={editor}
+    value={description}
+    config={{
+      readonly: false,
+      height: 200,
+      toolbarSticky: false,
+      buttons: [
+        'undo', 'redo', '|',
+        'bold', 'italic', 'underline', 'strikethrough', '|',
+        'ul', 'ol', '|',
+        'link', 'image', 'video', '|',
+        'align', '|',
+        'source', '|',
+        'help'
+      ]
+    }}
+    tabIndex={1}
+    onBlur={(newContent) => setDescription(newContent)}
+  />
+)}
+</label>
 
           <button type="submit" className={styles.submitBtn}>
             Submit
           </button>
         </form>
+      </div>
+      </div>
       </div>
     </Layout>
   );

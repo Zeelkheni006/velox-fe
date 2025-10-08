@@ -1,0 +1,60 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #f8fafb;
+    border-radius: 8px;
+}
+
+.pageTitle {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: left;
+    color: #2563eb;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.input,
+.select,
+.fileInput {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+.fileInput {
+    padding: 6px;
+}
+
+.info {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.updateBtn {
+    padding: 10px 20px;
+    background-color: #00c2cb;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    /* left-aligned */
+}
+
+.updateBtn:hover {
+    background-color: #00aab3;
+}

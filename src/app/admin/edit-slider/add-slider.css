@@ -1,6 +1,7 @@
 .add-slider-container {
     padding: 30px;
     background-color: #f4f7fa;
+    min-height: 100vh;
     font-family: 'Segoe UI', sans-serif;
     width: 1900px;
 }

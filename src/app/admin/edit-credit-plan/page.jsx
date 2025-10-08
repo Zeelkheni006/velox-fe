@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '../pages/page';
 import styles from '../styles/creditplan.module.css';
@@ -16,7 +16,7 @@ export default function EditCreditPlanPage() {
   const [validityType, setValidityType] = useState('Days');
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
-
+const [mounted, setMounted] = useState(false);
   // ✅ Load plan from localStorage
   useEffect(() => {
     const savedPlan = localStorage.getItem('selectedCreditPlan');
@@ -72,7 +72,9 @@ export default function EditCreditPlanPage() {
     console.log('Updated Plan:', updatedPlan);
     alert('Credit Plan updated successfully!');
   };
-
+ useEffect(() => {
+    setMounted(true);
+  }, []);
   if (!plan) {
     return (
       <Layout>
@@ -84,51 +86,59 @@ export default function EditCreditPlanPage() {
   return (
     <Layout>
       <div className={styles.addcontainer}>
-          <div className={styles.addheaderContainer}>
-                  <span className={styles.addbreadcrumb}>Credit Plan</span> &gt;{' '}
-                  <span className={styles.addbreadcrumbActive}>Edit Credit Plan</span>
-                </div>
-        <h1 className={styles.addtitle}>Edit Credit Plan</h1>
+             {/* Breadcrumb */}
+                <div className={styles.headerContainer}>
+                 <div>
+                                     <span className={styles.breadcrumb}>Credit Plan</span> &gt;{' '}
+                                     <span className={styles.breadcrumbActive}>Edit Credit Plan</span>
+                                   </div>
+              
+             </div>
+     
+            
+      <div className="addcontent">
+               <div className="addright">
+             <form className={styles.addform} onSubmit={handleSubmit}>
 
-        <form className={styles.addform} onSubmit={handleSubmit}>
+              <h1 className={styles.addtitle}>Edit Credit Plan</h1>
           {/* Title */}
-          <label>Title</label>
+          <label>Title
           <input
             type="text"
             value={plan.title || ''}
             onChange={(e) => handleChange('title', e.target.value)}
             required
           />
-
+</label>
           {/* Credit */}
-          <label>Credit</label>
+          <label>Credit
           <input
             type="text"
             value={plan.credit || ''}
             onChange={(e) => handleChange('credit', e.target.value)}
             required
           />
-
+</label>
           {/* Price */}
-          <label>Price</label>
+          <label>Price
           <input
             type="text"
             value={plan.price || ''}
             onChange={(e) => handleChange('price', e.target.value)}
             required
           />
-
+</label>
           {/* Validity */}
-          <label>Validity</label>
+          <label>Validity
           <input
             type="text"
             value={plan.validity || ''}
             onChange={(e) => handleChange('validity', e.target.value)}
             required
           />
-
+</label>
           {/* Validity Type */}
-          <label>Validity Type</label>
+          <label>Validity Type
           <select
             value={validityType}
             onChange={(e) => setValidityType(e.target.value)}
@@ -136,45 +146,52 @@ export default function EditCreditPlanPage() {
             <option value="Days">Days</option>
             <option value="Months">Months</option>
           </select>
-
+</label>
           {/* Image Upload */}
-          <label>Image</label>
+          <label>Image
           <input
             type="file"
             accept="image/png, image/jpeg, image/jpg"
             onChange={handleImageChange}
           />
+          </label>
           <span className={styles.note}>
             Only allowed jpg, png, jpeg format. Image resolution must be 300×200.
             Max file size allowed: 2MB
           </span>
 
           {/* Description */}
-          <label>Description</label>
-          <JoditEditor
-            ref={editor}
-            value={description}
-            config={{
-              readonly: false,
-              height: 300,
-              buttons: [
-                'undo', 'redo', '|',
-                'bold', 'italic', 'underline', '|',
-                'ul', 'ol', '|',
-                'font', 'fontsize', 'brush', '|',
-                'align', '|',
-                'table', 'link', 'image', 'video', '|',
-                'source'
-              ],
-            }}
-            onChange={(newContent) => setDescription(newContent)}
-          />
-
+          <label>Description
+             {mounted && (
+  <JoditEditor
+    ref={editor}
+    value={description}
+    config={{
+      readonly: false,
+      height: 200,
+      toolbarSticky: false,
+      buttons: [
+        'undo', 'redo', '|',
+        'bold', 'italic', 'underline', 'strikethrough', '|',
+        'ul', 'ol', '|',
+        'link', 'image', 'video', '|',
+        'align', '|',
+        'source', '|',
+        'help'
+      ]
+    }}
+    tabIndex={1}
+    onBlur={(newContent) => setDescription(newContent)}
+  />
+)}
+</label>
           {/* Submit Button */}
           <button type="submit" className={styles.submitBtn}>
             Update
           </button>
         </form>
+        </div>
+        </div>
       </div>
     </Layout>
   );

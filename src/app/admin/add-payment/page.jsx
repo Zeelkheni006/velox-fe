@@ -38,9 +38,12 @@ export default function AddPaymentPage() {
   return (
     <Layout>
       <div className={styles.addcontainer}>
-        <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Credit Plan</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Add Credit Plan</span>
+           <div className={styles.headerContainer}>
+            <div>
+                                <span className={styles.breadcrumb}>Payment</span> &gt;{' '}
+                                <span className={styles.breadcrumbActive}>Add Payment</span>
+                              </div>
+         
         </div>
 
         <div className={styles.addcard}>
