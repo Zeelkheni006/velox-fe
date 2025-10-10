@@ -32,9 +32,11 @@ export default function SendGift() {
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
-        <div className={styles.headerContainer}>
-          <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
-          <span className={styles.breadcrumbActive}>Send Gift</span>
+       <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Send Gift</span>
+          </div>
         </div>
 
         <div className={styles.card}>

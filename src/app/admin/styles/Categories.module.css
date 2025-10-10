@@ -197,13 +197,11 @@
 /* add-category css */
 
 .addcontainer {
-    width: 1500px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
+    padding: 30px;
+    background-color: #f4f7fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
 }
 
 .breadcrumbadd {

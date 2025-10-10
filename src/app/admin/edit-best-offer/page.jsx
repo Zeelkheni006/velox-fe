@@ -30,10 +30,11 @@ export default function AddSubCategory() {
   return (
     <Layout>
       <div className={styles.wrapper}>
-        <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Best Offer</span> &gt;{' '}
-          <span className={styles.addbreadcrumb}>Best Offer</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Edit Best Offer</span>
+         <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>BestOffer</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit BestOffer</span>
+          </div>
         </div>
 
         <div className={styles.addcard}>

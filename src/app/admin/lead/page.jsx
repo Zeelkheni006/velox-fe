@@ -5,7 +5,7 @@
     import styles from "../styles/Leads.module.css";
     import { useRouter } from 'next/navigation';
     import dynamic from "next/dynamic";
-
+import { useEffect } from "react";
 
 
     const leadsData = [
@@ -203,8 +203,36 @@ const handleDecline = () => {
     setShowSuccess(false);
   }, 2500);
 };
+  useEffect(() => {
+    // Disable right-click
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+    };
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    const handleKeyDown = (e) => {
+      if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" )) ||
+        (e.ctrlKey && e.key === "u") 
+        
+      ) {
+        e.preventDefault();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
 
     return (
+       
         <Layout>
         <div className={styles.pageWrapper}>
             
@@ -382,5 +410,6 @@ const handleDecline = () => {
   </div>
 )}
         </Layout>
+       
     );
     }

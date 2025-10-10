@@ -80,7 +80,7 @@ const giftId = searchParams.get("id");
             <h3>Gift</h3>
             <button
               className={styles.addBtn}
-              onClick={() => router.push("/admin/add-best-offer")}
+              onClick={() => router.push("/admin/admin-add/add-gift")}
             >
               + Add New
             </button>

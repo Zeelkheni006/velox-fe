@@ -163,6 +163,10 @@
     cursor: pointer;
 }
 
+.editBtn:hover {
+    background-color: #45bd61;
+}
+
 .noData {
     text-align: center;
     padding: 20px;

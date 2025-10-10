@@ -6,7 +6,7 @@ import styles from '../styles/services.module.css';
 import Layout from '../pages/page';
 import { updateService, getCategoriesWithSubcategories } from '../../api/admin-service/category-list';
 import { useRouter, useSearchParams } from 'next/navigation';
-
+import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; 
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function EditService() {
@@ -33,7 +33,8 @@ export default function EditService() {
   const [categories, setCategories] = useState([]);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const [popupMessage, setPopupMessage] = useState("");
+const [popupType, setPopupType] = useState(""); 
 const subCategoryId = searchParams.get('sub_category_id');
   const descriptionEditor = useRef(null);
   const longDescriptionEditor = useRef(null);
@@ -49,93 +50,106 @@ const subCategoryId = searchParams.get('sub_category_id');
 
   // Pre-fill form from localStorage
   useEffect(() => {
-    setMounted(true);
-    const savedService = localStorage.getItem('selectedService');
-    if (savedService) {
-      const service = JSON.parse(savedService);
-      setFormData({
-        id: service.id || '',
-        title: service.title || '',
-        category_id: service.category_id || '',
-        sub_category_id: service.sub_category_id || '',
-        price: service.price || '',
-        displayNumber: service.displayNumber || '',
-        image: service.image || null,
-        banner: service.banner || null,
-        hours: service.duration ? service.duration.split(' ')[0] : '',
-        minutes: service.duration ? service.duration.split(' ')[2] : '',
-      });
-      setDescription(service.description || '');
-      setLongDescription(service.long_description || '');
+    if (titleFromURL) setTitle(titleFromURL);
+    if (logoFromURL) setLogoUrl(logoFromURL);
+    if (descriptionFromURL) {
+      setDescription(descriptionFromURL);
+      setLongDescription(descriptionFromURL);
+    } else if (titleFromURL) {
+      const defaultDesc = `${titleFromURL} By Velox`;
+      setDescription(defaultDesc);
+      setLongDescription(defaultDesc);
     }
-  }, []);
-
+  }, [titleFromURL, logoFromURL, descriptionFromURL]);
   const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    if (type === 'file') {
-      setFormData(prev => ({ ...prev, [name]: files[0] || null }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      // Clear sub_category if category changes
-      if(name === 'category_id') setFormData(prev => ({ ...prev, sub_category_id: '' }));
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'image/svg+xml') {
+      alert('❌ Only SVG files are allowed!');
+      e.target.value = null;
+      return;
     }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB
+      alert('❌ File size exceeds 2MB!');
+      e.target.value = null;
+      return;
+    }
+
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.id) return alert('Service ID missing. Cannot update.');
+  e.preventDefault();
+  try {
+    setLoading(true);
 
-    try {
-      setLoading(true);
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    if (logoFile) formData.append("logo", logoFile);
 
-      const convertToBase64 = (file) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.readAsDataURL(file);
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = (err) => reject(err);
-        });
+      const res = await updateService(formData.id, payload);
 
-      const payload = {
-        title: formData.title,
-        description,
-        long_description: longDescription,
-        category_id: Number(formData.category_id),
-        sub_category_id: Number(formData.sub_category_id),
-        price: Number(formData.price),
-        duration: `${formData.hours || 0} Hour ${formData.minutes || 0} Minute`,
-        image: formData.image instanceof File ? await convertToBase64(formData.image) : formData.image,
-        banner: formData.banner instanceof File ? await convertToBase64(formData.banner) : formData.banner,
-      };
-
-      const result = await updateService(formData.id, payload);
-
-      if (result.success) {
-        alert('Service updated successfully!');
-          router.push('/admin/services?updated=true');
-        router.refresh();
-      } else {
-        alert('Failed to update service: ' + (result.message || 'Unknown error'));
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error occurred while updating the service.');
-    } finally {
-      setLoading(false);
+ 
+    if (!res.success) {
+      const messages = Object.values(res.message).flat().join("\n");
+      setPopupMessage("❌ Failed to update category:\n" + messages);
+      setPopupType("error");
+      return;
     }
-  };
+
+    setPopupMessage("✅ Category Updated Successfully!");
+      setPopupType("success");
+  } catch (err) {
+    console.error("Update Error:", err);
+    setPopupMessage("❌ Unexpected error: " + err.message);
+    setPopupType("error");
+  } finally {
+    setLoading(false);
+  }
+};
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+  if (!popupMessage) return;
+
+  const timer = setTimeout(() => {
+    setPopupType(prev => prev + " hide");
+    setTimeout(() => {
+      setPopupMessage("");
+      setPopupType("");
+    }, 400);
+  }, 4000);
+
+  return () => clearTimeout(timer);
+}, [popupMessage]);
+
 
   return (
     <Layout>
       <div className={styles.addcontainer}>
-        <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Services</span> &gt;{' '}
-          <span className={styles.addbreadcrumb}>Services</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Edit Services</span>
+           <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Best Service</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Best Service</span>
+          </div>
         </div>
 
         <div className={styles.addcard}>
           <h2>Edit Services</h2>
+            {popupMessage && (
+                      <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
+                        {popupType.startsWith("success") ? 
+                          <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
+                          <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
+                        <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
+                      </div>
+                    )}
           <form onSubmit={handleSubmit}>
             {/* CATEGORY */}
             {mounted && (

@@ -113,10 +113,12 @@ const handleSubmit = async (e) => {
   return (
     <Layout>
       <div className={styles.editcontainer}>
-        <div className={styles.editheader}>
-          <span className={styles.editbreadcrumb}>Category</span> &gt;{" "}
-          <span className={styles.editbreadcrumbActive}>Edit Category</span>
+                <div className={styles.headerContainer}>
+          <div>
+          <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+          <span className={styles.breadcrumbActive}>Edit Category</span>
         </div>
+</div>
 
         <div className={styles.editcard}>
           <h3>Edit Category</h3>

@@ -63,7 +63,7 @@ export default function NewsletterPage() {
           <div className={styles.header}>
             <h2>News Letter</h2>
             <button className={styles.sendBtn }    
-            onClick={() => router.push("/admin/add-newsletter")}>Send News Letter</button>
+            onClick={() => router.push("/admin/admin-add/add-newsletter")}>Send News Letter</button>
           </div>
 
           {/* Controls */}

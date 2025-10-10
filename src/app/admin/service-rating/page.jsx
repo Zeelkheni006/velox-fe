@@ -79,7 +79,7 @@ export default function ServiceRating() {
             <h2>Services Rating</h2>
             <button
               className={styles.addBtn}
-              onClick={() => router.push("/admin/add-service-rating")}
+              onClick={() => router.push("/admin/admin-add/add-service-rating")}
             >
               + Add new
             </button>

@@ -57,7 +57,7 @@ export default function PaymentPage({ data }) {
             <h1 className={styles.title}>Payment</h1>
             <button
               className={styles.addBtn}
-              onClick={() => router.push('/admin/add-payment')}
+              onClick={() => router.push('/admin/admin-add/add-payment')}
             >
               + Add New
             </button>

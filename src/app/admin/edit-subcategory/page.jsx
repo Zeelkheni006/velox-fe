@@ -113,9 +113,11 @@ data.append('category_id', categoryId);
   return (
     <Layout>
       <div className={styles.editcontainer}>
-        <div className={styles.editheader}>
-          <span className={styles.editbreadcrumb}>Sub Category</span> &gt;{' '}
-          <span className={styles.editbreadcrumbActive}>Edit Sub Category</span>
+            <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Sub Category</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit Subcategory</span>
+          </div>
         </div>
 
         <div className={styles.editcard}>

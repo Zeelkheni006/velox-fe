@@ -68,15 +68,12 @@ export default function Offer() {
     <Layout>
       <div className={styles.container}>
         {/* Header */}
-        <div className={styles.headerContainer}>
-  <span className={styles.pageTitle}>Offer</span>
-  <span className={styles.separator}>|</span>
-  <div className={styles.breadcrumb}>
-    <span className={styles.homeIcon}>🏠</span>
-    &nbsp;›&nbsp;
-    <span className={styles.activespan}>Offer</span>
-  </div>
-</div>
+     <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Offer</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Offer</span>
+          </div>
+        </div>
 
         {/* Card */}
         <div className={styles.card}>
@@ -85,7 +82,7 @@ export default function Offer() {
             <h3>Offers</h3>
             <button
               className={styles.addbtn}
-              onClick={() => router.push("/admin/add-offer")}
+              onClick={() => router.push("/admin/admin-add/add-offer")}
             >
               + Add New
             </button>

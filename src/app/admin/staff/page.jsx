@@ -123,9 +123,12 @@ const currentStaffPage = filteredStaff.slice(startIndex, endIndex);
     <Layout>
     <div className={styles.container}>
       <div className={styles.header}>
-        <div className={styles.breadcrumb}>
-          <span>Staffs</span> &gt; <span className={styles.active}>Manage Staffs</span>
-        </div>
+          <div className={styles.headerContainer}>
+                         <div>
+                           <span className={styles.breadcrumb}>Manage Staff</span> &gt;{" "}
+                           <span className={styles.breadcrumbActive}>Manage Staff</span>
+                         </div>
+                       </div>
            <button className={styles.addButton} onClick={() => setShowModal(true)}>
             + Add New Staff
           </button>

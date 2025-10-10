@@ -32,13 +32,27 @@ useEffect(() => {
   };
 
   fetchServices();
+}, [window.location.search]); 
 
-  // Refetch whenever `updated` query param changes
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("updated")) fetchServices();
-}, []);
+useEffect(() => {
+  const handleUpdatedService = () => {
+    const updatedService = localStorage.getItem('updatedService');
+    if (updatedService) {
+      const service = JSON.parse(updatedService);
+      setServicesList(prev =>
+        prev.map(s => (s.id === service.id ? service : s))
+      );
+      localStorage.removeItem('updatedService');
+    }
+  };
 
+  // Run on mount
+  handleUpdatedService();
 
+  // Also run on history change (when query ?updated=1 appears)
+  const unlisten = router.events?.on('routeChangeComplete', handleUpdatedService);
+  return () => unlisten && router.events.off('routeChangeComplete', handleUpdatedService);
+}, [router]);
 
   // 🔹 Search filter
   const filteredServices = servicesList.filter(service =>
@@ -125,7 +139,7 @@ useEffect(() => {
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+            <span className={styles.breadcrumb}>Service</span> &gt;{" "}
             <span className={styles.breadcrumbActive}>Services</span>
           </div>
         </div>
@@ -134,7 +148,7 @@ useEffect(() => {
           <h5 className={styles.title}>Services</h5>
           <button
             className={styles.addbtn}
-            onClick={() => router.push('/admin/add-services')}
+            onClick={() => router.push('/admin/admin-add/add-services')}
           >
             + Add new
           </button>
@@ -229,7 +243,7 @@ useEffect(() => {
                               onClick={() => {
                                 localStorage.setItem("selectedService", JSON.stringify(service));
                               router.push(
-  `/admin/edit-services?service_id=${service.id}&sub_category_id=${service.sub_category_id}`
+  `/admin/edit-services`
 );
                               }}
                             >

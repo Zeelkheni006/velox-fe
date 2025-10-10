@@ -1,9 +1,12 @@
 .wrapper {
-    padding: 30px;
-    background-color: #f9fafb;
-    min-height: 100vh;
-    font-family: 'Segoe UI', sans-serif;
-    width: 1700px;
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .headerContainer {
@@ -30,7 +33,7 @@
 
 .card {
     background: white;
-    padding: 20px;
+    padding: 16px 24px;
     border-radius: 8px;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
 }

@@ -46,10 +46,12 @@ export default function EditLeadPage() {
   return (
     <Layout>
   <div className={styles.editcontainer}>
-        <div className={styles.editheader}>
-          <span className={styles.editbreadcrumb}>Leads</span> &gt;{" "}
-          <span className={styles.editbreadcrumbActive}>Edit Leads</span>
-        </div>
+        <div className={styles.headerContainer}>
+                         <div>
+                           <span className={styles.breadcrumb}>Lead</span> &gt;{" "}
+                           <span className={styles.breadcrumbActive}>Edit Lead</span>
+                         </div>
+                       </div>
 
         <div className={styles.editcard}>
         <h2 className={styles.title}>Edit Lead</h2>

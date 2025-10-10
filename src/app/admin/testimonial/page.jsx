@@ -58,7 +58,7 @@ export default function TestimonialPage() {
             <h3>Testimonial</h3>
             <button
               className={styles.addBtn}
-              onClick={() => router.push("/admin/add-testimonial")}
+              onClick={() => router.push("/admin/admin-add/add-testimonial")}
             >
               + Add new
             </button>

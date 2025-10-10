@@ -71,10 +71,11 @@ useEffect(() => {
   return (
     <Layout>
       <div className={styles.wrapper}>
-        <div className={styles.breadcrumb}>
-          <span>Package</span> &nbsp;&gt;&nbsp;
-          <span>Package</span> &nbsp;&gt;&nbsp;
-          <span className={styles.active}>Add Package</span>
+        <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Package</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit Package</span>
+          </div>
         </div>
 
         <div className={styles.addcard}>

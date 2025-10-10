@@ -81,7 +81,7 @@ export default function AdminAbout() {
   const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
 const navigateToAddAbout = () => {
-  router.push("/admin/add-about");
+  router.push("/admin/admin-add/add-about");
 };
   useEffect(() => setMounted(true), []);
 

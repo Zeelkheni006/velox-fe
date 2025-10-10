@@ -285,7 +285,7 @@ const handleCloseModal = () => {
                       <td>
  <button
   className={styles.editBtn}
- onClick={() => router.push(`/admin/franchises-edit/${franchise.id}`)}
+ onClick={() => router.push(`/admin/franchises-edit`)}
 >
   Edit
 </button>

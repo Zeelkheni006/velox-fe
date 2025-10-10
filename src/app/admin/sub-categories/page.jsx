@@ -17,7 +17,7 @@ export default function SubCategories() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(500);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -25,35 +25,33 @@ export default function SubCategories() {
   const [popupType, setPopupType] = useState("");
   const router = useRouter();
 
-  const fetchData = async (page = 1, per_page = 500) => {
-    setLoading(true);
-    try {
-      const res = await getSubCategories(page, per_page, search);
-      if (res.success) {
-        // Normalize status to 'ACTIVE' / 'INACTIVE'
-        const normalizedData = res.data.map(item => ({
-          ...item,
-          status: item.status === true || item.status === 'ACTIVE' || item.status === 'active' ? 'ACTIVE' : 'INACTIVE'
-        }));
-        setSubCategories(normalizedData);
-        setTotalItems(res.total_items || normalizedData.length);
-        setTotalPages(res.total_page || 1);
-        setCurrentPage(res.page || page);
-        setEntriesPerPage(res.per_page || per_page);
-      } else {
-        setSubCategories([]);
-        setTotalItems(0);
-        setTotalPages(1);
-      }
-    } catch (err) {
-      console.error(err);
-      setSubCategories([]);
-      setTotalItems(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
+const fetchData = async () => {
+  setLoading(true);
+  try {
+    const res = await getSubCategories(1, 500, search); // fetch all
+    if (res.success) {
+      const normalizedData = res.data.map(item => ({
+        ...item,
+        status: item.status === true || item.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
+      }));
+      setTotalItems(normalizedData.length);
+      setTotalPages(Math.ceil(normalizedData.length / entriesPerPage));
+
+      // slice for current page
+      const start = (currentPage - 1) * entriesPerPage;
+      const end = start + entriesPerPage;
+      setSubCategories(normalizedData.slice(start, end));
     }
-  };
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchData();
+}, [currentPage, entriesPerPage, search]);
 
   useEffect(() => {
     fetchData(currentPage, entriesPerPage);
@@ -117,8 +115,8 @@ export default function SubCategories() {
     setSortConfig({ key: direction ? key : null, direction });
   };
 
-  const handlePrevPage = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNextPage = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+ const handlePrevPage = () => currentPage > 1 && setCurrentPage(prev => prev - 1);
+  const handleNextPage = () => currentPage < totalPages && setCurrentPage(prev => prev + 1);
   useEffect(() => {
     if (!popupMessage) return;
     const timer = setTimeout(() => {
@@ -151,7 +149,7 @@ export default function SubCategories() {
                           <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
                         </div>
                       )}
-            <button className={styles.addBtn} onClick={() => router.push('/admin/add-subcategory')}>
+            <button className={styles.addBtn} onClick={() => router.push('/admin/admin-add/add-subcategory')}>
               + Add new
             </button>
           </div>
@@ -159,15 +157,18 @@ export default function SubCategories() {
           <div className={styles.controls}>
             <label>
               Show{" "}
-              <select
-                className={styles.select}
-                value={entriesPerPage}
-                onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>{" "}
+         <select
+  className={styles.select}
+  value={entriesPerPage}
+  onChange={(e) => {
+    setEntriesPerPage(Number(e.target.value));
+    setCurrentPage(1); // reset to first page
+  }}
+>
+  <option value={10}>10</option>
+  <option value={25}>25</option>
+  <option value={50}>50</option>
+</select>{" "}
               entries
             </label>
 

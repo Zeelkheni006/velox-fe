@@ -78,9 +78,11 @@ export default function BestServices() {
   return (
     <Layout>
       <div className={styles.container}>
-        <div className={styles.breadcrumb}>
-          <span className={styles.bold}>Best Service</span> &nbsp;&gt;&nbsp;
-          <span className={styles.link}>Best Service</span>
+              <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Service</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit Service</span>
+          </div>
         </div>
 
         <div className={styles.card}>
@@ -88,7 +90,7 @@ export default function BestServices() {
             <h3>Best Services</h3>
             <button
               className={styles.addBtn}
-              onClick={() => router.push("/admin/add-bestservice")}
+              onClick={() => router.push("/admin/admin-add/add-bestservice")}
             >
               + Add new
             </button>

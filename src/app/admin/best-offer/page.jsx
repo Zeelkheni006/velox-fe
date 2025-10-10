@@ -77,7 +77,7 @@ export default function Offer() {
                         <h3>Best Offers</h3>
                         <button
                           className={styles.addbtn}
-                          onClick={() => router.push("/admin/add-offer")}
+                          onClick={() => router.push("/admin/admin-add/add-best-offer")}
                         >
                           + Add New
                         </button>

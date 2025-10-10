@@ -105,7 +105,10 @@ const handleVerifyOtp = async () => {
     const data = await loginWithOtp(email, id, otp); // email, admin_id, otp
     console.log("loginWithOtp response:", data);
 
-    if (data.ok && data.success) {
+   if (data.ok && data.success && data.data?.access_token) {
+      // ✅ Store access token
+      localStorage.setItem("access_token", data.data.access_token);
+      localStorage.setItem("admin_id", data.data.admin_id);
       setPopupMessage("✅ OTP verified successfully!");
       setPopupType("success");
       router.push("/admin/dashboard");
@@ -132,7 +135,10 @@ const handleVerifyOtp = async () => {
     setLoading(true);
     try {
       const data = await loginWithPassword(email, password);
-      if(data.success) {
+        if(data.success && data.data?.access_token) {
+      // ✅ Store access token
+      localStorage.setItem("access_token", data.data.access_token);
+      localStorage.setItem("admin_id", data.data.admin_id);
         setPopupMessage("✅ Password is valid! Logging in...");
         setPopupType("success");
 

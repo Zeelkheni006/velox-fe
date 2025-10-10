@@ -115,7 +115,7 @@ try {
 }
 };
 
-  const handleAddCategory = () => router.push('/admin/add-categories');
+  const handleAddCategory = () => router.push('/admin/admin-add/add-categories');
   const handleDelete = (index) => {
     const cat = currentCategories[index];
     const globalIndex = categories.findIndex(c => c.title === cat.title);
@@ -149,14 +149,22 @@ try {
     }, 4000);
     return () => clearTimeout(timer);
   }, [popupMessage]);
+   useEffect(() => {
+    const load = async () => {
+      const data = await fetchCategories();
+      setCategories(data);
+    };
+    load();
+  }, []);
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
+          <div>
           <span className={styles.breadcrumb}>Category</span> &gt;{" "}
           <span className={styles.breadcrumbActive}>Category</span>
         </div>
-
+</div>
         <div className={styles.card}>
           <h3>Categories</h3>
           {popupMessage && (

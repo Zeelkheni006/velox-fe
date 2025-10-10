@@ -65,7 +65,7 @@ export default function BlogAdmin() {
             <h3>Offers</h3>
             <button
               className={styles.addbtn}
-              onClick={() => router.push("/admin/add-blog")}
+              onClick={() => router.push("/admin/admin-add/add-blog")}
             >
               + Add New
             </button>

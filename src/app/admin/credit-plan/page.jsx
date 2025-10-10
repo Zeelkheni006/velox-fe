@@ -79,7 +79,7 @@ export default function CreditPlanPage() {
           <div className={styles.titleRow}>
             <h2 className={styles.sectionTitle}>Credit Plan</h2>
             <button className={styles.addBtn}
-            onClick={()=> router.push('/admin/add-credit-paln')}>+ Add New</button>
+            onClick={()=> router.push('/admin/admin-add/add-credit-paln')}>+ Add New</button>
           </div>
 
           <div className={styles.controls}>

@@ -56,10 +56,12 @@ export default function SendGift() {
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
+          <div>
           <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
           <span className={styles.breadcrumbActive}>
             {giftId ? "Edit Gift" : "Send Gift"}
           </span>
+        </div>
         </div>
 
         <div className={styles.card}>

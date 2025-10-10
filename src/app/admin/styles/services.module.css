@@ -195,10 +195,10 @@
 
 .addcontainer {
     padding: 30px;
-    background-color: #ffffff;
+    background-color: #f4f7fa;
     min-height: 100vh;
     font-family: 'Segoe UI', sans-serif;
-    width: 1600px;
+    width: 1900px;
 }
 
 .addcontainer h2 {
@@ -224,6 +224,15 @@
     font-weight: 600;
     color: #2885ff;
     font-size: 15px;
+}
+
+.addform {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
 }
 
 

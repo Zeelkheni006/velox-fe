@@ -37,10 +37,11 @@ useEffect(() => {
   return (
     <Layout>
       <div className={styles.wrapper}>
-        <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Best Services</span> &gt;{' '}
-          <span className={styles.addbreadcrumb}>Best Services</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Edit Services</span>
+                <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Best Service</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit BestService</span>
+          </div>
         </div>
 
         <div className={styles.addcard}>

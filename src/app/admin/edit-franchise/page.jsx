@@ -48,11 +48,12 @@ export default function EditFranchiseUser() {
   return (
     <Layout>
        <div className={styles.container1}>
-         <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Franchise User</span> &gt;{' '}
-                    <span className={styles.addbreadcrumb}>Franchise User</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Edit Franchise User</span>
+              <div className={styles.headerContainer}>
+          <div>
+          <span className={styles.breadcrumb}>FranchiseUesr</span> &gt;{" "}
+          <span className={styles.breadcrumbActive}>Edit Franchiseuser</span>
         </div>
+</div>
         <div className={styles.addcard}>
         <h2 className={styles.title1}>Edit Franchise User</h2>
         <form onSubmit={handleSubmit} className={styles.form1}>

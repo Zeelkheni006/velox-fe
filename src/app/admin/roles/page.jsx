@@ -86,7 +86,7 @@ const currentRoles = filteredRoles.slice(startIndex, endIndex);
           <div className={styles.breadcrumb}>
             <span>Roles</span> &gt; <span className={styles.active}>Manage Roles</span>
           </div>
-         <button className={styles.addButton} onClick={() => router.push("/admin/add-roles")}>
+         <button className={styles.addButton} onClick={() => router.push("/admin/admin-add/add-roles")}>
   + Add New Staff
 </button>
         </div>
@@ -139,7 +139,7 @@ const currentRoles = filteredRoles.slice(startIndex, endIndex);
                   <td>
                      <button
     className={styles.editBtn}
-    onClick={() => router.push(`/admin/add-roles?role=${encodeURIComponent(role.name)}`)}
+    onClick={() => router.push(`/admin/edit-role?role=${encodeURIComponent(role.name)}`)}
   >
     <FaEdit />
   </button>

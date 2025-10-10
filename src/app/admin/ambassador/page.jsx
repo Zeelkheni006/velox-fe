@@ -80,7 +80,7 @@ export default function Specification() {
 
           <button
             className={styles.addbtn}
-            onClick={() => router.push('/admin/add-ambassador')}
+            onClick={() => router.push('/admin/admin-add/add-ambassador')}
           >
             + Add new
           </button>

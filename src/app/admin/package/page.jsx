@@ -76,16 +76,18 @@ export default function PackagesTable() {
   return (
     <Layout>
       <div className={styles.container}>
-        <div className={styles.breadcrumb}>
-          <span className={styles.bold}>Packages</span> &nbsp;&gt;&nbsp;
-          <span className={styles.link}>Packages</span>
+        <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Package</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Package</span>
+          </div>
         </div>
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h2>Packages</h2>
             <button
               className={styles.addBtn}
-              onClick={() => router.push("/admin/add-package")}
+              onClick={() => router.push("/admin/admin-add/add-package")}
             >
               + Add new
             </button>

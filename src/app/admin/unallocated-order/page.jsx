@@ -109,10 +109,11 @@
       <Layout>
         <div className={styles.container}>
           <div className={styles.headerContainer}>
+            <div>
             <span className={styles.breadcrumb}>Unallocated Orders View</span> &gt;{" "}
             <span className={styles.breadcrumbActive}>Unallocated Orders View</span>
           </div>
-
+</div>
           <div className={styles.card}>
             <h2>Unallocated Orders View</h2>
 

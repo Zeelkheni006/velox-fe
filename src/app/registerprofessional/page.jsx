@@ -1,8 +1,10 @@
 // components/EasyRegisterProcess.js
+'use client';
 import React from 'react';
 import Image from "next/image";
 import './main.css';  
-
+import { getLocationHierarchy } from "../api/user-side/register-professional/location";
+import { useState, useEffect } from "react";
  const data = [
     {
       image: '/images/no-marketing.jpg',
@@ -47,6 +49,55 @@ import './main.css';
   
   ];
 const EasyRegisterProcess = () => {
+   const [hierarchy, setHierarchy] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
+
+  // Fetch hierarchy on mount
+useEffect(() => {
+  async function fetchHierarchy() {
+    try {
+      const response = await getLocationHierarchy();
+      const countriesData = response?.data?.country || [];
+      setHierarchy(countriesData);
+      setCountries(countriesData.map(c => c.title));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  fetchHierarchy();
+}, []);
+
+  // Update states when country changes
+useEffect(() => {
+  if (!selectedCountry) return;
+  const countryObj = hierarchy.find(c => c.title === selectedCountry);
+  const stateList = countryObj?.state?.map(s => s.title) || [];
+  setStates(stateList);
+  setSelectedState("");
+  setCities([]);
+  setSelectedCity("");
+}, [selectedCountry, hierarchy]);
+
+  // Update cities when state changes
+useEffect(() => {
+  if (!selectedState || !selectedCountry) return;
+  const countryObj = hierarchy.find(c => c.title === selectedCountry);
+  const stateObj = countryObj?.state?.find(s => s.title === selectedState);
+  const cityList = stateObj?.city?.map(c => c.title) || [];
+  setCities(cityList);
+  setSelectedCity("");
+}, [selectedState, selectedCountry, hierarchy]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert(`Country: ${selectedCountry}\nState: ${selectedState}\nCity: ${selectedCity}`);
+  };
   return (
     
     <div className="container">
@@ -116,7 +167,7 @@ const EasyRegisterProcess = () => {
           <h2 className="heading">Register as <span>a </span>Professional</h2>
           <p className="subheading">Join 1500+ partners across India</p>
 
-          <form className="form">
+          <form className="form" onSubmit={handleSubmit}>
             <div className="row">
               <input type="text" placeholder="Enter your name" required />
               <input type="tel" placeholder="Enter your phone" required />
@@ -124,21 +175,22 @@ const EasyRegisterProcess = () => {
 
             <div className="row">
               <input type="email" placeholder="Email" required />
-              <select required>
-                <option value="">Select Country</option>
-                <option>India</option>
-              </select>
+           <select value={selectedCountry} onChange={e => setSelectedCountry(e.target.value)} required>
+  <option value="">Select Country</option>
+  {countries.map(c => <option key={c} value={c}>{c}</option>)}
+</select>
             </div>
 
             <div className="row">
-              <select required>
-                <option value="">Select State</option>
-                <option>Gujarat</option>
-              </select>
-              <select required>
-                <option value="">Select City</option>
-                <option>Ahmedabad</option>
-              </select>
+            
+<select value={selectedState} onChange={e => setSelectedState(e.target.value)} disabled={!selectedCountry} required>
+  <option value="">Select State</option>
+  {states.map(s => <option key={s} value={s}>{s}</option>)}
+</select>
+           <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState} required>
+  <option value="">Select City</option>
+  {cities.map(c => <option key={c} value={c}>{c}</option>)}
+</select>
             </div>
 
             <textarea placeholder="What do you do?" rows={4} />

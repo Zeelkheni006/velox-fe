@@ -77,9 +77,11 @@ export default function EditOfferPage() {
   return (
     <Layout>
       <div className={styles.addOfferContainer}>
-        <div className={styles.breadcrumbs}>
-          <span>Offer</span> &gt; <span>Offer</span> &gt;{" "}
-          <span className={styles.breadcrumbActive}>Edit Offer</span>
+         <div className={styles.headerContainer}>
+          <div>
+            <span className={styles.breadcrumb}>Offer</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Edit Offer</span>
+          </div>
         </div>
 
         <form className={styles.formCard} onSubmit={handleSubmit}>

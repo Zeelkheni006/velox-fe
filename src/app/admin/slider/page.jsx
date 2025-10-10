@@ -87,7 +87,7 @@ const router = useRouter();
 
         <div className="tableCard">
           <h3 className="tableTitle">Manage Sliders</h3>
-          <button className="addBtn" onClick={() => router.push("/admin/add-slider")}>
+          <button className="addBtn" onClick={() => router.push("/admin/admin-add/add-slider")}>
   + Add New
 </button>
           <div className="tableControls">
