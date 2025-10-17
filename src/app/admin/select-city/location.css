@@ -1,12 +1,12 @@
 .location-container {
-    width: 1400px;
-    margin: 0 auto;
-    padding: 30px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    font-family: Arial, sans-serif;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .location-container h2 {
@@ -54,8 +54,159 @@
     border-radius: 6px;
     cursor: pointer;
     transition: 0.3s;
+    width: 100px;
 }
 
 .submit-btn:hover {
     background-color: #3946f7;
+}
+
+.location-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.title {
+    margin-bottom: 15px;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.select-boxes {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.select-boxes select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.map-container {
+    width: 100%;
+    height: 450px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Ensure map looks same as embedded Google Map */
+
+.map-container>div {
+    border: none !important;
+    border-radius: 8px;
+}
+
+.submit-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background: #4285F4;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background: #357ae8;
+}
+
+.table-section {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.showEntries {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.table-title {
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #888;
+}
+
+.location-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.location-table th,
+.location-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.location-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
 }

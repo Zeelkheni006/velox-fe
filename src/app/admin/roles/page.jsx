@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { FaEdit } from "react-icons/fa";
 import styles from "../styles/roles.module.css"; // use .module.css if CSS Modules
 import Layout from "../pages/page"; // Ensure Layout contains Sidebar + Header
@@ -64,20 +64,50 @@ const rolesData = [
 ];
 
 const Roles = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
 
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-  const filteredRoles = rolesData.filter((role) =>
-    role.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+    </span>
   );
-   const router = useRouter();
 
-   const totalPages = Math.ceil(filteredRoles.length / entriesPerPage);
-const startIndex = (currentPage - 1) * entriesPerPage;
-const endIndex = startIndex + entriesPerPage;
-const currentRoles = filteredRoles.slice(startIndex, endIndex);
+  // Filtered + Sorted roles
+  const filteredRoles = useMemo(() => {
+    let filtered = rolesData.filter((role) =>
+      role.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (!sortConfig.key || !sortConfig.direction) return filtered;
+
+    return [...filtered].sort((a, b) => {
+      const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
+      const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
+
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [searchTerm, sortConfig]); // ✅ rolesData is in scope
+
+  // Pagination
+  const totalPages = Math.ceil(filteredRoles.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentRoles = filteredRoles.slice(startIndex, endIndex);
   return (
      
     <Layout>
@@ -125,8 +155,12 @@ const currentRoles = filteredRoles.slice(startIndex, endIndex);
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Permissions</th>
+                  <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Name<SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                  <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                      Permission<SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
                 <th>Options</th>
               </tr>
             </thead>

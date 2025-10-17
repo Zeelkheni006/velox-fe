@@ -1,0 +1,149 @@
+.container {
+    display: flex;
+    padding: 40px 20px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 290px;
+    border: 1px solid #ddd;
+    padding: 20px;
+    height: 400px;
+    margin-top: 40px;
+    margin-left: 350px;
+}
+
+.logo {
+    color: orange;
+    margin-bottom: 15px;
+}
+
+.navList {
+    list-style: none;
+    padding: 0;
+}
+
+.navList li {
+    padding: 15px 0;
+    border-bottom: 1px dotted #ccc;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.navList li:hover {
+    color: #f38a00;
+}
+
+.mainContent {
+    flex: 1;
+    margin-left: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px 20px;
+    max-width: 1000px;
+}
+
+.orderHistoryBox {
+    background: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+.orderTitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+
+/* Show entries and search */
+
+.showEntries {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.select1 {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.searchLabel input {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+
+/* Table */
+
+.orderTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.orderTable th,
+.orderTable td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.orderTable th {
+    background: #f3f4f6;
+    font-weight: 600;
+}
+
+.viewBtn {
+    background: #eb8525;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.viewBtn:hover {
+    background: #d8871d;
+}
+
+
+/* Pagination */
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}

@@ -47,23 +47,16 @@ const toggleSidebar = () => {
       </div>
 
       <div className={styles.sectionTitle}>MANAGE USERS</div>
-      <div className={styles.menuItem} onClick={() => toggleMenu('roles')}>
-        <FaUserCog /><span>Manage Roles</span> {openMenus.roles ? (
-          <FaChevronDown className={styles.arrow} />  // Show up arrow when open
-        ) : (
-          <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
-        )}
+         <div
+  className={styles.menuItem}
+  onClick={() => {
+    router.push('/admin/roles'); // or '/dashboard' depending on your routing structure
+    onClose(); // this closes the sidebar if it's on mobile
+  }}
+>
+        <FaUserCog /><span>Manage Roles</span> 
       </div>
-     {openMenus.roles && (
-  <div className={styles.subMenu}>
-    <div onClick={() => {
-      router.push('/admin/roles');
-      onClose();
-    }}>
-      Roles
-    </div>
-  </div>
-)}
+  
 
       <div className={styles.menuItem} onClick={() => toggleMenu('users')}>
         

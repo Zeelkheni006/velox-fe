@@ -17,8 +17,8 @@ export default function LogoPage() {
     <Layout>
        <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Blog</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Blog List</span>
+            <span className={styles.breadcrumb}>Logo</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Logo</span>
           </div>
         </div>
       <div className={styles.container}>

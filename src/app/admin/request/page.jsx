@@ -4,6 +4,8 @@ import { useState, useMemo, useEffect } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/request.module.css";
 
+// Sort Arrow Component
+
 export default function RequestPage() {
   const [requestType, setRequestType] = useState("");
   const [status, setStatus] = useState("");
@@ -13,12 +15,14 @@ export default function RequestPage() {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openActionId, setOpenActionId] = useState(null);
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: '5px', fontSize: '12px' }}>
+      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+    </span>
+  );
 
-  // follow-up modal
-  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
-  const [followUpMessage, setFollowUpMessage] = useState("");
-  const [followUpDate, setFollowUpDate] = useState("");
-  const [selectedRequest, setSelectedRequest] = useState(null);
+  // Sorting
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
   const requests = [
     {
@@ -62,16 +66,51 @@ export default function RequestPage() {
     });
   }, [requests, requestType, status, search]);
 
-  const totalPages = Math.ceil(filteredRequests.length / entries);
+  // Sorted requests
+  const sortedRequests = useMemo(() => {
+    if (!sortConfig.key) return filteredRequests;
+
+    return [...filteredRequests].sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      // Numeric
+      if (sortConfig.key === "id") return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+
+      // Date
+      if (sortConfig.key === "visitDate") {
+        return sortConfig.direction === "asc"
+          ? new Date(aVal) - new Date(bVal)
+          : new Date(bVal) - new Date(aVal);
+      }
+
+      // String
+      aVal = aVal ? String(aVal).toLowerCase() : "";
+      bVal = bVal ? String(bVal).toLowerCase() : "";
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredRequests, sortConfig]);
+
+  // Pagination
+  const totalPages = Math.ceil(sortedRequests.length / entries);
   const startIndex = (currentPage - 1) * entries;
-  const endIndex = Math.min(startIndex + entries, filteredRequests.length);
-  const currentRequests = filteredRequests.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + entries, sortedRequests.length);
+  const currentRequests = sortedRequests.slice(startIndex, endIndex);
 
+  // Sorting handler
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    setSortConfig({ key, direction });
+  };
+
+  // Pagination handlers
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () =>
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
-  // View message modal
+  // Message modal
   const openModal = (message) => {
     setModalMessage(message);
     setIsModalOpen(true);
@@ -79,22 +118,21 @@ export default function RequestPage() {
   const closeModal = () => setIsModalOpen(false);
 
   // Dropdown
-  const toggleActionMenu = (id) => {
-    setOpenActionId((prev) => (prev === id ? null : id));
-  };
+  const toggleActionMenu = (id) => setOpenActionId((prev) => (prev === id ? null : id));
   const handleDropdownClick = (e) => e.stopPropagation();
-
   useEffect(() => {
     const handleClickOutside = () => setOpenActionId(null);
     window.addEventListener("click", handleClickOutside);
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleDelete = (id) => {
-    alert(`Delete request with ID: ${id}`);
-  };
+  const handleDelete = (id) => alert(`Delete request with ID: ${id}`);
 
-  // Follow-up Modal controls
+  // Follow-up
+  const [isFollowUpOpen, setIsFollowUpOpen] = useState(false);
+  const [followUpMessage, setFollowUpMessage] = useState("");
+  const [followUpDate, setFollowUpDate] = useState("");
+
   const openFollowUpModal = (req) => {
     setSelectedRequest(req);
     setFollowUpMessage("");
@@ -103,17 +141,13 @@ export default function RequestPage() {
     setOpenActionId(null);
   };
   const closeFollowUpModal = () => setIsFollowUpOpen(false);
-
   const handleFollowUpSubmit = () => {
-    if (!followUpMessage || !followUpDate) {
-      alert("Please fill out both message and date fields.");
-      return;
-    }
-    alert(
-      `Follow-up submitted for ${selectedRequest.name}\nMessage: ${followUpMessage}\nDate: ${followUpDate}`
-    );
+    if (!followUpMessage || !followUpDate) return alert("Please fill out both fields");
+    alert(`Follow-up submitted for ${selectedRequest.name}\nMessage: ${followUpMessage}\nDate: ${followUpDate}`);
     setIsFollowUpOpen(false);
   };
+
+  // Refer
   const [isReferOpen, setIsReferOpen] = useState(false);
   const [selectedFranchise, setSelectedFranchise] = useState("");
   const [referMessage, setReferMessage] = useState("");
@@ -125,40 +159,29 @@ export default function RequestPage() {
     setIsReferOpen(true);
     setOpenActionId(null);
   };
-
   const closeReferModal = () => setIsReferOpen(false);
-
   const handleReferSubmit = () => {
-    if (!selectedFranchise || !referMessage) {
-      alert("Please select a franchise and enter a message.");
-      return;
-    }
-    alert(
-      `Referred ${selectedRequest.name} to ${selectedFranchise}\nMessage: ${referMessage}`
-    );
+    if (!selectedFranchise || !referMessage) return alert("Please select a franchise and enter a message.");
+    alert(`Referred ${selectedRequest.name} to ${selectedFranchise}\nMessage: ${referMessage}`);
     setIsReferOpen(false);
   };
+
   return (
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Request</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Request</span>
-          </div>
+          <span className={styles.breadcrumb}>Request</span> &gt; <span className={styles.breadcrumbActive}>Request</span>
+        </div>
         </div>
 
-        {/* Main Card */}
         <div className={styles.card}>
-          {/* Title & Filters */}
+          {/* Header & Filters */}
           <div className={styles.header}>
             <h2>Request Quotes</h2>
             <div className={styles.filters}>
-              <select
-                value={requestType}
-                onChange={(e) => setRequestType(e.target.value)}
-              >
+              <select value={requestType} onChange={(e) => setRequestType(e.target.value)}>
                 <option value="">Select Request Type</option>
                 <option value="Service A">Service A</option>
                 <option value="Service B">Service B</option>
@@ -172,52 +195,18 @@ export default function RequestPage() {
             </div>
           </div>
 
-          {/* Table Controls */}
-          <div className={styles.controls}>
-            <label>
-              Show{" "}
-              <select
-                className={styles.select}
-                value={entries}
-                onChange={(e) => {
-                  setEntries(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>{" "}
-              entries
-            </label>
-
-            <label className={styles.searchLabel}>
-              Search:{" "}
-              <input
-                type="text"
-                className={styles.search}
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </label>
-          </div>
-
           {/* Table */}
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Address</th>
+                <th onClick={() => handleSort("id")}>Id <SortArrow direction={sortConfig.key==="id"?sortConfig.direction:null}/></th>
+                <th onClick={() => handleSort("name")}>Name <SortArrow direction={sortConfig.key==="name"?sortConfig.direction:null}/></th>
+                <th onClick={() => handleSort("email")}>Email <SortArrow direction={sortConfig.key==="email"?sortConfig.direction:null}/></th>
+                <th onClick={() => handleSort("phone")}>Phone <SortArrow direction={sortConfig.key==="phone"?sortConfig.direction:null}/></th>
+                <th onClick={() => handleSort("address")}>Address <SortArrow direction={sortConfig.key==="address"?sortConfig.direction:null}/></th>
                 <th>Request Message</th>
-                <th>Visit Date & Time</th>
-                <th>Status</th>
+                <th onClick={() => handleSort("visitDate")}>Visit Date & Time <SortArrow direction={sortConfig.key==="visitDate"?sortConfig.direction:null}/></th>
+                <th onClick={() => handleSort("status")}>Status <SortArrow direction={sortConfig.key==="status"?sortConfig.direction:null}/></th>
                 <th>Action</th>
               </tr>
             </thead>

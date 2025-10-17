@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 export default function PaymentPage({ data }) {
   const router = useRouter();
 
-  // Sample fallback data
   const sampleData = [
     { id: 1, franchise: 'Shree Auto Care', paymentType: 'Online', paymentDate: '2025-10-05', amount: '₹12,000' },
     { id: 2, franchise: 'Meena Car Service', paymentType: 'Offline', paymentDate: '2025-09-30', amount: '₹8,500' },
@@ -17,12 +16,25 @@ export default function PaymentPage({ data }) {
 
   const rows = Array.isArray(data) && data.length ? data : sampleData;
 
-  // 🔹 States
   const [search, setSearch] = useState('');
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-  // 🔹 Filter rows
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+    else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: '5px', fontSize: '12px' }}>
+      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+    </span>
+  );
+
+  // Filter
   const filteredRows = rows.filter(
     (r) =>
       r.franchise.toLowerCase().includes(search.toLowerCase()) ||
@@ -30,19 +42,43 @@ export default function PaymentPage({ data }) {
       r.amount.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 🔹 Pagination
-  const startIndex = (currentPage - 1) * entries;
-  const endIndex = Math.min(startIndex + entries, filteredRows.length);
-  const paginatedRows = filteredRows.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredRows.length / entries);
+  // Sort
+  let sortedRows = [...filteredRows];
+  if (sortConfig.key && sortConfig.direction) {
+    sortedRows.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
 
-  const handlePrevPage = () => { if (currentPage > 1) setCurrentPage(prev => prev - 1); };
-  const handleNextPage = () => { if (currentPage < totalPages) setCurrentPage(prev => prev + 1); };
+      // For amount, remove currency symbol and commas
+      if (sortConfig.key === 'amount') {
+        aVal = parseFloat(aVal.replace(/[₹,]/g, '')) || 0;
+        bVal = parseFloat(bVal.replace(/[₹,]/g, '')) || 0;
+      }
+
+      // For dates
+      if (sortConfig.key === 'paymentDate') {
+        aVal = new Date(aVal);
+        bVal = new Date(bVal);
+      }
+
+      aVal = aVal.toString().toLowerCase();
+      bVal = bVal.toString().toLowerCase();
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Pagination
+  const startIndex = (currentPage - 1) * entries;
+  const endIndex = Math.min(startIndex + entries, sortedRows.length);
+  const paginatedRows = sortedRows.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedRows.length / entries);
 
   return (
     <Layout>
       <div className={styles.container}>
-        {/* Header Section */}
         <div className={styles.headerContainer}>
           <div>
             <span className={styles.breadcrumb}>Payment</span> &gt;{' '}
@@ -50,28 +86,18 @@ export default function PaymentPage({ data }) {
           </div>
         </div>
 
-        {/* Card Section */}
         <div className={styles.card}>
-          {/* Title + Add Button */}
           <div className={styles.titleRow}>
             <h1 className={styles.title}>Payment</h1>
-            <button
-              className={styles.addBtn}
-              onClick={() => router.push('/admin/admin-add/add-payment')}
-            >
+            <button className={styles.addBtn} onClick={() => router.push('/admin/admin-add/add-payment')}>
               + Add New
             </button>
           </div>
 
-          {/* Controls */}
           <div className={styles.controls}>
             <label>
               Show{' '}
-              <select
-                className={styles.select}
-                value={entries}
-                onChange={(e) => { setEntries(Number(e.target.value)); setCurrentPage(1); }}
-              >
+              <select className={styles.select} value={entries} onChange={(e) => { setEntries(Number(e.target.value)); setCurrentPage(1); }}>
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
@@ -91,15 +117,22 @@ export default function PaymentPage({ data }) {
             </label>
           </div>
 
-          {/* Table */}
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Franchise</th>
-                  <th>Payment Type</th>
-                  <th>Payment Date</th>
-                  <th>Amount</th>
+                  <th onClick={() => handleSort('franchise')} style={{ cursor: 'pointer' }}>
+                    Franchise <SortArrow direction={sortConfig.key === 'franchise' ? sortConfig.direction : null} />
+                  </th>
+                  <th onClick={() => handleSort('paymentType')} style={{ cursor: 'pointer' }}>
+                    Payment Type <SortArrow direction={sortConfig.key === 'paymentType' ? sortConfig.direction : null} />
+                  </th>
+                  <th onClick={() => handleSort('paymentDate')} style={{ cursor: 'pointer' }}>
+                    Payment Date <SortArrow direction={sortConfig.key === 'paymentDate' ? sortConfig.direction : null} />
+                  </th>
+                  <th onClick={() => handleSort('amount')} style={{ cursor: 'pointer' }}>
+                    Amount <SortArrow direction={sortConfig.key === 'amount' ? sortConfig.direction : null} />
+                  </th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -111,16 +144,12 @@ export default function PaymentPage({ data }) {
                     <td>{r.paymentDate}</td>
                     <td>{r.amount}</td>
                     <td>
-                       <button
-    className={styles.editBtn}
-    onClick={() => {
-      // Save selected payment to localStorage
-      localStorage.setItem('selectedPayment', JSON.stringify(r));
-      router.push(`/admin/edit-payment?id=${r.id}`);
-    }}
-  >
-    Edit
-  </button>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() => { localStorage.setItem('selectedPayment', JSON.stringify(r)); router.push(`/admin/edit-payment?id=${r.id}`); }}
+                      >
+                        Edit
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -133,17 +162,16 @@ export default function PaymentPage({ data }) {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className={styles.pagination}>
             <span>
-              {filteredRows.length === 0
+              {sortedRows.length === 0
                 ? 'No entries found'
-                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredRows.length} entries`}
+                : `Showing ${startIndex + 1} to ${endIndex} of ${sortedRows.length} entries`}
             </span>
             <div className={styles.paginationControls}>
-              <button className={styles.paginationButton} onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+              <button className={styles.paginationButton} onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Previous</button>
               <span className={styles.pageNumber}>{currentPage}</span>
-              <button className={styles.paginationButton} onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+              <button className={styles.paginationButton} onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
             </div>
           </div>
         </div>

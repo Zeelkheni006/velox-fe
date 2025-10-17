@@ -1,0 +1,108 @@
+.container {
+    display: flex;
+    padding: 40px 20px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 290px;
+    border: 1px solid #ddd;
+    padding: 20px;
+    height: 400px;
+    margin-top: 40px;
+    margin-left: 350px;
+}
+
+.logo {
+    color: orange;
+    margin-bottom: 15px;
+}
+
+.navList {
+    list-style: none;
+    padding: 0;
+}
+
+.navList li {
+    padding: 15px 0;
+    border-bottom: 1px dotted #ccc;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.navList li:hover {
+    color: #f38a00;
+}
+
+.mainContent {
+    flex: 1;
+    margin-left: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px 20px;
+    max-width: 800px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+
+/* Tracking box layout */
+
+.trackBox {
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 50;
+    height: auto;
+}
+
+
+/* Input + Button row */
+
+.trackRow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+}
+
+.trackInput {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-right: none;
+    /* merge with button */
+    border-radius: 8px 0 0 8px;
+    /* square left, rounded right handled by button */
+    outline: none;
+    font-size: 15px;
+}
+
+.trackInput:focus {
+    border-color: #000000;
+}
+
+.trackBtn {
+    background: #ff8717;
+    color: white;
+    border: 1px solid #e37d09;
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 0 25px 25px 0;
+    /* square left, rounded right */
+    transition: background 0.3s;
+}
+
+.trackBtn:hover {
+    background: #ff7f44;
+}

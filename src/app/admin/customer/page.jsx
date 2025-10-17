@@ -1,113 +1,160 @@
 "use client";
-import { useState } from 'react';
+
+import { useState, useEffect, useMemo } from "react";
 import styles from "../styles/managecustomer.module.css";
 import Layout from "../pages/page";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
+import { deleteCustomer,getCustomers } from "../../api/manage_users/manage_customer";
 
-const initialCustomers = [
-  { name: 'harsh mundra', email: 'harshmundra248@gmail.com', mobile: '8619983849', city: 'Jamnagar' },
-  { name: 'Kuldip', email: 'happy2023friends@gmail.com', mobile: '9909567650', city: 'Rajkot' },
-  { name: 'Nanda Yash', email: 'yashgnanda@gmail.com', mobile: '7984142724', city: 'Jamnagar' },
-  { name: 'MOHAMMAD ANAS QURESHI', email: 'aquacool2004@gmail.com', mobile: '7574896226', city: 'Ahmedabad' },
-  { name: 'Shubh', email: 'shubhpgajera21@gmail.com', mobile: '6358116822', city: 'Jamnagar' },
-  { name: 'Zeel Kheni', email: 'zeelkheni123@gmail.com', mobile: '9979616888', city: 'Anjar' },
-  { name: 'Rahul Maradia', email: 'maradiyarahul@gmail.com', mobile: '9624323346', city: 'Jamnagar' },
-  { name: 'Nanda abhishek', email: 'nandabhsk@gmail.com', mobile: '8141009217', city: 'Jamnagar' },
-    { name: 'Shubh', email: 'shubhpgajera21@gmail.com', mobile: '6358116822', city: 'Jamnagar' },
-  { name: 'Zeel Kheni', email: 'zeelkheni123@gmail.com', mobile: '9979616888', city: 'Anjar' },
-  { name: 'Rahul Maradia', email: 'maradiyarahul@gmail.com', mobile: '9624323346', city: 'Jamnagar' },
-  { name: 'Nanda abhishek', email: 'nandabhsk@gmail.com', mobile: '8141009217', city: 'Jamnagar' },
-];
+
 
 export default function ManageCustomerPage() {
-     
-const [search, setSearch] = useState('');
-const [selectedCity, setSelectedCity] = useState('');
-const [currentPage, setCurrentPage] = useState(1);
-const [entriesPerPage, setEntriesPerPage] = useState(10);
-const router = useRouter();
-const [customers, setCustomers] = useState(initialCustomers);
+  const router = useRouter();
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
 
-// 🔁 Filter customers
-const filteredCustomers = customers.filter((cust) => {
-  const matchesSearch =
-    cust.name.toLowerCase().includes(search.toLowerCase()) ||
-    cust.email.toLowerCase().includes(search.toLowerCase()) ||
-    cust.mobile.includes(search);
-  const matchesCity = selectedCity ? cust.city === selectedCity : true;
-  return matchesSearch && matchesCity;
-});
+  // Sorting
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-// ✅ Use filteredCustomers *after* it's declared
-const totalPages = Math.ceil(filteredCustomers.length / entriesPerPage);
-const startIndex = (currentPage - 1) * entriesPerPage;
-const endIndex = startIndex + entriesPerPage;
-const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
+  // Fetch customers from API
+useEffect(() => {
+  const fetchCustomers = async () => {
+    try {
+   const res = await getCustomers(); // res is already an array
+console.log("API Response:", res);
 
+const normalized = res.map(c => ({
+  id: c.id,
+  username: c.username || "",
+  email: c.email || "",
+  phonenumber: c.phone || "",
+  city: c.city || ""
+}));
 
-const handleEntriesChange = (e) => {
-  setEntriesPerPage(Number(e.target.value));
-  setCurrentPage(1); // Reset to first page when entries per page changes
-};
+      console.log("Normalized customers:", normalized);
 
-  const handleDelete = (index) => {
-    const confirmDelete = confirm('Are you sure you want to delete this customer?');
-    if (confirmDelete) {
-      const updated = [...customers];
-      updated.splice(index, 1);
-      setCustomers(updated);
+      setCustomers(normalized);
+    } catch (err) {
+      alert("Error fetching customers: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-const handleNextPage = () => {
-  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  fetchCustomers();
+}, []);
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+    </span>
+  );
+
+  // Filter + Sort customers
+const filteredCustomers = useMemo(() => {
+  let filtered = customers
+    .filter((cust) => cust) // <-- skip undefined/null
+    .filter((cust) => {
+     const matchesSearch =
+  ((cust.username || cust.name) || "").toLowerCase().includes(search.toLowerCase()) ||
+  (cust.email || "").toLowerCase().includes(search.toLowerCase()) ||
+  ((cust.phonenumber || cust.mobile) || "").includes(search);
+      const matchesCity = selectedCity ? cust.city === selectedCity : true;
+      return matchesSearch && matchesCity;
+    });
+
+  if (!sortConfig.key || !sortConfig.direction) return filtered;
+
+  return [...filtered].sort((a, b) => {
+    const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
+    const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
+    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+}, [customers, search, selectedCity, sortConfig]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredCustomers.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentCustomers = filteredCustomers.slice(startIndex, endIndex);
+
+  const handleEntriesChange = (e) => {
+    setEntriesPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
+
+const handleDelete = async (id) => {
+  const confirmDelete = confirm("Are you sure you want to delete this customer?");
+  if (!confirmDelete) return;
+
+  try {
+    await deleteCustomer(id); // This should mark the user as deleted
+    setCustomers((prev) => prev.filter((cust) => cust.id !== id)); // remove from ManageCustomerPage table
+    alert("Customer moved to Deleted Accounts!");
+  } catch (err) {
+    alert("Error deleting customer: " + err.message);
+  }
 };
 
-const handlePrevPage = () => {
-  if (currentPage > 1) setCurrentPage(currentPage - 1);
-};
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   const uniqueCities = [...new Set(customers.map((c) => c.city))];
+
+ 
 
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.topCard}>
           <div>
-            <span className={styles.breadcrumb}>Staffs</span> &gt; <span className={styles.breadcrumbActive}>Manage Staffs</span>
+            <span className={styles.breadcrumb}>Customers</span> &gt; <span className={styles.breadcrumbActive}>Manage Customers</span>
           </div>
-        <button className={styles.addBtn} onClick={() => router.push('/admin/create')}>
-  + Add New
+                    <button
+  className={styles.deletedAccountBtn}
+  onClick={() => router.push('/admin/delete_accounts')}
+>
+  Deleted Accounts
 </button>
+          <button className={styles.addBtn} onClick={() => router.push('/admin/create')}>+ Add New</button>
+ 
         </div>
 
         <div className={styles.tableCard}>
-          <h3 className={styles.tableTitle}>Manage Staff</h3>
+          <h3 className={styles.tableTitle}>Manage Customers</h3>
 
           <div className={styles.tableControls}>
             <div>
               Show{" "}
-             <select className={styles.select} value={entriesPerPage} onChange={handleEntriesChange}>
-                <option>10</option>
-                <option>25</option>
-                <option>50</option>
-              </select>{" "}
-              entries
+              <select className={styles.select} value={entriesPerPage} onChange={handleEntriesChange}>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>{" "} entries
             </div>
 
             <div>
               <label>City: </label>
-              <select
-                className={styles.select}
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-              >
+              <select className={styles.select} value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)}>
                 <option value="">Select City</option>
-                {uniqueCities.map((city, i) => (
-                  <option key={i} value={city}>{city}</option>
-                ))}
+                {uniqueCities.map((city, i) => <option key={i} value={city}>{city}</option>)}
               </select>
             </div>
+
+
 
             <div>
               <label>Search: </label>
@@ -124,44 +171,50 @@ const handlePrevPage = () => {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>City</th>
+                <th onClick={() => handleSort("username")} style={{ cursor: "pointer" }}>
+                  Name <SortArrow direction={sortConfig.key === "username" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("email")} style={{ cursor: "pointer" }}>
+                  Email <SortArrow direction={sortConfig.key === "email" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("phonenumber")} style={{ cursor: "pointer" }}>
+                  Phone <SortArrow direction={sortConfig.key === "phonenumber" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("city")} style={{ cursor: "pointer" }}>
+                  City <SortArrow direction={sortConfig.key === "city" ? sortConfig.direction : null} />
+                </th>
                 <th>Options</th>
               </tr>
             </thead>
             <tbody>
-              {currentCustomers.map((cust, index) => (
-               <tr key={index}>
-                    <td>{cust.name}</td>
-                  <td>{cust.email}</td>
-                  <td>{cust.mobile}</td>
-                  <td>{cust.city}</td>
+              {currentCustomers.length > 0 ? currentCustomers.map((cust) => (
+                <tr key={cust.id}>
+                <td>{cust.username}</td>
+<td>{cust.email}</td>
+<td>{cust.phonenumber}</td>
+<td>{cust.city}</td>
                   <td>
-                    <button className={styles.deletebtn} onClick={() => handleDelete(index)}> Delete </button>
+                    <button className={styles.deletebtn} onClick={() => handleDelete(cust.id)}>Delete</button>
                   </td>
                 </tr>
-              ))}
-              {currentCustomers.length === 0 && (
+              )) : (
                 <tr>
-                  <td colSpan={4}>No matching records found.</td>
+                  <td colSpan={5}>No matching records found.</td>
                 </tr>
               )}
             </tbody>
           </table>
 
-         <div className={styles.pagination}>
-  <span>
-    Showing {startIndex + 1} to {Math.min(endIndex, filteredCustomers.length)} of {filteredCustomers.length} entries
-  </span>
-  <div className={styles.paginationControls}>
-    <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-    <span className={styles.pageNumber}>{currentPage}</span>
-    <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-  </div>
-</div>
-
+          <div className={styles.pagination}>
+            <span>
+              Showing {startIndex + 1} to {Math.min(endIndex, filteredCustomers.length)} of {filteredCustomers.length} entries
+            </span>
+            <div className={styles.paginationControls}>
+              <button onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
+              <span className={styles.pageNumber}>{currentPage}</span>
+              <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

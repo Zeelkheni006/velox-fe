@@ -1,17 +1,20 @@
 "use client";
+
 import styles from "../styles/managecustomer.module.css";
 import Layout from "../pages/page";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { addCustomer } from "../../api/manage_users/manage_customer"; // ✅ Import API function
 
 export default function AddCustomerPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    password: '',
-    confirmPassword: ''
+    username: "",
+    email: "",
+    phonenumber: "",
+    city: "",
+    password: "",
+    confirm_password: "",
   });
 
   const handleChange = (e) => {
@@ -19,40 +22,48 @@ export default function AddCustomerPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
+
+    if (formData.password !== formData.confirm_password) {
       alert("Passwords do not match");
       return;
     }
 
-    // You can POST this data to your backend here
-    console.log("Submitted:", formData);
-    alert("Customer added successfully!");
-
-    // Navigate back to manage page
-    router.push("/manage-customer"); // or wherever your list page is
+    try {
+      const response = await addCustomer(formData);
+      if (response.success) {
+        alert("✅ Customer added successfully!");
+        router.push("/admin/customer");
+      } else {
+        alert("❌ " + (response.message || "Failed to add customer"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error: " + err.message);
+    }
   };
 
   return (
     <Layout>
-        <div className={styles.addcontainer}>
-            <div className={styles.topCard}>
+      <div className={styles.addcontainer}>
+        <div className={styles.topCard}>
           <div>
-            <span className={styles.breadcrumb}>Manage Customer</span> &gt; <span className={styles.breadcrumbActive}> Add ManageCustomer</span>
+            <span className={styles.breadcrumb}>Manage Customer</span> &gt;{" "}
+            <span className={styles.breadcrumbActive}>Add Customer</span>
           </div>
- 
         </div>
-<div className={styles.addcard}>
+
+        <div className={styles.addcard}>
           <h2 className={styles.formTitle}>Add Customer</h2>
 
           <form className={styles.form} onSubmit={handleSubmit}>
-            <label>Name</label>
+            <label>Username</label>
             <input
               type="text"
-              name="name"
+              name="username"
               placeholder="Username"
-              value={formData.name}
+              value={formData.username}
               onChange={handleChange}
               required
             />
@@ -70,11 +81,21 @@ export default function AddCustomerPage() {
             <label>Mobile</label>
             <input
               type="text"
-              name="mobile"
-              placeholder="10 digit Mobile number"
-              value={formData.mobile}
+              name="phonenumber"
+              placeholder="13 digit Mobile number"
+              value={formData.phonenumber}
               onChange={handleChange}
-              maxLength="10"
+              maxLength="14"
+              required
+            />
+
+            <label>City</label>
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              value={formData.city}
+              onChange={handleChange}
               required
             />
 
@@ -91,14 +112,16 @@ export default function AddCustomerPage() {
             <label>Confirm Password</label>
             <input
               type="password"
-              name="confirmPassword"
+              name="confirm_password"
               placeholder="Confirm Password"
-              value={formData.confirmPassword}
+              value={formData.confirm_password}
               onChange={handleChange}
               required
             />
 
-            <button type="submit" className={styles.submitBtn}>Submit</button>
+            <button type="submit" className={styles.submitBtn}>
+              Submit
+            </button>
           </form>
         </div>
       </div>

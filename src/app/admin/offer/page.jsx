@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/offers.module.css";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export default function Offer() {
   const [offerlist, setOfferlist] = useState([
@@ -27,7 +27,9 @@ export default function Offer() {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-    const router = useRouter(); 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const router = useRouter();
 
   // 🔄 Toggle Status
   const toggleStatus = (index) => {
@@ -36,12 +38,40 @@ export default function Offer() {
         i === index
           ? {
               ...offer,
-              status: offer.status === "Active" ? "Inactive" : "Active",
+              status:
+                offer.status === "Active"
+                  ? "Inactive"
+                  : "Active",
             }
           : offer
       )
     );
   };
+
+  // 🔼 Sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
+
+    setSortConfig({ key: direction ? key : null, direction });
+
+    if (!direction) return; // no sorting
+
+    setOfferlist((prev) =>
+      [...prev].sort((a, b) => {
+        if (a[key] < b[key]) return direction === "asc" ? -1 : 1;
+        if (a[key] > b[key]) return direction === "asc" ? 1 : -1;
+        return 0;
+      })
+    );
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: 5 }}>
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+    </span>
+  );
 
   // 🔍 Search filter
   const filteredOffers = offerlist.filter(
@@ -50,7 +80,7 @@ export default function Offer() {
       offer.offercode.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📄 Pagination logic
+  // 📄 Pagination
   const totalPages = Math.ceil(filteredOffers.length / entries);
   const startIndex = (currentPage - 1) * entries;
   const endIndex = Math.min(startIndex + entries, filteredOffers.length);
@@ -68,7 +98,7 @@ export default function Offer() {
     <Layout>
       <div className={styles.container}>
         {/* Header */}
-     <div className={styles.headerContainer}>
+        <div className={styles.headerContainer}>
           <div>
             <span className={styles.breadcrumb}>Offer</span> &gt;{" "}
             <span className={styles.breadcrumbActive}>Offer</span>
@@ -77,7 +107,6 @@ export default function Offer() {
 
         {/* Card */}
         <div className={styles.card}>
-          {/* Card Header */}
           <div className={styles.header}>
             <h3>Offers</h3>
             <button
@@ -126,12 +155,57 @@ export default function Offer() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Offer Value</th>
-                <th>Offer Code</th>
-                <th>Valid Upto</th>
-                <th>Owner</th>
-                <th>Status</th>
+                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Title
+                  <SortArrow
+                    direction={sortConfig.key === "title" ? sortConfig.direction : null}
+                  />
+                </th>
+                <th
+                  onClick={() => handleSort("offervalue")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Offer Value
+                  <SortArrow
+                    direction={sortConfig.key === "offervalue" ? sortConfig.direction : null}
+                  />
+                </th>
+                 <th
+                  onClick={() => handleSort("offervalue")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Offer Code
+                  <SortArrow
+                    direction={sortConfig.key === "offervalue" ? sortConfig.direction : null}
+                  />
+                </th>
+                 <th
+                  onClick={() => handleSort("offervalue")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Valide Upto
+                  <SortArrow
+                    direction={sortConfig.key === "offervalue" ? sortConfig.direction : null}
+                  />
+                </th>
+                 <th
+                  onClick={() => handleSort("offervalue")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Owner
+                  <SortArrow
+                    direction={sortConfig.key === "offervalue" ? sortConfig.direction : null}
+                  />
+                </th>
+                 <th
+                  onClick={() => handleSort("offervalue")}
+                  style={{ cursor: "pointer" }}
+                >
+                  Status
+                  <SortArrow
+                    direction={sortConfig.key === "offervalue" ? sortConfig.direction : null}
+                  />
+                </th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -156,16 +230,22 @@ export default function Offer() {
                       </span>
                     </td>
                     <td>
- <button
-  className={styles.editBtn}
-  onClick={() =>
-    router.push(
-      `/admin/edit-offer/?title=${encodeURIComponent(offer.title)}&offervalue=${offer.offervalue}&offercode=${offer.offercode}&valideupto=${encodeURIComponent(offer.valideupto)}&owner=${encodeURIComponent(offer.owner)}`
-    )
-  }
->
-  Edit
-</button>
+                      <button
+                        className={styles.editBtn}
+                        onClick={() =>
+                          router.push(
+                            `/admin/edit-offer/?title=${encodeURIComponent(
+                              offer.title
+                            )}&offervalue=${offer.offervalue}&offercode=${
+                              offer.offercode
+                            }&valideupto=${encodeURIComponent(
+                              offer.valideupto
+                            )}&owner=${encodeURIComponent(offer.owner)}`
+                          )
+                        }
+                      >
+                        Edit
+                      </button>
                       <button
                         className={
                           offer.status === "Active"
@@ -194,9 +274,7 @@ export default function Offer() {
             <span>
               {filteredOffers.length === 0
                 ? "No entries found"
-                : `Showing ${startIndex + 1} to ${endIndex} of ${
-                    filteredOffers.length
-                  } entries`}
+                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredOffers.length} entries`}
             </span>
             <div className={styles.paginationControls}>
               <button
@@ -216,7 +294,7 @@ export default function Offer() {
               </button>
             </div>
           </div>
-        </div>  
+        </div>
       </div>
     </Layout>
   );

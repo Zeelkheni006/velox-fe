@@ -212,8 +212,12 @@ try {
                   <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
                     Title <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
                   </th>
-                  <th>Logo</th>
-                  <th>Description</th>
+                  <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
+                    Logo <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
+                  </th>
+                <th onClick={() => handleSort('title')} style={{ cursor: 'pointer' }}>
+                    Description <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
+                  </th>
                   <th onClick={() => handleSort('status')} style={{ cursor: 'pointer' }}>
                     Status <SortArrow direction={sortConfig.key === 'status' ? sortConfig.direction : null} />
                   </th>

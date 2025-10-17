@@ -1,109 +1,149 @@
-  'use client';
-  import { useState, useEffect, useRef } from 'react';
-  import Layout from '../pages/page';
-  import styles from '../styles/order.module.css';
-  import { FaEye, FaBuilding, FaTasks } from 'react-icons/fa';
-  import { useRouter } from 'next/navigation';
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import Layout from '../pages/page';
+import styles from '../styles/order.module.css';
+import { FaEye, FaBuilding, FaTasks } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
-  // Mock data
-  const MOCK_ORDERS = [
-    { id: 1, user_name: 'John Doe', order_number: 'ORD001', services: 'Split AC Check', total_quantity: 2, total_amount: 500, city: 'Jamnagar', status: 'pending' },
-    { id: 2, user_name: 'Jane Smith', order_number: 'ORD002', services: 'Split AC Chemical Wash', total_quantity: 1, total_amount: 300, city: 'Ahmedabad', status: 'completed' },
-    { id: 3, user_name: 'Alice Johnson', order_number: 'ORD003', services: 'Window AC Service', total_quantity: 1, total_amount: 450, city: 'Surat', status: 'pending' },
-  ];
+// Mock data
+const MOCK_ORDERS = [
+  { id: 1, user_name: 'John Doe', order_number: 'ORD001', services: 'Split AC Check', total_quantity: 2, total_amount: 500, city: 'Jamnagar', status: 'pending' },
+  { id: 2, user_name: 'Jane Smith', order_number: 'ORD002', services: 'Split AC Chemical Wash', total_quantity: 1, total_amount: 300, city: 'Ahmedabad', status: 'completed' },
+  { id: 3, user_name: 'Alice Johnson', order_number: 'ORD003', services: 'Window AC Service', total_quantity: 1, total_amount: 450, city: 'Surat', status: 'pending' },
+];
 
-  export default function OrdersTable() {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [entriesPerPage, setEntriesPerPage] = useState(10);
-    const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
-    const [cityFilter, setCityFilter] = useState('');
-    const [serviceFilter, setServiceFilter] = useState('');
-    const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
-    const [openStatusModal, setOpenStatusModal] = useState(false);
+export default function OrdersTable() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [cityFilter, setCityFilter] = useState('');
+  const [serviceFilter, setServiceFilter] = useState('');
+  const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
+  const [openStatusModal, setOpenStatusModal] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const router = useRouter();
-    const rowRefs = useRef([]);
+  const rowRefs = useRef([]);
 
-    // Load mock data
-    useEffect(() => {
-      setLoading(true);
-      setTimeout(() => {
-        setOrders(MOCK_ORDERS);
-        setLoading(false);
-      }, 500);
-    }, []);
+  // Load mock data
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setOrders(MOCK_ORDERS);
+      setLoading(false);
+    }, 500);
+  }, []);
 
-    // Click outside to close dropdown
-    useEffect(() => {
-      const handleClickOutside = e => {
-        if (!rowRefs.current.some(ref => ref && ref.contains(e.target))) {
-          setOpenDropdownIndex(null);
-        }
-      };
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }, []);
+  // Handle Sorting
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+    else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
 
-    // Filtered orders
-    const filteredOrders = orders.filter(o =>
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: '5px', fontSize: '12px' }}>
+      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+    </span>
+  );
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!rowRefs.current.some((ref) => ref && ref.contains(e.target))) {
+        setOpenDropdownIndex(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  // ✅ Filtered orders
+  const filteredOrders = orders.filter(
+    (o) =>
       (!statusFilter || o.status === statusFilter) &&
       (!cityFilter || o.city === cityFilter) &&
       (!serviceFilter || o.services.includes(serviceFilter)) &&
       (o.user_name.toLowerCase().includes(search.toLowerCase()) ||
-      o.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      o.services.toLowerCase().includes(search.toLowerCase()))
-    );
+        o.order_number.toLowerCase().includes(search.toLowerCase()) ||
+        o.services.toLowerCase().includes(search.toLowerCase()))
+  );
 
-    // Pagination
-    const totalPages = Math.ceil(filteredOrders.length / entriesPerPage);
-    const startIndex = (currentPage - 1) * entriesPerPage;
-    const endIndex = Math.min(startIndex + entriesPerPage, filteredOrders.length);
-    const currentOrders = filteredOrders.slice(startIndex, endIndex);
+  // ✅ Sorting applied correctly
+  let sortedOrders = [...filteredOrders];
+  if (sortConfig.key && sortConfig.direction) {
+    sortedOrders.sort((a, b) => {
+      const aValue = a[sortConfig.key]?.toString().toLowerCase();
+      const bValue = b[sortConfig.key]?.toString().toLowerCase();
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 
-    // Print and PDF handlers
-    const handlePrintClick = () => {
-      const tableElement = document.getElementById("orders-table");
-      if (!tableElement) return alert("No orders table found to print.");
-      const printContent = tableElement.outerHTML;
-      const newWindow = window.open("", "_blank");
-      newWindow.document.write(`
-        <html>
-          <head>
-            <title>Orders</title>
-            <style>
-              table { border-collapse: collapse; width: 100%; }
-              th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-              th { background-color: #f4f4f4; }
-            </style>
-          </head>
-          <body>
-            <h2>Orders</h2>
-            ${printContent}
-          </body>
-        </html>
-      `);
-      newWindow.document.close();
-      newWindow.focus();
-      newWindow.print();
-      newWindow.onafterprint = () => newWindow.close();
-    };
+  // ✅ Pagination
+  const totalPages = Math.ceil(sortedOrders.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = Math.min(startIndex + entriesPerPage, sortedOrders.length);
+  const currentOrders = sortedOrders.slice(startIndex, endIndex);
 
-    const handlePdfClick = async () => {
-      const { jsPDF: JsPDF } = await import("jspdf");
-      await import("jspdf-autotable");
-      const doc = new JsPDF();
-      doc.text("Orders (Current Page)", 14, 20);
-      const tableColumn = ["ID", "User Name", "Order Number", "Services", "Quantity", "Amount", "City", "Status"];
-      const tableBody = currentOrders.map(order => [
-        order.id, order.user_name, order.order_number, order.services,
-        order.total_quantity, order.total_amount, order.city, order.status
-      ]);
-      doc.autoTable({ head: [tableColumn], body: tableBody, startY: 30, styles: { fontSize: 8 }, headStyles: { fillColor: [22, 160, 133] } });
-      doc.save("orders.pdf");
-    };
+  // Print and PDF handlers
+  const handlePrintClick = () => {
+    const tableElement = document.getElementById('orders-table');
+    if (!tableElement) return alert('No orders table found to print.');
+    const printContent = tableElement.outerHTML;
+    const newWindow = window.open('', '_blank');
+    newWindow.document.write(`
+      <html>
+        <head>
+          <title>Orders</title>
+          <style>
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f4f4f4; }
+          </style>
+        </head>
+        <body>
+          <h2>Orders</h2>
+          ${printContent}
+        </body>
+      </html>
+    `);
+    newWindow.document.close();
+    newWindow.focus();
+    newWindow.print();
+    newWindow.onafterprint = () => newWindow.close();
+  };
+
+  const handlePdfClick = async () => {
+    const { jsPDF: JsPDF } = await import('jspdf');
+    await import('jspdf-autotable');
+    const doc = new JsPDF();
+    doc.text('Orders (Current Page)', 14, 20);
+    const tableColumn = ['ID', 'User Name', 'Order Number', 'Services', 'Quantity', 'Amount', 'City', 'Status'];
+    const tableBody = currentOrders.map((order) => [
+      order.id,
+      order.user_name,
+      order.order_number,
+      order.services,
+      order.total_quantity,
+      order.total_amount,
+      order.city,
+      order.status,
+    ]);
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableBody,
+      startY: 30,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [22, 160, 133] },
+    });
+    doc.save('orders.pdf');
+  };
 
     return (
       <Layout>
@@ -152,14 +192,50 @@
                 <table id="orders-table" className={styles.table}>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>User Name</th>
-                      <th>Order Number</th>
-                      <th>Services</th>
-                      <th>Total Quantity</th>
-                      <th>Total Amount</th>
-                      <th>City</th>
-                      <th>Status</th>
+                         <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>
+                  Id
+                  <SortArrow direction={sortConfig.key === "name" ? sortConfig.direction : null} />
+                </th>
+                             <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>
+                  User Name
+                  <SortArrow direction={sortConfig.key === "name" ? sortConfig.direction : null} />
+                </th>
+                       <th onClick={() => handleSort('order_number')} style={{ cursor: 'pointer' }}>
+                      Order Number
+                      <SortArrow
+                        direction={sortConfig.key === 'order_number' ? sortConfig.direction : null}
+                      />
+                    </th>
+                      <th onClick={() => handleSort('services')} style={{ cursor: 'pointer' }}>
+                      Services
+                      <SortArrow
+                        direction={sortConfig.key === 'services' ? sortConfig.direction : null}
+                      />
+                    </th>
+                       <th onClick={() => handleSort('total_quantity')} style={{ cursor: 'pointer' }}>
+                      Total Quantity
+                      <SortArrow
+                        direction={
+                          sortConfig.key === 'total_quantity' ? sortConfig.direction : null
+                        }
+                      />
+                    </th>
+                       <th onClick={() => handleSort('total_amount')} style={{ cursor: 'pointer' }}>
+                      Total Amount
+                      <SortArrow
+                        direction={sortConfig.key === 'total_amount' ? sortConfig.direction : null}
+                      />
+                    </th>
+                       <th onClick={() => handleSort('city')} style={{ cursor: 'pointer' }}>
+                      City
+                      <SortArrow direction={sortConfig.key === 'city' ? sortConfig.direction : null} />
+                    </th>
+                       <th onClick={() => handleSort('status')} style={{ cursor: 'pointer' }}>
+                      Status
+                      <SortArrow
+                        direction={sortConfig.key === 'status' ? sortConfig.direction : null}
+                      />
+                    </th>
                       <th>Action</th>
                     </tr>
                   </thead>

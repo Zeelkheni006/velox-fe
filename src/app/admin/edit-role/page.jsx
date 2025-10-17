@@ -64,7 +64,7 @@ const AddRole = () => {
             onChange={(e) => setRoleName(e.target.value)}
             placeholder="Enter role name"
             className={styles.input}
-            readOnly={isEditMode} // optional: prevent changing role name during edit
+           // optional: prevent changing role name during edit
           />
 
           <h2 className={styles.cardTitle1}>Permissions</h2>
@@ -81,6 +81,7 @@ const AddRole = () => {
                 <label className={styles.permissionLabel}>ADD *</label>
                 <input type="checkbox" className={styles.toggle} />
               </div>
+                  
               <div className={styles.permissionGroup}>
                 <label className={styles.permissionLabel}>EDIT *</label>
                 <input type="checkbox" className={styles.toggle} />
@@ -446,7 +447,7 @@ const AddRole = () => {
           </div>
            <div className={styles.permissionSection}>
             <h3 className={styles.sectionHeading}>Accounts</h3>
-            <div className={styles.permissionRow}>
+            <div className={styles.permissionRow1}>
               <div className={styles.permissionGroup}>
                 <label className={styles.permissionLabel}>ACCOUNTS *</label>
                 <input type="checkbox" className={styles.toggle} />

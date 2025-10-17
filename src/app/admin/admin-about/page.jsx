@@ -85,7 +85,41 @@ const navigateToAddAbout = () => {
 };
   useEffect(() => setMounted(true), []);
 
+const SortArrow = ({ direction }) => (
+  <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+    {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+  </span>
+);
 
+// Sorting handler
+const handleSort = (key) => {
+  let direction = "asc";
+  if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+  else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null; // unsorted
+  setSortConfig({ key: direction ? key : null, direction });
+};
+
+// Sorted & filtered team
+const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+// 🔹 Sorted & filtered team
+const sortedTeam = useMemo(() => {
+  let filtered = team.filter(t =>
+    t.name.toLowerCase().includes(teamSearch.toLowerCase()) ||
+    t.designation.toLowerCase().includes(teamSearch.toLowerCase())
+  );
+
+  if (!sortConfig.key || !sortConfig.direction) return filtered;
+
+  return [...filtered].sort((a, b) => {
+    let aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
+    let bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
+
+    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+}, [team, teamSearch, sortConfig]);
   return (
     <Layout>
       <div className={styles.container}>
@@ -276,15 +310,23 @@ const navigateToAddAbout = () => {
           </div>
 
           <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Image</th>
-                <th>Designation</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+           <thead>
+  <tr>
+    <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>
+      Name <SortArrow direction={sortConfig.key === "name" ? sortConfig.direction : null} />
+    </th>
+    <th onClick={() => handleSort("image")} style={{ cursor: "pointer" }}>
+      Image <SortArrow direction={sortConfig.key === "image" ? sortConfig.direction : null} />
+    </th>
+    <th onClick={() => handleSort("designation")} style={{ cursor: "pointer" }}>
+      Designation <SortArrow direction={sortConfig.key === "designation" ? sortConfig.direction : null} />
+    </th>
+    <th onClick={() => handleSort("status")} style={{ cursor: "pointer" }}>
+      Status <SortArrow direction={sortConfig.key === "status" ? sortConfig.direction : null} />
+    </th>
+    <th>Action</th>
+  </tr>
+</thead>
             <tbody>
               {currentTeam.map(member => (
                 <tr key={member.id}>

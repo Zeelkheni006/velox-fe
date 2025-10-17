@@ -195,12 +195,24 @@ useEffect(() => {
                   #
                   <SortArrow direction={sortConfig.key === 'title' ? sortConfig.direction : null} />
                 </th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Sub Category</th>
-                <th>Image</th>
-                <th>Duration</th>
-                <th>Status</th>
+                 <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Title <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Category <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Sub Category <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                 <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Image <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                 <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Duration<SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                 <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Status <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
                 <th>Action</th>
               </tr>
             </thead>

@@ -216,7 +216,7 @@
     background-color: #f4f7fa;
     min-height: 100vh;
     font-family: 'Segoe UI', sans-serif;
-    width: 1900px;
+    width: 2000px;
 }
 
 .breadcrumb {
@@ -295,9 +295,20 @@
 
 .permissionRow {
     display: grid;
-    grid-template-columns: 2fr 1.5fr 1.4fr 1fr 1fr 1.5fr;
+    grid-template-columns: 1.7fr 1.5fr 1.2fr 1.1fr 1.6fr 1.6fr;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 25px;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.permissionRow1 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr 4fr;
+    flex-wrap: wrap;
+    gap: 25px;
     align-items: center;
     margin-bottom: 20px;
     padding: 10px 0;
@@ -332,6 +343,40 @@
     position: relative;
     cursor: pointer;
     transition: background-color 0.2s;
+    right: 45px;
+}
+
+.toggle1 {
+    appearance: none;
+    width: 40px;
+    height: 22px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    left: 10px;
+    margin-top: 10px;
+}
+
+.toggle1::before {
+    content: "";
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s;
+}
+
+.toggle1:checked {
+    background-color: #3b82f6;
+}
+
+.toggle1:checked::before {
+    transform: translateX(20px);
 }
 
 .toggle::before {

@@ -63,7 +63,7 @@ export default function ServiceCards() {
           <div className="content">
             <h3>{item.title}</h3>
             <p>{item.desc}</p>
-            <Link href={`/services/${item.slug}`}>
+  <Link href={`/blog-view`}>
   <button className="readMore">READ MORE</button>
 </Link>
           </div>

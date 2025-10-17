@@ -20,6 +20,21 @@
     margin-bottom: 24px;
 }
 
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -132,4 +147,29 @@
 
 .closeBtn:hover {
     background-color: #1b1555f1;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
 }

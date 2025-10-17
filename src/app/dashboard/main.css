@@ -35,7 +35,7 @@
 }
 
 .navList li:hover {
-    color: #0070f3;
+    color: #f38a00;
 }
 
 
@@ -58,7 +58,7 @@
     border: 1px solid #ddd;
     padding: 20px;
     width: 50;
-    height: 200px;
+    height: auto;
 }
 
 .accountInfo h3 {

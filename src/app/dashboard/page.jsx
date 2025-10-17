@@ -1,21 +1,32 @@
 'use client';
-
+import { useRouter } from "next/navigation"; 
 import React from "react";
 import "./main.css"; 
 
 export default function Dashboard() {
+    const router = useRouter();
   return (
     <div className="container">
       {/* Sidebar */}
       <aside className="sidebar">
-        <h3 className="logo">Dashboard</h3>
+        
         <ul className="navList">
-          <li>Order History</li>
-          <li>Ongoing Order</li>
-          <li>Order Tracking</li>
-          <li>Edit Profile</li>
-          <li>Reset Password</li>
-          <li>Logout</li>
+          <li onClick={()=> router.push("/dashboard")}>Dashboard</li>
+          <li onClick={() => router.push("/order-history")}>Order History</li>
+          <li onClick={()=>router.push("/ongoing-order")}>Ongoing Order</li>
+          <li onClick={()=>router.push("/order-track")}>Order Tracking</li>
+          <li onClick={()=>router.push("/user-profile")}>Edit Profile</li>
+          <li onClick={()=>router.push("/resetform")}>Reset Password</li>
+                   <li
+  onClick={() => {
+    // 1️⃣ Clear stored login/session data
+    localStorage.removeItem("access_token"); // or your auth token key
+    // 2️⃣ Redirect to login or homepage
+    router.push("/"); // redirect to your login page
+  }}
+>
+  Logout
+</li>
         </ul>
       </aside>
 

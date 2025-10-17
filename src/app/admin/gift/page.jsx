@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
-
-
 export default function Gift() {
   const searchParams = useSearchParams();
-const giftId = searchParams.get("id");
+  const giftId = searchParams.get("id");
+  const router = useRouter();
+
   const [offerlist, setOfferlist] = useState([
     {
       id: 1,
       title: "Car service",
       giftvalue: 100,
-      image: "/public/images/AC Service and Repair.webp",
+      image: "/images/AC Service and Repair.webp",
       valideupto: "10-09-2021 To 30-11-2021",
       status: "Active",
     },
@@ -33,37 +33,63 @@ const giftId = searchParams.get("id");
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const router = useRouter(); 
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-  // Toggle Active / Inactive status
+  // Toggle Active / Inactive
   const toggleStatus = (index) => {
-    setOfferlist((prevList) =>
-      prevList.map((offer, i) =>
-        i === index
-          ? { ...offer, status: offer.status === "Active" ? "Inactive" : "Active" }
-          : offer
+    setOfferlist((prev) =>
+      prev.map((o, i) =>
+        i === index ? { ...o, status: o.status === "Active" ? "Inactive" : "Active" } : o
       )
     );
   };
 
-  // Filter based on search
-  const filteredOffers = offerlist.filter(
-    (offer) => offer.title.toLowerCase().includes(search.toLowerCase())
+  // Sorting
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+    </span>
   );
 
+  // Filtered offers
+  const filteredOffers = offerlist.filter((o) =>
+    o.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Sorting applied
+  let sortedOffers = [...filteredOffers];
+  if (sortConfig.key && sortConfig.direction) {
+    sortedOffers.sort((a, b) => {
+      let aValue = a[sortConfig.key];
+      let bValue = b[sortConfig.key];
+
+      // handle numbers
+      if (typeof aValue === "number") return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+
+      // handle strings
+      aValue = aValue?.toString().toLowerCase() || "";
+      bValue = bValue?.toString().toLowerCase() || "";
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
   // Pagination
-  const totalPages = Math.ceil(filteredOffers.length / entries);
+  const totalPages = Math.ceil(sortedOffers.length / entries);
   const startIndex = (currentPage - 1) * entries;
-  const endIndex = Math.min(startIndex + entries, filteredOffers.length);
-  const currentOffers = filteredOffers.slice(startIndex, endIndex);
+  const endIndex = Math.min(startIndex + entries, sortedOffers.length);
+  const currentOffers = sortedOffers.slice(startIndex, endIndex);
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
+  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   return (
     <Layout>
@@ -78,63 +104,44 @@ const giftId = searchParams.get("id");
         <div className={styles.card}>
           <div className={styles.header}>
             <h3>Gift</h3>
-            <button
-              className={styles.addBtn}
-              onClick={() => router.push("/admin/admin-add/add-gift")}
-            >
-              + Add New
-            </button>
-            <button
-              className={styles.sendbtn}
-              onClick={() => router.push("/admin/send-gift")}
-            >
-              Send Gift
-            </button>
+            <button className={styles.addBtn} onClick={() => router.push("/admin/admin-add/add-gift")}>+ Add New</button>
+            <button className={styles.sendbtn} onClick={() => router.push("/admin/send-gift")}>Send Gift</button>
           </div>
 
-          {/* Controls */}
           <div className={styles.controls}>
             <label>
               Show{" "}
-              <select
-                className={styles.select}
-                value={entries}
-                onChange={(e) => {
-                  setEntries(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
+              <select className={styles.select} value={entries} onChange={(e) => { setEntries(Number(e.target.value)); setCurrentPage(1); }}>
                 <option value={10}>10</option>
                 <option value={25}>25</option>
                 <option value={50}>50</option>
-              </select>{" "}
-              entries
+              </select>{" "}entries
             </label>
 
             <label className={styles.searchlable}>
               Search:{" "}
-              <input
-                type="text"
-                placeholder="Search..."
-                className={styles.search}
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
+              <input type="text" placeholder="Search..." className={styles.search} value={search} onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }} />
             </label>
           </div>
 
-          {/* Table */}
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Title</th>
-                <th>Gift Value</th>
-                <th>Image</th>
-                <th>Valid Upto</th>
-                <th>Status</th>
+                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Title <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("giftvalue")} style={{ cursor: "pointer" }}>
+                  Gift Value <SortArrow direction={sortConfig.key === "giftvalue" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("image")} style={{ cursor: "pointer" }}>
+                  Image <SortArrow direction={sortConfig.key === "image" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("valideupto")} style={{ cursor: "pointer" }}>
+                  Valide Upto <SortArrow direction={sortConfig.key === "valideupto" ? sortConfig.direction : null} />
+                </th>
+                <th onClick={() => handleSort("status")} style={{ cursor: "pointer" }}>
+                  Status <SortArrow direction={sortConfig.key === "status" ? sortConfig.direction : null} />
+                </th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -144,49 +151,12 @@ const giftId = searchParams.get("id");
                   <tr key={offer.id}>
                     <td>{offer.title}</td>
                     <td>{offer.giftvalue}</td>
-                    <td>
-                     {offer.image ? (
-  <Image
-    src={offer.image}
-    alt={offer.title}
-    width={50}
-    height={50}
-    objectFit="cover"
-  />
-) : (
-  "-"
-)}
-                    </td>
+                    <td>{offer.image ? <Image src={offer.image} width={50} height={50} alt={offer.title} /> : "-"}</td>
                     <td>{offer.valideupto}</td>
+                    <td>{offer.status}</td>
                     <td>
-                      <span
-                        className={`${styles.status} ${
-                          offer.status === "Active"
-                            ? styles.active
-                            : styles.inactive
-                        }`}
-                      >
-                        {offer.status}
-                      </span>
-                    </td>
-                    <td>
-                   <button
-  className={styles.editBtn}
-  onClick={() => {
-    localStorage.setItem("selectedGift", JSON.stringify(offer));
-    router.push(`/admin/edit-gift?id=${offer.id}`);
-  }}
->
-  Edit
-</button>
-                      <button
-                        className={
-                          offer.status === "Active"
-                            ? styles.inactiveBtn
-                            : styles.activeBtn
-                        }
-                        onClick={() => toggleStatus(index)}
-                      >
+                      <button className={styles.editBtn} onClick={() => { localStorage.setItem("selectedGift", JSON.stringify(offer)); router.push(`/admin/edit-gift?id=${offer.id}`); }}>Edit</button>
+                      <button className={offer.status === "Active" ? styles.inactiveBtn : styles.activeBtn} onClick={() => toggleStatus(index)}>
                         {offer.status === "Active" ? "In Active" : "Active"}
                       </button>
                     </td>
@@ -194,37 +164,20 @@ const giftId = searchParams.get("id");
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center" }}>
-                    No entries found
-                  </td>
+                  <td colSpan="6" style={{ textAlign: "center" }}>No entries found</td>
                 </tr>
               )}
             </tbody>
           </table>
 
-          {/* Pagination */}
           <div className={styles.pagination}>
             <span>
-              {filteredOffers.length === 0
-                ? "No entries found"
-                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredOffers.length} entries`}
+              {sortedOffers.length === 0 ? "No entries found" : `Showing ${startIndex + 1} to ${endIndex} of ${sortedOffers.length} entries`}
             </span>
             <div className={styles.paginationControls}>
-              <button
-                className={styles.paginationButton}
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
+              <button className={styles.paginationButton} disabled={currentPage === 1} onClick={handlePrevPage}>Previous</button>
               <span className={styles.pageNumber}>{currentPage}</span>
-              <button
-                className={styles.paginationButton}
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+              <button className={styles.paginationButton} disabled={currentPage === totalPages} onClick={handleNextPage}>Next</button>
             </div>
           </div>
         </div>

@@ -5,7 +5,6 @@ import styles from '../styles/franchiseFees.module.css';
 import Layout from '../pages/page'; // Adjust path if needed
 
 export default function FranchiseOutstandingPage({ data }) {
-  // Sample fallback data
   const sampleData = [
     { id: 1, franchiseName: 'Shree Auto Care', outstanding: '0 CREDIT' },
     { id: 2, franchiseName: 'Meena Car Service', outstanding: '0 CREDIT' },
@@ -14,45 +13,73 @@ export default function FranchiseOutstandingPage({ data }) {
 
   const rows = Array.isArray(data) && data.length ? data : sampleData;
 
-  // 🔹 States for search, entries, and pagination
+  // 🔹 States
   const [search, setSearch] = useState('');
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-  // 🔹 Filter logic (only filters by franchiseName and outstanding)
+  // 🔹 Sorting handler
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+    else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: '5px', fontSize: '12px' }}>
+      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+    </span>
+  );
+
+  // 🔹 Filter rows
   const filteredRows = rows.filter(
     (r) =>
       r.franchiseName.toLowerCase().includes(search.toLowerCase()) ||
       r.outstanding.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 🔹 Pagination logic
+  // 🔹 Sort filtered rows
+  let sortedRows = [...filteredRows];
+  if (sortConfig.key && sortConfig.direction) {
+    sortedRows.sort((a, b) => {
+      let aVal = a[sortConfig.key]?.toString().toLowerCase() || '';
+      let bVal = b[sortConfig.key]?.toString().toLowerCase() || '';
+
+      // Optional: for Outstanding, convert numbers if needed
+      if (sortConfig.key === 'outstanding') {
+        const parseAmount = (v) => parseFloat(v) || 0;
+        aVal = parseAmount(aVal);
+        bVal = parseAmount(bVal);
+      }
+
+      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // 🔹 Pagination
   const startIndex = (currentPage - 1) * entries;
-  const endIndex = Math.min(startIndex + entries, filteredRows.length);
-  const paginatedRows = filteredRows.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredRows.length / entries);
+  const endIndex = Math.min(startIndex + entries, sortedRows.length);
+  const paginatedRows = sortedRows.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedRows.length / entries);
 
-  // 🔹 Handlers for pagination buttons
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
-  };
+  const handlePrevPage = () => currentPage > 1 && setCurrentPage((prev) => prev - 1);
+  const handleNextPage = () => currentPage < totalPages && setCurrentPage((prev) => prev + 1);
 
   return (
     <Layout>
       <div className={styles.container}>
-        {/* Header Section */}
+        {/* Header */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Home</span> &gt;{' '}
+            <span className={styles.breadcrumb}>Franchise Outstandings</span> &gt;{' '}
             <span className={styles.breadcrumbActive}>Franchise Outstandings</span>
           </div>
         </div>
 
-        {/* Main Card */}
         <div className={styles.card}>
           <h1 className={styles.title}>Franchise Outstandings</h1>
 
@@ -95,8 +122,14 @@ export default function FranchiseOutstandingPage({ data }) {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Franchise Name</th>
-                  <th>Outstanding Amount</th>
+                  <th onClick={() => handleSort('franchiseName')} style={{ cursor: 'pointer' }}>
+                    Franchise Name{' '}
+                    <SortArrow direction={sortConfig.key === 'franchiseName' ? sortConfig.direction : null} />
+                  </th>
+                  <th onClick={() => handleSort('outstanding')} style={{ cursor: 'pointer' }}>
+                    Outstanding Amount{' '}
+                    <SortArrow direction={sortConfig.key === 'outstanding' ? sortConfig.direction : null} />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -122,9 +155,9 @@ export default function FranchiseOutstandingPage({ data }) {
           {/* Pagination */}
           <div className={styles.pagination}>
             <span>
-              {filteredRows.length === 0
+              {sortedRows.length === 0
                 ? 'No entries found'
-                : `Showing ${startIndex + 1} to ${endIndex} of ${filteredRows.length} entries`}
+                : `Showing ${startIndex + 1} to ${endIndex} of ${sortedRows.length} entries`}
             </span>
 
             <div className={styles.paginationControls}>

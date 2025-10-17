@@ -1,197 +1,88 @@
 "use client";
-import React, { useState,useEffect } from "react";
-import { useRouter } from 'next/navigation'; 
+import React, { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Layout from "../pages/page";
 import styles from "../styles/Franchises.module.css";
- import Layout from "../pages/page";
-import { jsPDF } from "jspdf";
 import dynamic from "next/dynamic";
 
-
 const franchiseData = [
-  {
-    id: 34,
-    name: "ABC ENTERPRICE JAM",
-    country: "India",
-    state: "Gujarat",
-    city: "Jamnagar",
-    commission: "20%",
-    status: " Active",
-  },
-  {
-    id: 33,
-    name: "Velox Ahmedabad",
-    country: "India",
-    state: "Gujarat",
-    city: "Ahmedabad",
-    commission: "0%",
-    status: " Active",
-  },
-  {
-    id: 32,
-    name: "Spark Services",
-    country: "India",
-    state: "Gujarat",
-    city: "Morbi",
-    commission: "0%",
-    status: " Active",
-  },
-  {
-    id: 31,
-    name: "Execelent Management",
-    country: "India",
-    state: "Gujarat",
-    city: "Rajkot",
-    commission: "0%",
-    status: " Active",
-  },
-  {
-    id: 30,
-    name: "Jony Rathod",
-    country: "India",
-    state: "Gujarat",
-    city: "Surat",
-    commission: "10%",
-    status: "Active",
-  },
-  {
-    id: 29,
-    name: "Manisha Beauty Care",
-    country: "India",
-    state: "Gujarat",
-    city: "Jamnagar",
-    commission: "10%",
-    status: "Active",
-  },
-  {
-    id: 28,
-    name: "MP MANAGEMENT",
-    country: "India",
-    state: "Gujarat",
-    city: "Surat",
-    commission: "10%",
-    status: " Active",
-  },
-  {
-    id: 27,
-    name: "XYZ Car Service",
-    country: "India",
-    state: "Gujarat",
-    city: "Surat",
-    commission: "10%",
-    status: "Active",
-  },
-    {
-    id: 30,
-    name: "Manisha Beauty Care",
-    country: "India",
-    state: "Gujarat",
-    city: "Jamnagar",
-    commission: "10%",
-    status: "Active",
-  },
-  {
-    id: 31,
-    name: "MP MANAGEMENT",
-    country: "India",
-    state: "Gujarat",
-    city: "Surat",
-    commission: "10%",
-    status: " Active",
-  },
-  {
-    id: 32,
-    name: "XYZ Car Service",
-    country: "India",
-    state: "Gujarat",
-    city: "Surat",
-    commission: "10%",
-    status: "Active",
-  },
+  { id: 34, name: "ABC ENTERPRICE JAM", country: "India", state: "Gujarat", city: "Jamnagar", commission: "20%", status: "Active" },
+  { id: 33, name: "Velox Ahmedabad", country: "India", state: "Gujarat", city: "Ahmedabad", commission: "0%", status: "Active" },
+  { id: 32, name: "Spark Services", country: "India", state: "Gujarat", city: "Morbi", commission: "0%", status: "Active" },
+  { id: 31, name: "Execelent Management", country: "India", state: "Gujarat", city: "Rajkot", commission: "0%", status: "Active" },
+  { id: 30, name: "Jony Rathod", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
+  { id: 29, name: "Manisha Beauty Care", country: "India", state: "Gujarat", city: "Jamnagar", commission: "10%", status: "Active" },
+  { id: 28, name: "MP MANAGEMENT", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
+  { id: 27, name: "XYZ Car Service", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
 ];
 
+const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
+
 export default function FranchisesPage() {
-      const [franchises, setFranchises] = useState(franchiseData);
-       const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
   const router = useRouter();
-
-const handlePrintClick = () => {
-  localStorage.setItem("franchisesToPrint", JSON.stringify(franchises));
-  router.push("/admin/print-franchises");  // Adjust route as per your project structure
-};
-  const toggleStatus = (id) => {
-    const updated = franchises.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            status: item.status === "Active" ? "In Active" : "Active",
-          }
-        : item
-    );
-    setFranchises(updated);
-  };
- const totalPages = Math.ceil(franchises.length / entriesPerPage);
-  const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = Math.min(startIndex + entriesPerPage, franchises.length);
-  const currentFranchises = franchises.slice(startIndex, endIndex);
+  const [franchises, setFranchises] = useState(franchiseData);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [search, setSearch] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const [selectedFranchise, setSelectedFranchise] = useState(null);
-const [showModal, setShowModal] = useState(false);
 
-  const handleEntriesChange = (e) => {
-    setEntriesPerPage(Number(e.target.value));
-    setCurrentPage(1); // reset to first page
+  // Sorting
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
+    else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
+    setSortConfig({ key: direction ? key : null, direction });
+  };
+  const SortArrow = ({ direction }) => (
+    <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+    </span>
+  );
+
+  // Filtered and Sorted Franchises
+  const filteredFranchises = useMemo(() => {
+    let filtered = franchises.filter(f => f.name.toLowerCase().includes(search.toLowerCase()));
+    if (sortConfig.key && sortConfig.direction) {
+      filtered.sort((a, b) => {
+        const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
+        const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
+        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return filtered;
+  }, [franchises, search, sortConfig]);
+
+  const totalPages = Math.ceil(filteredFranchises.length / entriesPerPage);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = Math.min(startIndex + entriesPerPage, filteredFranchises.length);
+  const currentFranchises = filteredFranchises.slice(startIndex, endIndex);
+
+  const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  const handleEntriesChange = (e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); };
+
+  const toggleStatus = (id) => {
+    setFranchises(prev => prev.map(f => f.id === id ? { ...f, status: f.status === "Active" ? "Inactive" : "Active" } : f));
   };
 
- 
-const handlePrevPage = () => {
-  setCurrentPage((prev) => Math.max(prev - 1, 1));
-};
+  const handleMoreInfo = (franchise) => { setSelectedFranchise(franchise); setShowModal(true); };
+  const handleCloseModal = () => { setShowModal(false); setSelectedFranchise(null); };
 
-const handleNextPage = () => {
-  setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-};
-const handleMoreInfo = (franchise) => {
-  setSelectedFranchise(franchise);
-  setShowModal(true);
-};
-
-const handleCloseModal = () => {
-  setShowModal(false);
-  setSelectedFranchise(null);
-};
-
-  const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
-
-  useEffect(() => {
-    import("jspdf-autotable");
-  }, []);
+  const handlePrintClick = () => { localStorage.setItem("franchisesToPrint", JSON.stringify(franchises)); router.push("/admin/print-franchises"); };
 
   const handlePDFDownload = async () => {
     const { jsPDF: JsPDF } = await import("jspdf");
     await import("jspdf-autotable");
-
     const doc = new JsPDF();
-
-    doc.text("Franchises (Current Page)", 40, 40);
-      const tableBody = franchiseData.map(f => [
-    f.id,
-    f.name,
-    f.country,
-    f.state,
-    f.city,
-    f.commission,
-    f.status.trim(),
-  ]);
-  console.log(tableBody);
-    doc.autoTable({
-      head: [["ID", "Name", "Country", "State", "City", "Commission", "Status"]],
-      body: tableBody,
-      startY: 60,
-    });
-
+    doc.text("Franchises (Current Page)", 14, 20);
+    const tableBody = currentFranchises.map(f => [f.id, f.name, f.country, f.state, f.city, f.commission, f.status]);
+    doc.autoTable({ head: [["ID","Name","Country","State","City","Commission","Status"]], body: tableBody, startY: 30 });
     doc.save("franchises.pdf");
   };
-
   return (
     <Layout>
     <div className={styles.container}>
@@ -248,14 +139,28 @@ const handleCloseModal = () => {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Franchise Name</th>
-            <th>Country</th>
-            <th>State</th>
-            <th>City</th>
-            <th>Commission</th>
+               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Id <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+              <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Sranchise Name <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+              <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Country <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+              <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  State <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+              <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  City <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
+               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Commission <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
             <th>More Information</th>
-            <th>Status</th>
+               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+                  Status <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                </th>
             <th>Action</th>
           </tr>
         </thead>
