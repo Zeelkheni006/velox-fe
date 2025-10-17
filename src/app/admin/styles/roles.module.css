@@ -295,9 +295,9 @@
 
 .permissionRow {
     display: grid;
-    grid-template-columns: 1.7fr 1.5fr 1.2fr 1.1fr 1.6fr 1.6fr;
+    grid-template-columns: 1.7fr 1.5fr 1.2fr 1.1fr 1.6fr 4fr;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: 30px;
     align-items: center;
     margin-bottom: 20px;
     padding: 10px 0;
@@ -317,18 +317,31 @@
 
 .permissionGroup {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    gap: 50px;
-    min-width: 100px;
+    justify-content: space-between;
+    /* space between label and toggle */
+    padding: 10px;
+    border: 1px solid #e0e4eb;
+    border-radius: 5px;
+    background-color: #f9fafb;
+    width: 170px;
+    /* set fixed width */
+    box-sizing: border-box;
+    /* include padding in width */
+    margin-bottom: 10px;
+    /* optional spacing between boxes */
 }
 
 .permissionLabel {
     font-size: 13px;
     font-weight: 500;
     color: #374151;
-    margin-bottom: 8px;
-    white-space: nowrap;
+    margin: 0;
+    /* remove default margin */
+    white-space: inherit;
+    /* allow text wrap */
+    flex: 1;
+    text-align: left;
 }
 
 
@@ -343,7 +356,7 @@
     position: relative;
     cursor: pointer;
     transition: background-color 0.2s;
-    right: 45px;
+    flex-shrink: 0;
 }
 
 .toggle1 {
@@ -436,4 +449,184 @@
     font-size: 14px;
     color: #2563eb;
     font-weight: 500;
+}
+
+.rols {
+    padding: 24px;
+    background-color: #f9fafb;
+    min-height: 100vh;
+    width: 1700px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 24px;
+}
+
+.panelBox {
+    margin-bottom: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: #4c80ee;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.panelHeaderActive {
+    background-color: #1d4ed8;
+}
+
+.panelTitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 17px;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    /* light gray line */
+    margin: 20px 0;
+}
+
+.arrow {
+    font-size: 18px;
+}
+
+.panelBody {
+    background: #fff;
+    padding: 20px;
+}
+
+.actionsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.selectAll {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+}
+
+.buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s ease;
+    border: none;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.categoryItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.categoryLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+/* Toggle Switch */
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d1d5db;
+    border-radius: 9999px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #fff;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked+.slider {
+    background-color: #22c55e;
+}
+
+.switch input:checked+.slider::before {
+    transform: translateX(22px);
+}
+
+.panelEmpty {
+    background-color: #fff;
+    padding: 20px;
+    color: #6b7280;
+    font-size: 14px;
 }
