@@ -36,6 +36,11 @@ const [dropdownData, setDropdownData] = useState({
   status:[],
 });
 const [selectedCategories, setSelectedCategories] = useState([]);
+const [selectedName, setSelectedName] = useState(null);
+const [selectedEmail, setSelectedEmail] = useState(null);
+const [selectedPhone, setSelectedPhone] = useState(null);
+const [selectedCity, setSelectedCity] = useState(null);
+const [selectedStatus, setSelectedStatus] = useState(null);
 
 
   // Fetch leads
@@ -70,35 +75,27 @@ useEffect(() => {
 
   // Filter + Sort
 const filteredLeads = useMemo(() => {
-  let filtered = leads.filter((lead) => {
-    const query = search.toLowerCase();
-
+  return leads.filter(lead => {
     return (
-      (lead.name?.toLowerCase() || "").includes(query) ||
-      (lead.email?.toLowerCase() || "").includes(query) ||
-      (lead.phone?.toLowerCase() || "").includes(query) ||
-      (lead.message?.toLowerCase() || "").includes(query) ||
-      (lead.category?.toLowerCase() || "").includes(query) ||
-      (lead.country?.toLowerCase() || "").includes(query) ||
-      (lead.state?.toLowerCase() || "").includes(query) ||
-      (lead.city?.toLowerCase() || "").includes(query) ||
-      (lead.status?.toLowerCase() || "").includes(query)
+      (!selectedName || lead.name?.trim() === selectedName) &&
+      (!selectedEmail || lead.email?.trim() === selectedEmail) &&
+      (!selectedPhone || lead.phone?.trim() === selectedPhone) &&
+      (!selectedCity || lead.city?.trim() === selectedCity.label?.trim()) &&
+      (!selectedStatus || lead.status?.trim() === selectedStatus.label) &&
+      (selectedCategories.length === 0 ||
+        selectedCategories.some(cat =>
+          (Array.isArray(lead.categories) ? lead.categories : [lead.categories])
+            .map(c => c.toString().trim())
+            .includes(cat.label.trim())
+        )
+      )
     );
   });
+}, [leads, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
 
-  // ✅ Sorting logic stays same
-  if (sortConfig.key && sortConfig.direction) {
-    filtered.sort((a, b) => {
-      const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
-      const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
-      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-  }
 
-  return filtered;
-}, [leads, search, sortConfig]);
+
+
 useEffect(() => {
   setCurrentPage(1);
 }, [search]);
@@ -346,73 +343,76 @@ useEffect(() => {
     
     {/* Name Filter */}
 {/* Name Filter */}
-<Select
-  placeholder="Select Name"
-  options={dropdownData?.name?.map(n => ({
-    label: n.trim(),
-    value: n.trim()
-  })) || []}
-  onChange={(opt) => setSearch(opt?.value || "")}
-  className={styles.select}
-/>
+ <Select
+      placeholder="All Names"
+      options={[
+        { label: "All Names", value: "" },
+        ...(dropdownData?.name?.map(n => ({ label: n.trim(), value: n.trim() })) || [])
+      ]}
+      value={selectedName ? { label: selectedName, value: selectedName } : { label: "All Names", value: "" }}
+      onChange={(opt) => setSelectedName(opt?.value || null)}
+      className={styles.select}
+    />
 
-{/* Email Filter */}
-<Select
-  placeholder="Select Email"
- options={
-  dropdownData?.email?.map(n => ({
-    label: n.trim(),
-    value: n.trim()
-  })) || []
-}
-  onChange={(opt) => setSearch(opt?.value || "")}
-  styles={selectStyles}
-  className={styles.select}
-/>
+    {/* Email Filter */}
+    <Select
+      placeholder="All Emails"
+      options={[
+        { label: "All Emails", value: "" },
+        ...(dropdownData?.email?.map(e => ({ label: e.trim(), value: e.trim() })) || [])
+      ]}
+      value={selectedEmail ? { label: selectedEmail, value: selectedEmail } : { label: "All Emails", value: "" }}
+      onChange={(opt) => setSelectedEmail(opt?.value || null)}
+      className={styles.select}
+    />
 
-{/* Phone Filter */}
-<Select
-  placeholder="Select Phone"
-options={
-  dropdownData?.phone?.map(n => ({
-    label: n.trim(),
-    value: n.trim(),
-  })) || []
-}
-  onChange={(opt) => setSearch(opt?.value || "")}
-  styles={selectStyles}
-  className={styles.select}
-/>
+    {/* Phone Filter */}
+    <Select
+      placeholder="All Phones"
+      options={[
+        { label: "All Phones", value: "" },
+        ...(dropdownData?.phone?.map(p => ({ label: p.trim(), value: p.trim() })) || [])
+      ]}
+      value={selectedPhone ? { label: selectedPhone, value: selectedPhone } : { label: "All Phones", value: "" }}
+      onChange={(opt) => setSelectedPhone(opt?.value || null)}
+      className={styles.select}
+    />
 
-<Select
-  isMulti
-  placeholder="Select Category"
-  options={dropdownData?.categories || []}
-  value={selectedCategories}
-  onChange={(opt) => setSelectedCategories(opt || [])}
-  styles={selectStyles}
-  className={styles.select}
-/>
+    {/* Category Filter */}
+    <Select
+      isMulti
+      placeholder="All Categories"
+      options={dropdownData?.categories || []}
+      value={selectedCategories}
+      onChange={(opt) => setSelectedCategories(opt || [])}
+      className={styles.select}
+    />
 
-{/* City Filter */}
-<Select
-  placeholder="Select City"
-  options={dropdownData?.city || []}
-  onChange={(opt) => setSearch(opt?.value || "")}
-  styles={selectStyles}
-  className={styles.select}
-/>
-<Select
-  placeholder="Select Status"
-  options={[
-    { label: "PENDING", value: "PENDING" },
-    { label: "ACCEPTED", value: "ACCEPTED" },
-    { label: "DECLINE", value: "DECLINE" },
-  ]}
-  onChange={(opt) => setSelectedStatus(opt?.value || null)}
-  styles={selectStyles}
-  className={styles.select}
-/>
+    {/* City Filter */}
+    <Select
+      placeholder="All Cities"
+      options={[
+        { value: "", label: "All Cities" },
+        ...(dropdownData?.city || [])
+      ]}
+      value={selectedCity?.value ? selectedCity : { value: "", label: "All Cities" }}
+      onChange={(opt) => setSelectedCity(opt?.value ? opt : null)}
+      className={styles.select}
+    />
+
+    {/* Status Filter */}
+    <Select
+      placeholder="All Status"
+      options={[
+        { label: "All Status", value: "" },
+        { label: "PENDING", value: "PENDING" },
+        { label: "ACCEPTED", value: "ACCEPTED" },
+        { label: "DECLINE", value: "DECLINE" },
+      ]}
+      value={selectedStatus?.value ? selectedStatus : { label: "All Status", value: "" }}
+      onChange={(opt) => setSelectedStatus(opt?.value ? opt : null)}
+      className={styles.select}
+    />
 
   </div>
 )}
@@ -455,14 +455,14 @@ options={
   key={startIndex + index}
   onDoubleClick={() =>
     router.push(
-      `/admin/edit?id=${lead._id || lead.id}` +
-        `&name=${encodeURIComponent(lead.name || "")}` +
-        `&email=${encodeURIComponent(lead.email || "")}` +
-        `&phone=${encodeURIComponent(lead.phone || "")}` +
-        `&message=${encodeURIComponent(lead.message || "")}` +
-         `&categories=${encodeURIComponent(lead.categories || "")}` +
-        `&country=${encodeURIComponent(lead.country || "")}` +
-        `&state=${encodeURIComponent(lead.state || "")}` +
+      `/admin/edit?id=${lead._id || lead.id}` 
+        `&name=${encodeURIComponent(lead.name || "")}` 
+        `&email=${encodeURIComponent(lead.email || "")}` 
+        `&phone=${encodeURIComponent(lead.phone || "")}` 
+        `&message=${encodeURIComponent(lead.message || "")}` 
+         `&categories=${encodeURIComponent(lead.categories || "")}` 
+        `&country=${encodeURIComponent(lead.country || "")}` 
+        `&state=${encodeURIComponent(lead.state || "")}` 
         `&city=${encodeURIComponent(lead.city || "")}`
     )
   }

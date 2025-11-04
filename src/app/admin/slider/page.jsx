@@ -86,7 +86,9 @@ export default function SliderTable() {
   const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
 
-  const handleEdit = (id) => alert(`Edit slider with ID: ${id}`);
+const handleEdit = (id) => {
+  router.push(`/admin/edit-slider`);
+};
   const handleDelete = (id) => alert(`Delete slider with ID: ${id}`);
   const handleToggleStatus = (id) => {
     setSliders(sliders.map(slider => slider.id === id 
@@ -142,7 +144,17 @@ export default function SliderTable() {
                   <td>{slide.title}</td>
                   <td><img src={slide.image ? `http://192.168.29.69:5000${slide.image}` : "/placeholder.jpg"} alt={slide.title} className="slider-img" style={{ width:"170px", height:"50px", objectFit:"cover" }}/></td>
                   <td>{stripHTML(slide.description)}</td>
-                  <td><span className={`status ${slide.status?.toLowerCase()}`}>{slide.status?.toUpperCase()}</span></td>
+<td>
+  <span
+    className={`status ${
+      slide.status
+        ? slide.status.toString().toLowerCase()
+        : "inactive"
+    }`}
+  >
+    {(slide.status ? slide.status.toString() : "Inactive").toUpperCase()}
+  </span>
+</td>
                   <td>
                     <button className="edit-btn" onClick={() => handleEdit(slide.id)}>Edit</button>
                     <button className="delete-btn" onClick={() => handleDelete(slide.id)}>Delete</button>

@@ -32,7 +32,17 @@ useEffect(() => {
   };
 
   fetchServices();
-}, [window.location.search]); 
+
+  // ✅ Check if an updated service exists in localStorage
+  const updatedService = localStorage.getItem("updatedService");
+  if (updatedService) {
+    const service = JSON.parse(updatedService);
+    setServicesList(prev =>
+      prev.map(s => (s.id === service.id ? service : s))
+    );
+    localStorage.removeItem("updatedService");
+  }
+}, []); 
 
 useEffect(() => {
   const handleUpdatedService = () => {
@@ -250,17 +260,17 @@ useEffect(() => {
                       {openDropdownIndex === index && (
                         <div className={styles.dropdownMenu}>
                           <ul>
-                            {/* ✅ Fixed Edit Button */}
-                            <li
-                              onClick={() => {
-                                localStorage.setItem("selectedService", JSON.stringify(service));
-                              router.push(
-  `/admin/edit-services`
-);
-                              }}
-                            >
-                              <FontAwesomeIcon icon={faEdit} /> Edit
-                            </li>
+                            {/* ✅ Fixed Edit Button */}  
+<li
+  onClick={() => {
+    localStorage.setItem("selectedService", JSON.stringify(service));
+    router.push(
+      `/admin/edit-services?service_id=${service.id}&sub_category_id=${service.sub_category_id}`
+    );
+  }}
+>
+  Edit
+</li>
 
                             <li onClick={() => handleDelete(index)}>
                               <FontAwesomeIcon icon={faTrash} /> Delete

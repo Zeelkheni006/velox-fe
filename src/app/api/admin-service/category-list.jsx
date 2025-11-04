@@ -92,36 +92,26 @@ export async function getServices() {
 }
 
 
-// ✅ Update service api
-export async function updateService(serviceId, payload) {
-  try {
-    const accessToken = localStorage.getItem("access_token");
-    if (!accessToken) throw new Error("Access token not found");
+export const updateService = async (id, data) => {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("No access token found");
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/service/update/${serviceId}`, {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/service/update/${id}`,
+    {
       method: "PATCH",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${token}`,
+        // ❌ Do NOT set Content-Type manually for FormData
       },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json(); // ✅ Parse JSON before using it
-
-    if (!res.ok) {
-      console.error("❌ Failed to update service:", data);
-      return {
-        success: false,
-        message: data?.message || "Failed to update service",
-      };
+      body: data,
     }
+  );
 
-    return data; // success response
-  } catch (err) {
-    console.error("❌ Error updating service:", err);
-    return { success: false, message: err.message };
-  }
-}
+  return await response.json();
+};
+
+
+
 
 

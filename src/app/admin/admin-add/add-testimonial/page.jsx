@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../../pages/page";
-import styles from "../..styles/testimonial.module.css";// create new CSS
+import styles from "../../tyles/testimonial.module.css";// create new CSS
 
 export default function AddTestimonial() {
   const router = useRouter();

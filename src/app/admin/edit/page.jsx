@@ -80,7 +80,9 @@ const handleSubmit = async (e) => {
     email: lead.email,
     phone: lead.phone,
     message: lead.message,
-    category_list: selectedCategories.map(c => c.value),
+    category_list: selectedCategories.length > 0 
+      ? selectedCategories.map(c => c.value)
+      : [], // ✅ allow empty
   };
 
   try {
@@ -89,22 +91,17 @@ const handleSubmit = async (e) => {
     if (res.success) {
       showPopup("✅ Updated Successfully!", "success");
 
-      // ✅ Update local UI state also so table shows correct categories
-      setLead(prev => ({
-        ...prev,
-        category_ids: payload.category_list,
-        categories: selectedCategories.map(c => c.label)
-      }));
-
       setTimeout(() => router.push("/admin/lead"), 500);
     } else {
       showPopup(res.message || "❌ Update failed!", "error");
     }
+
   } catch (err) {
-    showPopup("❌ Server error!", "error");
     console.error(err);
+    showPopup("❌ Server error!", "error");
   }
 };
+
 
 
   const handleChange = (e) => {
@@ -141,16 +138,17 @@ const handleSubmit = async (e) => {
               </div>
             ))}
 
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Categories</label>
-              <Select
-                isMulti
-                placeholder="Select Categories"
-                options={categoryOptions}
-                value={selectedCategories}
-                onChange={setSelectedCategories}
-              />
-            </div>
+           <div className={styles.formGroup}>
+  <label className={styles.label}>Categories</label>
+  <Select
+    isMulti
+    placeholder="Select Categories (Optional)"
+    options={categoryOptions}
+    value={selectedCategories}
+    onChange={(selected) => setSelectedCategories(selected || [])}
+    isClearable={true}
+  />
+</div>
 
             <button type="submit" className={styles.button}>
               Update Lead
