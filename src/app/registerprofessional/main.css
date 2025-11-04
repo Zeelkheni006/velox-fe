@@ -34,6 +34,19 @@
     display: inline-block;
 }
 
+.step-heading {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 30px;
+}
+
+.step-text {
+    font-size: 14px;
+    margin-top: 10px;
+    line-height: 1.6;
+    color: #333;
+}
+
 .circle1 {
     width: 100px;
     height: 100px;
@@ -395,6 +408,24 @@ button:hover {
 
 .readMore:hover {
     background: #333;
+}
+
+.category-info-btn {
+    padding: 6px 10px;
+    width: 100px;
+    /* ✅ compact width */
+    border: none;
+    background: #ff9800;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-left: 10px;
+    white-space: nowrap;
+}
+
+.category-info-btn:hover {
+    background: #e68900;
 }
 
 

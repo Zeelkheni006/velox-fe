@@ -4,13 +4,18 @@ import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { useRouter } from 'next/navigation';
 import dynamic from "next/dynamic";
-import { getLeads, updateLeadStatus } from "../../api/manage_users/lead";
+import { getLeads, updateLeadStatus,getFilterDropdownData} from "../../api/manage_users/lead";
+import Select from "react-select";
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
 export default function LeadsPage() {
   const router = useRouter();
-
+const [showFilter, setShowFilter] = useState(false);
   const [leads, setLeads] = useState([]);
   const [totalLeads, setTotalLeads] = useState(0);
   const [search, setSearch] = useState("");
@@ -20,19 +25,34 @@ export default function LeadsPage() {
   const [activeLead, setActiveLead] = useState(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+const [expandedMessageIndex, setExpandedMessageIndex] = useState(null);
+const { popupMessage, popupType, showPopup } = usePopup();
+const [dropdownData, setDropdownData] = useState({
+  name: [],
+  email: [],
+  phone: [],
+  categories: {},
+  city: {},
+  status:[],
+});
+const [selectedCategories, setSelectedCategories] = useState([]);
+
 
   // Fetch leads
-  const fetchLeadsData = async () => {
-    try {
-      const { leads, total } = await getLeads(currentPage, entriesPerPage);
-      setLeads(leads);
-      setTotalLeads(total);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+const fetchLeadsData = async () => {
+  try {
+    const { leads, total } = await getLeads(); // ✅ remove pagination from API call
+    setLeads(leads);
+    setTotalLeads(total);
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
-  useEffect(() => { fetchLeadsData(); }, [currentPage, entriesPerPage]);
+useEffect(() => {
+  fetchLeadsData();
+
+}, []);
 
   // Sorting
   const handleSort = (key) => {
@@ -44,34 +64,58 @@ export default function LeadsPage() {
 
   const SortArrow = ({ direction }) => (
     <span style={{ marginLeft: "5px", fontSize: "12px" }}>
-      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : ""}
     </span>
   );
 
   // Filter + Sort
-  const filteredLeads = useMemo(() => {
-    let filtered = leads.filter(lead =>
-      lead.name.toLowerCase().includes(search.toLowerCase())
+const filteredLeads = useMemo(() => {
+  let filtered = leads.filter((lead) => {
+    const query = search.toLowerCase();
+
+    return (
+      (lead.name?.toLowerCase() || "").includes(query) ||
+      (lead.email?.toLowerCase() || "").includes(query) ||
+      (lead.phone?.toLowerCase() || "").includes(query) ||
+      (lead.message?.toLowerCase() || "").includes(query) ||
+      (lead.category?.toLowerCase() || "").includes(query) ||
+      (lead.country?.toLowerCase() || "").includes(query) ||
+      (lead.state?.toLowerCase() || "").includes(query) ||
+      (lead.city?.toLowerCase() || "").includes(query) ||
+      (lead.status?.toLowerCase() || "").includes(query)
     );
-    if (sortConfig.key && sortConfig.direction) {
-      filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
-        const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-    return filtered;
-  }, [leads, search, sortConfig]);
+  });
 
-  const totalPages = Math.ceil(totalLeads / entriesPerPage);
-  const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = Math.min(startIndex + entriesPerPage, filteredLeads.length);
-  const currentLeads = filteredLeads.slice(0, entriesPerPage);
+  // ✅ Sorting logic stays same
+  if (sortConfig.key && sortConfig.direction) {
+    filtered.sort((a, b) => {
+      const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
+      const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
 
-  const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  return filtered;
+}, [leads, search, sortConfig]);
+useEffect(() => {
+  setCurrentPage(1);
+}, [search]);
+
+const totalPages = Math.ceil(filteredLeads.length / entriesPerPage);
+const startIndex = (currentPage - 1) * entriesPerPage;
+const endIndex = Math.min(startIndex + entriesPerPage, filteredLeads.length);
+const currentLeads = filteredLeads.slice(startIndex, endIndex);
+
+useEffect(() => {
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages || 1);
+  }
+}, [totalPages, currentPage]);
+
+ const handlePrevPage = () => setCurrentPage(p => Math.max(p - 1, 1));
+const handleNextPage = () => setCurrentPage(p => Math.min(p + 1, totalPages));
   const handleEntriesChange = (e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); };
 
   // Status Management
@@ -83,23 +127,28 @@ export default function LeadsPage() {
 
 const handleAccept = async () => {
   if (!activeLead?.id) return alert("Lead ID is missing!");
+
   try {
     const res = await updateLeadStatus(activeLead.id, 1); // ✅ numeric for backend
+
     if (res.success) {
-      // ✅ Update UI immediately
       setLeads(prev =>
         prev.map(l =>
           String(l._id || l.id) === String(activeLead.id)
-            ? { ...l, status: "ACCEPT" }
+            ? { ...l, status: "ACCEPTED" }
             : l
         )
       );
+
       setShowModal(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2500);
+
+      // ✅ Popup show here
+      showPopup("✅ Status updated to ACCEPT", "success");
+
     } else {
       alert(res.message || "Failed to update status");
     }
+
   } catch (err) {
     alert(err.message);
   }
@@ -107,8 +156,10 @@ const handleAccept = async () => {
 
 const handleDecline = async () => {
   if (!activeLead?.id) return alert("Lead ID is missing!");
+
   try {
-    const res = await updateLeadStatus(activeLead.id, 2); // ✅ numeric for backend
+    const res = await updateLeadStatus(activeLead.id, 2);
+
     if (res.success) {
       setLeads(prev =>
         prev.map(l =>
@@ -117,38 +168,159 @@ const handleDecline = async () => {
             : l
         )
       );
+
       setShowModal(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 2500);
+
+      // ✅ Popup show here
+      showPopup("❌ Status updated to DECLINE", "error");
+
     } else {
       alert(res.message || "Failed to update status");
     }
+
   } catch (err) {
     alert(err.message);
   }
 };
 
   // PDF
-  const handlePdfClick = async () => {
-    const { jsPDF: JsPDF } = await import("jspdf");
-    await import("jspdf-autotable");
-    const doc = new JsPDF();
-    doc.text("Leads (Current Page)", 14, 20);
-    const tableColumn = ["Name", "Email", "phone", "message", "Country", "State", "City", "Status"];
-    const tableBody = currentLeads.map(l => [
-      l.name, l.email, l.mobile, l.skill, l.country, l.state, l.city, l.status
-    ]);
-    doc.autoTable({ head: [tableColumn], body: tableBody, startY: 30, styles: { fontSize: 8 }, headStyles: { fillColor: [22,160,133] } });
-    doc.save("leads.pdf");
-  };
+const handlePdfClick = async () => {
+  const { jsPDF: JsPDF } = await import("jspdf");
+  await import("jspdf-autotable");
 
-  const handlePrintClick = () => {
-    const leadsString = encodeURIComponent(JSON.stringify(leads));
-    router.push(`/admin/print-leads?leads=${leadsString}`);
-  };
+  const doc = new JsPDF();
+
+  doc.text("Leads (Current Page)", 14, 20);
+
+  const tableColumn = [
+    "Name",
+    "Email",
+    "Phone",
+    "Message",
+    "category",
+    "Country",
+    "State",
+    "City",
+    "Status"
+  ];
+
+  const tableBody = currentLeads.map(l => [
+    l.name || "",
+    l.email || "",
+    l.phone || "",
+    l.message || "",
+    l.category|| "",
+    l.country || "",
+    l.state || "",
+    l.city || "",
+    l.status || "PENDING"
+  ]);
+
+  doc.autoTable({
+    head: [tableColumn],
+    body: tableBody,
+    startY: 30,
+    styles: { fontSize: 8, cellPadding: 2, overflow: "linebreak" },
+    headStyles: { fillColor: [22, 160, 133] },
+
+    // ✅ STATUS COLOR SUPPORT IN PDF
+    didParseCell: function(data) {
+      if (data.column.index === 7) { // status column index
+        const status = data.cell.text[0];
+
+        if (status === "ACCEPT") {
+          data.cell.styles.fillColor = [46, 204, 113]; // green
+          data.cell.styles.textColor = [255, 255, 255];
+        } else if (status === "DECLINE") {
+          data.cell.styles.fillColor = [231, 76, 60]; // red
+          data.cell.styles.textColor = [255, 255, 255];
+        } else { // Default PENDING
+          data.cell.styles.fillColor = [243, 156, 18]; // orange
+          data.cell.styles.textColor = [255, 255, 255];
+        }
+      }
+    }
+  });
+
+  doc.save("leads.pdf");
+};
+
+const handlePrintClick = () => {
+  sessionStorage.setItem("printLeads", JSON.stringify(leads));
+  router.push("/admin/print-leads");
+};
+
+function formatMessage(message, wordsPerLine = 11) {
+  const words = message.split(" ");
+  const lines = [];
+
+  for (let i = 0; i < words.length; i += wordsPerLine) {
+    lines.push(words.slice(i, i + wordsPerLine).join(" "));
+  }
+
+  return lines.join("\n");
+}
+
+const selectStyles = {
+  menu: (base) => ({ ...base, zIndex: 9999 }),
+  control: (base) => ({
+    ...base,
+    minHeight: "38px",
+    borderColor: "#b3b3b3",
+    "&:hover": { borderColor: "#0d6efd" },
+    boxShadow: "none"
+  }),
+};
+
+
+
+useEffect(() => {
+  const fetchDropdownData = async () => {
+  try {
+    const api = await getFilterDropdownData();
+
+    setDropdownData({
+      name: Array.isArray(api.name) ? api.name.map(n => n.trim()) : [],
+      email: Array.isArray(api.email) ? api.email.map(e => e.trim()) : [],
+      phone: Array.isArray(api.phone) ? api.phone.map(p => p.trim()) : [],
+      status: Array.isArray(api.status) ? api.status.map(p => p.trim()) : [],
+      categories: api.categories
+        ? Object.entries(api.categories).map(([id, title]) => ({
+            value: id,
+            label: title.trim(),
+          }))
+        : [],
+
+      city: api.city
+        ? Object.entries(api.city).map(([id, title]) => ({
+            value: id,
+            label: title.trim(),
+          }))
+        : [],
+    });
+
+  } catch (err) {
+    console.error("Dropdown Fetch Error:", err);
+    setDropdownData({
+      name: [],
+      email: [],
+      phone: [],
+      categories: [],
+      city: [],
+      status:[],
+    });
+  }
+};
+
+
+  fetchDropdownData();
+}, []);
+
+// ✅ Call only ONCE in useEffect
 
   return (
     <Layout>
+      <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.pageWrapper}>
         <div className={styles.headerContainer}>
           <div>
@@ -158,35 +330,118 @@ const handleDecline = async () => {
         <div className={styles.card}>
           <h1 className={styles.heading}>Leads</h1>
 
-          <div className={styles.showEntries}>
-            Show{" "}
-            <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>{" "} entries
-          </div>
+    <div className={styles.controls}>
 
-          <div className={styles.controls}>
-            <div>
-              <button className={styles.buttonPrimary} onClick={handlePdfClick}>PDF</button>
-              <button className={styles.buttonSecondary} onClick={handlePrintClick}>Print</button>
-            </div>
-            <div className={styles.dropdownGroup}>
-              <select className={styles.select}><option>Select Skill</option></select>
-              <select className={styles.select}><option>Select City</option></select>
-            </div>
-            <label className={styles.searchLabel}>
-              Search:{" "}
-              <input className={styles.searchBox} type="text" placeholder="Search" value={search} onChange={(e) => setSearch(e.target.value)} />
-            </label>
-          </div>
+  {/* ✅ Row 1 */}
+  <div className={styles.topRow}>
+    <button
+      className={styles.filterButton}
+      onClick={() => setShowFilter(!showFilter)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+
+    {showFilter && (
+  <div className={styles.filterGroup}>
+    
+    {/* Name Filter */}
+{/* Name Filter */}
+<Select
+  placeholder="Select Name"
+  options={dropdownData?.name?.map(n => ({
+    label: n.trim(),
+    value: n.trim()
+  })) || []}
+  onChange={(opt) => setSearch(opt?.value || "")}
+  className={styles.select}
+/>
+
+{/* Email Filter */}
+<Select
+  placeholder="Select Email"
+ options={
+  dropdownData?.email?.map(n => ({
+    label: n.trim(),
+    value: n.trim()
+  })) || []
+}
+  onChange={(opt) => setSearch(opt?.value || "")}
+  styles={selectStyles}
+  className={styles.select}
+/>
+
+{/* Phone Filter */}
+<Select
+  placeholder="Select Phone"
+options={
+  dropdownData?.phone?.map(n => ({
+    label: n.trim(),
+    value: n.trim(),
+  })) || []
+}
+  onChange={(opt) => setSearch(opt?.value || "")}
+  styles={selectStyles}
+  className={styles.select}
+/>
+
+<Select
+  isMulti
+  placeholder="Select Category"
+  options={dropdownData?.categories || []}
+  value={selectedCategories}
+  onChange={(opt) => setSelectedCategories(opt || [])}
+  styles={selectStyles}
+  className={styles.select}
+/>
+
+{/* City Filter */}
+<Select
+  placeholder="Select City"
+  options={dropdownData?.city || []}
+  onChange={(opt) => setSearch(opt?.value || "")}
+  styles={selectStyles}
+  className={styles.select}
+/>
+<Select
+  placeholder="Select Status"
+  options={[
+    { label: "PENDING", value: "PENDING" },
+    { label: "ACCEPTED", value: "ACCEPTED" },
+    { label: "DECLINE", value: "DECLINE" },
+  ]}
+  onChange={(opt) => setSelectedStatus(opt?.value || null)}
+  styles={selectStyles}
+  className={styles.select}
+/>
+
+  </div>
+)}
+  </div>
+
+  {/* ✅ Row 2 */}
+  <div className={styles.middleRow}>
+    <button className={styles.buttonPrimary} onClick={handlePdfClick}>PDF</button>
+    <button className={styles.buttonSecondary} onClick={handlePrintClick}>Print</button>
+  </div>
+
+  {/* ✅ Row 3 */}
+  <div className={styles.bottomRow}>
+    Show{" "}
+    <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
+      <option value={10}>10</option>
+      <option value={25}>25</option>
+      <option value={50}>50</option>
+    </select>{" "}
+    entries
+  </div>
+
+</div>
 
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <thead>
                 <tr>
-                  {["name","email","mobile","skill","country","state","city","status"].map((key) => (
+                  {["name","email","mobile","skill","categories","country","state","city","status"].map((key) => (
                     <th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
                       {key.charAt(0).toUpperCase() + key.slice(1)} <SortArrow direction={sortConfig.key===key ? sortConfig.direction : null} />
                     </th>
@@ -196,28 +451,117 @@ const handleDecline = async () => {
               </thead>
               <tbody>
                 {currentLeads.map((lead, index) => (
-                  <tr key={startIndex + index}>
-                    <td>{lead.name}</td>
-                    <td>{lead.email}</td>
-                    <td>{lead.phone}</td>
-                    <td>{lead.message}</td>
-                    <td>{lead.country}</td>
-                    <td>{lead.state}</td>
-                    <td>{lead.city}</td>
+                 <tr
+  key={startIndex + index}
+  onDoubleClick={() =>
+    router.push(
+      `/admin/edit?id=${lead._id || lead.id}` +
+        `&name=${encodeURIComponent(lead.name || "")}` +
+        `&email=${encodeURIComponent(lead.email || "")}` +
+        `&phone=${encodeURIComponent(lead.phone || "")}` +
+        `&message=${encodeURIComponent(lead.message || "")}` +
+         `&categories=${encodeURIComponent(lead.categories || "")}` +
+        `&country=${encodeURIComponent(lead.country || "")}` +
+        `&state=${encodeURIComponent(lead.state || "")}` +
+        `&city=${encodeURIComponent(lead.city || "")}`
+    )
+  }
+  style={{ cursor: "pointer" }}
+>
+                    <td
+  onClick={(e) => handleCopy(e, lead.name, "Name", showPopup)}
+  className={styles.copyCell}
+>
+  {lead.name}
+</td>
+                    <td
+ onClick={(e) => handleCopy(e, lead.email, "Email", showPopup)}
+  className={styles.copyCell}
+>
+  {lead.email}
+</td>
+                    <td
+  onClick={(e) => handleCopy(e, lead.phone, "Phone",showPopup )}
+  className={styles.copyCell}
+>
+  {lead.phone}
+</td>
+<td className={styles.messageCell}onClick={(e) => handleCopy(e, lead.message, "message", showPopup)}>
+  <div className={styles.messageContent}>
+    {expandedMessageIndex === index
+      ? formatMessage(lead.message)
+      : formatMessage(lead.message).split("\n").slice(0, 2).join("\n")}
+  </div>
+
+  {formatMessage(lead.message).split("\n").length > 2 && (
+    <button
+      className={styles.showMoreBtn}
+      onClick={() =>
+        setExpandedMessageIndex(
+          expandedMessageIndex === index ? null : index
+        )
+      }
+    >
+      {expandedMessageIndex === index ? "Show Less" : "Show More"}
+    </button>
+  )}
+</td>        
+<td className={styles.categoryCell}>
+  <div className={styles.categoryContent}>
+    {(Array.isArray(lead.categories) ? lead.categories : lead.categories?.split(",") || [])
+      .slice(0, expandedMessageIndex === index ? lead.categories.length : 2)
+      .map((cat, i) => (
+        <div
+          key={i}
+          className={styles.categoryLine}
+          onClick={(e) => handleCopy(e, cat, "Category", showPopup)}
+        >
+          {cat}
+        </div>
+      ))}
+
+    {Array.isArray(lead.categories) && lead.categories.length > 2 && (
+      <button
+        className={styles.showMoreBtn}
+        onClick={(e) => {
+          e.stopPropagation();
+          setExpandedMessageIndex(expandedMessageIndex === index ? null : index);
+        }}
+      >
+        {expandedMessageIndex === index ? "Show Less" : "Show More"}
+      </button>
+    )}
+  </div>
+</td>
+                    <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
+                    <td onClick={(e) => handleCopy(e, lead.state, "state", showPopup)}>{lead.state}</td>
+                    <td onClick={(e) => handleCopy(e, lead.city, "city", showPopup)}>{lead.city}</td>
                     <td>
                       <span className={`${styles.badge} ${
                         lead.status === "PENDING" ? styles.pending :
-                        lead.status === "ACCEPT" ? styles.accept : styles.decline
+                        lead.status === "ACCEPTED" ? styles.accept : styles.decline
                       }`}>
                         {lead.status}
                       </span>
                     </td>
                     <td>
-                     <button
+                    <button
   className={styles.editBtn}
   onClick={() =>
     router.push(
-      `/admin/edit?id=${lead._id || lead.id}&name=${encodeURIComponent(lead.name)}&email=${encodeURIComponent(lead.email)}&mobile=${encodeURIComponent(lead.phone)}&skill=${encodeURIComponent(lead.message)}&country=${encodeURIComponent(lead.country)}&state=${encodeURIComponent(lead.state)}&city=${encodeURIComponent(lead.city)}`
+      `/admin/edit?id=${lead._id || lead.id}
+      &name=${encodeURIComponent(lead.name)}
+      &email=${encodeURIComponent(lead.email)}
+      &phone=${encodeURIComponent(lead.phone)}
+      &categories=${encodeURIComponent(
+  Array.isArray(lead.categories)
+    ? lead.categories.join(",")
+    : ""
+)}
+      &message=${encodeURIComponent(lead.message)}
+      &country=${encodeURIComponent(lead.country)}
+      &state=${encodeURIComponent(lead.state)}
+      &city=${encodeURIComponent(lead.city)}`
     )
   }
 >
@@ -237,7 +581,8 @@ const handleDecline = async () => {
               <div className={styles.paginationControls}>
                 <button className={styles.paginationButton} onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
                 <span className={styles.pageNumber}>{currentPage}</span>
-                <button className={styles.paginationButton} onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+                <button disabled={currentPage >= totalPages}>Next</button>
+
               </div>
             </div>
           </div>

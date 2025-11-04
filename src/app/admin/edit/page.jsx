@@ -5,10 +5,16 @@ import { useEffect, useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { updateLead } from "../../api/manage_users/lead";
+import Select from "react-select";
+import usePopup from "../components/popup";
+import PopupAlert from "../components/PopupAlert";
+import { getCategoryList } from "../../api/user-side/register-professional/location";
 
 export default function EditLeadPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { popupMessage, popupType, showPopup } = usePopup();
+
   const [lead, setLead] = useState({
     id: "",
     name: "",
@@ -18,92 +24,136 @@ export default function EditLeadPage() {
     country: "",
     state: "",
     city: "",
+    categories:"",
   });
 
-  useEffect(() => {
-    setLead({
-      id: searchParams.get("id") || "", // ✅ add id
-      name: searchParams.get("name") || "",
-      email: searchParams.get("email") || "",
-      phone: searchParams.get("phone") || "",
-      message: searchParams.get("message") || "",
-      country: searchParams.get("country") || "",
-      state: searchParams.get("state") || "",
-      city: searchParams.get("city") || "",
-    });
-  }, [searchParams]);
+  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setLead((prev) => ({ ...prev, [name]: value ?? "" }));
-};
-
- const handleSubmit = async (e) => {
-  e.preventDefault();
+const fetchCategories = async (existingIds = []) => {
   try {
-    if (!lead.id) return alert("Lead ID is missing!");
+    const list = await getCategoryList();
 
-    // Only send allowed fields
-    const payload = {
-      name: lead.name,
-      email: lead.email,
-      phone: lead.phone,
-      message: lead.message,
-      
-      // omit country/state/city/id
-    };
+    const formattedOptions = list.map(c => ({
+      label: c.title,
+      value: Number(c.id)
+    }));
 
-    const response = await updateLead(lead.id, payload);
-    if (response.success) {
-      alert("✅ Lead updated successfully!");
-      router.push("/admin/lead");
-    } else {
-      alert("❌ " + (response.message || "Failed to update lead"));
-    }
+    setCategoryOptions(formattedOptions);
+
+    const matched = formattedOptions.filter(opt =>
+      existingIds.includes(opt.value)
+    );
+
+    setSelectedCategories(matched);
+
   } catch (err) {
-    alert(err.message);
+    showPopup("Failed to load categories ❌", "error");
   }
 };
 
+useEffect(() => {
+  const existingCatIds = searchParams.get("category_ids")
+    ?.split(",")
+    .map(id => Number(id.trim()))
+    .filter(id => !isNaN(id)) || [];
+
+  setLead({
+    id: searchParams.get("id") || "",
+    name: searchParams.get("name") || "",
+    email: searchParams.get("email") || "",
+    phone: searchParams.get("phone") || "",
+    message: searchParams.get("message") || "",
+    country: searchParams.get("country") || "",
+    state: searchParams.get("state") || "",
+    city: searchParams.get("city") || "",
+  });
+
+  fetchCategories(existingCatIds);
+}, []);
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    name: lead.name,
+    email: lead.email,
+    phone: lead.phone,
+    message: lead.message,
+    category_list: selectedCategories.map(c => c.value),
+  };
+
+  try {
+    const res = await updateLead(lead.id, payload);
+
+    if (res.success) {
+      showPopup("✅ Updated Successfully!", "success");
+
+      // ✅ Update local UI state also so table shows correct categories
+      setLead(prev => ({
+        ...prev,
+        category_ids: payload.category_list,
+        categories: selectedCategories.map(c => c.label)
+      }));
+
+      setTimeout(() => router.push("/admin/lead"), 500);
+    } else {
+      showPopup(res.message || "❌ Update failed!", "error");
+    }
+  } catch (err) {
+    showPopup("❌ Server error!", "error");
+    console.error(err);
+  }
+};
+
+
+  const handleChange = (e) => {
+    setLead({ ...lead, [e.target.name]: e.target.value });
+  };
+
   return (
     <Layout>
+      <PopupAlert message={popupMessage} type={popupType} />
+
       <div className={styles.editcontainer}>
         <div className={styles.headerContainer}>
-          <div>
-            <span className={styles.breadcrumb}>Lead</span> &gt;{" "}
-            <span className={styles.breadcrumbActive}>Edit Lead</span>
-          </div>
+          <span className={styles.breadcrumb}>Lead</span> &gt;
+          <span className={styles.breadcrumbActive}> Edit Lead</span>
         </div>
 
         <div className={styles.editcard}>
           <h2 className={styles.title}>Edit Lead</h2>
+
           <form onSubmit={handleSubmit} className={styles.form}>
-            {[
-              { label: "Country", name: "country" },
-              { label: "State", name: "state" },
-              { label: "City", name: "city" },
-              { label: "Name", name: "name" },
-              { label: "Email", name: "email", type: "email" },
-              { label: "Mobile Number", name: "phone", type: "tel" },
-              { label: "Skill", name: "message" },
-            ].map(({ label, name, type = "text" }) => (
-              <div key={name} className={styles.formGroup}>
-                <label htmlFor={name} className={styles.label}>
-                  {label}
+            {["country", "state", "city", "name", "email", "phone", "message"].map(field => (
+              <div key={field} className={styles.formGroup}>
+                <label className={styles.label}>
+                  {field.charAt(0).toUpperCase() + field.slice(1)}
                 </label>
-             <input
-  type={type}
-  id={name}
-  name={name}
-  value={lead[name] ?? ""} // ✅ ensure string
-  onChange={handleChange}
-  className={styles.input}
-  required
-/>
+                <input
+                  type="text"
+                  name={field}
+                  value={lead[field]}
+                  onChange={handleChange}
+                  className={styles.input}
+                  required
+                />
               </div>
             ))}
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Categories</label>
+              <Select
+                isMulti
+                placeholder="Select Categories"
+                options={categoryOptions}
+                value={selectedCategories}
+                onChange={setSelectedCategories}
+              />
+            </div>
+
             <button type="submit" className={styles.button}>
-              Update
+              Update Lead
             </button>
           </form>
         </div>

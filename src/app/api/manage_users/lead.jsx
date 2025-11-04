@@ -45,7 +45,7 @@ export async function updateLeadStatus(id, status) {
 
     return data;
   } catch (err) {
-    console.error("❌ updateLeadStatus error:", err);
+    console.error(" updateLeadStatus error:", err);
     throw err;
   }
 }
@@ -55,22 +55,29 @@ export async function updateLead(id, leadData) {
     const token = localStorage.getItem("access_token");
     if (!token) throw new Error("⚠️ Please login.");
 
-    // API expects FormData
     const formData = new FormData();
+
     for (const key in leadData) {
-      formData.append(key, leadData[key]);
+      if (Array.isArray(leadData[key])) {
+        leadData[key].forEach(value => formData.append(`${key}`, value));
+      } else {
+        formData.append(key, leadData[key]);
+      }
     }
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`, {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-      },
-      body: formData, // ✅ important
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`, 
+      {
+        method: "PATCH",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+        body: formData
+      }
+    );
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update lead");
+    if (!res.ok) throw data;
 
     return data;
   } catch (err) {
@@ -82,4 +89,25 @@ export async function updateLead(id, leadData) {
 
 
 
+export async function getFilterDropdownData() {
+  try {
+    const token = localStorage.getItem("access_token");
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/admin/manage-users/leads/dropdown-data`,
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        }
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to load dropdown data");
+
+    return data.data; // ✅ expect { names, emails, phones, categories, statuses, cities }
+  } catch (err) {
+    console.error("Dropdown Fetch Error:", err);
+    return {};
+  }
+}
 

@@ -37,7 +37,7 @@ const ManageStaff = () => {
 
   const SortArrow = ({ direction }) => (
     <span style={{ marginLeft: "5px", fontSize: "12px" }}>
-      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
+      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : ""}
     </span>
   );
 

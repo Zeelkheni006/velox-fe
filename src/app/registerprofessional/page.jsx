@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from "next/image";
 import './main.css';  
-import { getLocationHierarchy } from "../api/user-side/register-professional/location";
+import { getCountries ,getCategoryList, getStates, getCities} from "../api/user-side/register-professional/location";
 import { useState, useEffect } from "react";
  const data = [
     {
@@ -49,54 +49,53 @@ import { useState, useEffect } from "react";
   
   ];
 const EasyRegisterProcess = () => {
-   const [hierarchy, setHierarchy] = useState([]);
+
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
 
-  // Fetch hierarchy on mount
-useEffect(() => {
-  async function fetchHierarchy() {
-    try {
-      const response = await getLocationHierarchy();
-      const countriesData = response?.data?.country || [];
-      setHierarchy(countriesData);
-      setCountries(countriesData.map(c => c.title));
-    } catch (error) {
-      console.error(error);
+  // ✅ Fetch Countries & Categories on load
+  useEffect(() => {
+    getCountries().then(setCountries);
+    getCategoryList().then(setCategories);
+  }, []);
+
+  // ✅ Fetch States when Country changes
+  useEffect(() => {
+    if (!selectedCountry) {
+      setStates([]);
+      setCities([]);
+      setSelectedState("");
+      setSelectedCity("");
+      return;
     }
-  }
-  fetchHierarchy();
-}, []);
+    getStates(selectedCountry).then(setStates);
+  }, [selectedCountry]);
 
-  // Update states when country changes
-useEffect(() => {
-  if (!selectedCountry) return;
-  const countryObj = hierarchy.find(c => c.title === selectedCountry);
-  const stateList = countryObj?.state?.map(s => s.title) || [];
-  setStates(stateList);
-  setSelectedState("");
-  setCities([]);
-  setSelectedCity("");
-}, [selectedCountry, hierarchy]);
+  // ✅ Fetch Cities when State changes
+  useEffect(() => {
+    if (!selectedState) {
+      setCities([]);
+      setSelectedCity("");
+      return;
+    }
+    getCities(selectedState).then(setCities);
+  }, [selectedState]);
 
-  // Update cities when state changes
-useEffect(() => {
-  if (!selectedState || !selectedCountry) return;
-  const countryObj = hierarchy.find(c => c.title === selectedCountry);
-  const stateObj = countryObj?.state?.find(s => s.title === selectedState);
-  const cityList = stateObj?.city?.map(c => c.title) || [];
-  setCities(cityList);
-  setSelectedCity("");
-}, [selectedState, selectedCountry, hierarchy]);
-
+  // ✅ Handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Country: ${selectedCountry}\nState: ${selectedState}\nCity: ${selectedCity}`);
+    alert("Form successfully submitted ✅");
+    console.log({
+      country: selectedCountry,
+      state: selectedState,
+      city: selectedCity,
+    });
   };
   return (
     
@@ -162,7 +161,7 @@ useEffect(() => {
         />
       </div>
 
-      <div className="rightSection">
+  <div className="rightSection">
         <div className="formBox">
           <h2 className="heading">Register as <span>a </span>Professional</h2>
           <p className="subheading">Join 1500+ partners across India</p>
@@ -175,25 +174,67 @@ useEffect(() => {
 
             <div className="row">
               <input type="email" placeholder="Email" required />
-           <select value={selectedCountry} onChange={e => setSelectedCountry(e.target.value)} required>
-  <option value="">Select Country</option>
-  {countries.map(c => <option key={c} value={c}>{c}</option>)}
-</select>
+
+              {/* ✅ Country */}
+              <select
+                value={selectedCountry}
+                onChange={(e) => setSelectedCountry(e.target.value)}
+                required
+              >
+                <option value="">Select Country</option>
+                {countries.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="row">
-            
-<select value={selectedState} onChange={e => setSelectedState(e.target.value)} disabled={!selectedCountry} required>
-  <option value="">Select State</option>
-  {states.map(s => <option key={s} value={s}>{s}</option>)}
-</select>
-           <select value={selectedCity} onChange={e => setSelectedCity(e.target.value)} disabled={!selectedState} required>
-  <option value="">Select City</option>
-  {cities.map(c => <option key={c} value={c}>{c}</option>)}
-</select>
+              {/* ✅ State */}
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                disabled={!selectedCountry}
+                required
+              >
+                <option value="">Select State</option>
+                {states.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+
+              {/* ✅ City */}
+              <select
+                value={selectedCity}
+                onChange={(e) => setSelectedCity(e.target.value)}
+                disabled={!selectedState}
+                required
+              >
+                <option value="">Select City</option>
+                {cities.map(c => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             </div>
 
-            <textarea placeholder="What do you do?" rows={4} />
+            {/* ✅ Category */}
+            <select required>
+              <option value="">Select Category</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.title}
+                </option>
+              ))}
+            </select>
+  <button
+    type="button"
+    className="category-info-btn"
+    onClick={() => alert("Category information coming soon ✅")}
+  >
+    Category Info
+  </button>
+            <textarea placeholder="What do you do?" rows={4}></textarea>
 
             <button type="submit">Submit</button>
           </form>

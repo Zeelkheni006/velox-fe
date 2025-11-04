@@ -3,7 +3,6 @@
 .container {
     display: flex;
     height: 100vh;
-    overflow: hidden;
     margin: 0;
     padding: 0;
 }
@@ -16,6 +15,7 @@
     /* sidebar width */
     height: 100vh;
     overflow-y: auto;
+    width: calc(100% - 250px);
 }
 
 .main {
@@ -23,7 +23,8 @@
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
-    margin-right: 60px;
+    margin-right: -40px;
+    margin-left: -30px;
     text-align: center;
     font-size: 20px;
 }
