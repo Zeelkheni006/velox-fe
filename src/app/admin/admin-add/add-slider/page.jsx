@@ -2,7 +2,7 @@
                 
 
 import "./add-slider.css";
-import Layout from "../pages/page";
+import Layout from "../../pages/page";
 import { useRouter } from "next/navigation";
 import { addSlider } from "../../../api/add-image/add-slider";
 import React, { useState, useRef, useEffect } from "react";
