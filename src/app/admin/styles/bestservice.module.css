@@ -1,0 +1,430 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.breadcrumb {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.bold {
+    font-weight: 400;
+    font-size: 19px;
+}
+
+.link {
+    color: #2563eb;
+}
+
+.card {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.addBtn {
+    background: #3b82f6;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background: #2563eb;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.select,
+.search {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.table th {
+    text-align: left;
+    padding: 12px 8px;
+    color: #555;
+    border-bottom: 1px solid #eee;
+}
+
+.table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.status {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+    min-width: 80px;
+    /* Fixed width for stability */
+    text-align: center;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.activeStatus {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactiveStatus {
+    background: #fee2e2;
+    color: #dc2626;
+    /* Red text */
+}
+
+.editBtn {
+    background: #f59e0b;
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.editBtn:hover {
+    background: #d97706;
+}
+
+
+/* Common button style with fixed width */
+
+.actionBtn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 90px;
+    /* fixed width to avoid shifting */
+    text-align: center;
+    font-size: 16px;
+}
+
+.activateBtn {
+    background: #22c55e;
+    color: #fff;
+}
+
+.activateBtn:hover {
+    background: #15803d;
+}
+
+.deactivateBtn {
+    background: #ef4444;
+    color: #fff;
+}
+
+.deactivateBtn:hover {
+    background: #b91c1c;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* add best-service css */
+
+
+/* SubCategories.module.css */
+
+.wrapper {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+
+.addheaderContainer {
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.addbreadcrumb {
+    font-weight: 500;
+    color: #1c1c1d;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.addbreadcrumbActive {
+    font-weight: 500;
+    color: #0070f3;
+}
+
+.addcard {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin: 0 auto;
+}
+
+.addcard h3 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: left;
+    color: #888;
+}
+
+.addform {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.addform label {
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-align: left;
+    font-size: 15px;
+    color: #888;
+}
+
+.addinput {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.addinput:focus {
+    border-color: #0070f3;
+    outline: none;
+}
+
+.submitBtn {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #0070f3;
+    color: #fff;
+    font-weight: 100;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100px;
+}
+
+.submitBtn:hover {
+    background-color: #005bb5;
+}
+
+
+/* Optional: make form responsive */
+
+@media (max-width: 640px) {
+    .addcard {
+        padding: 20px 15px;
+    }
+    .addinput {
+        font-size: 13px;
+    }
+    .submitBtn {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+}
+
+
+/* edit best-service */
+
+
+/* Container */
+
+.editcontainer {
+    width: 1500px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* Breadcrumb */
+
+.editheader {
+    margin-bottom: 20px;
+}
+
+.editbreadcrumb {
+    color: #555;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.editbreadcrumbActive {
+    color: #0070f3;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+/* Card */
+
+.editcard {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 25px 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin: 0 auto;
+}
+
+.editcard h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    font-weight: 600;
+    text-align: left;
+    color: #888;
+}
+
+
+/* Form */
+
+.editform {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.editlabel {
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-align: left;
+    font-size: 15px;
+    color: #888;
+}
+
+.editinput select {
+    padding: 10px 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.editinput:focus select:focus {
+    border-color: #0070f3;
+    outline: none;
+}
+
+
+/* Update button */
+
+.editupdateBtn {
+    padding: 12px 25px;
+    background-color: #0070f3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.editupdateBtn:hover {
+    background-color: #005bb5;
+}
+
+
+/* Optional: file input preview */
+
+.logoPreview {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}

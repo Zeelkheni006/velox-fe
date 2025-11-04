@@ -1,0 +1,365 @@
+.sidebar {
+    width: 250px;
+    background: #1e2a3a;
+    color: white;
+    overflow-y: auto;
+    height: 100vh;
+    /* fullscreen height */
+    position: fixed;
+    /* sidebar fixed on left */
+    top: 0;
+    /* start from top */
+    left: 0;
+    padding: 0;
+    /* padding hatavo */
+    margin: 0;
+    /* margin hatavo */
+    box-sizing: border-box;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+    /* small width */
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    /* light thumb */
+    border-radius: 10px;
+}
+
+.open {
+    left: 0;
+    /* Show the sidebar when open */
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.close-btn {
+    display: none;
+}
+
+@media (max-width: 375px) {
+    /* Sidebar width on mobile */
+    .sidebar {
+        width: 250px;
+        position: fixed;
+        z-index: 1100;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        background-color: #1e2a47;
+        transition: transform 0.3s ease;
+        transform: translateX(-100%);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    /* Show overlay when sidebar open */
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1050;
+    }
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 24px;
+        cursor: pointer;
+        color: white;
+        background: none;
+        border: none;
+        display: inline;
+    }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+}
+
+.logo {
+    position: sticky;
+    top: 0;
+    background: #1e2a3a;
+    padding: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 5px solid #1e2a3a;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Safari support */
+    border-bottom: 5px 6px solid #b1b1b1b9(255, 255, 255, 0.1);
+    /* soft white border */
+}
+
+.logoImg {
+    width: 150px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.logoText {
+    font-size: 18px;
+}
+
+.logoSub {
+    color: #38bdf8;
+}
+
+.sectionTitle {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+    color: #5099f8;
+}
+
+.menuItem:hover {
+    background-color: #1e293b;
+    border-radius: 6px;
+}
+
+.arrow {
+    margin-left: auto;
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.subMenu {
+    margin-left: 25px;
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.menuItem .arrow.open {
+    transform: rotate(180deg);
+    /* Rotate the chevron when the menu is open */
+}
+
+.subMenu.open {
+    display: block;
+    /* Show submenu when it's open */
+}
+
+.subMenu div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.subMenu div:hover {
+    background-color: #34495e;
+    color: white;
+}
+
+
+/* header */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 250px;
+    /* sidebar ni width */
+    right: 0;
+    height: 60px;
+    background: white;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+    width: 1658px;
+}
+
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: flex-end;
+    flex: 1;
+}
+
+.notification {
+    position: relative;
+    font-size: 18px;
+    color: #334155;
+    cursor: pointer;
+}
+
+.badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 10px;
+    width: 16px;
+    height: 16px;
+    text-align: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.adminText {
+    font-size: 14px;
+    color: #334155;
+}
+
+.profilePic {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+}
+
+.hamburger {
+    display: none;
+}
+
+
+/* header media css  */
+
+@media (max-width: 375px) {
+    .header {
+        left: 0;
+        width: 100%;
+        padding: 0 12px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .hamburger {
+        display: flex;
+        font-size: 22px;
+        background: transparent;
+        border: none;
+        color: #2b2e4a;
+        padding: 6px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .rightSection {
+        flex: none;
+        gap: 12px;
+    }
+    .adminText {
+        display: none;
+    }
+    .notification {
+        font-size: 16px;
+    }
+    .badge {
+        top: -6px;
+        right: -8px;
+        width: 14px;
+        height: 14px;
+        font-size: 9px;
+    }
+    .profilePic {
+        width: 28px;
+        height: 28px;
+        border-width: 1.5px;
+    }
+}
+
+
+/* styles/scrollToTop.module.css */
+
+.scrollToTopBtn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+}
+
+.scrollToTopBtn:hover {
+    background-color: #357bd8;
+}
+
+
+/* footer */
+
+.footer {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #ffffffee;
+    /* Light gray */
+    color: #4b5563;
+    /* Dark gray text */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.heart {
+    color: red;
+    margin: 0 4px;
+    font-size: 10px;
+}
+
+.loaderOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.loader {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #2563eb;
+    /* blue color */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,234 @@
+.admin-login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #c3cedd;
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-login-wrapper::before,
+.admin-login-wrapper::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.432);
+    filter: blur(80px);
+    z-index: 0;
+}
+
+.admin-login-wrapper::before {
+    width: 400px;
+    height: 200px;
+    top: -50px;
+    left: -100px;
+}
+
+.admin-login-wrapper::after {
+    width: 500px;
+    height: 250px;
+    bottom: -50px;
+    right: -120px;
+}
+
+.pill-shape {
+    position: absolute;
+    background: rgba(253, 255, 255, 0.459);
+    border-radius: 100px;
+    filter: blur(2px);
+    z-index: 0;
+}
+
+.pill1 {
+    width: 300px;
+    height: 70px;
+    top: 50%;
+    left: -5%;
+}
+
+.pill2 {
+    width: 400px;
+    height: 90px;
+    bottom: 50%;
+    right: -10%;
+}
+
+.pill3 {
+    width: 400px;
+    height: 100px;
+    top: 54%;
+    left: -5%;
+}
+
+.pill4 {
+    width: 500px;
+    height: 150px;
+    bottom: 55%;
+    right: -10%;
+}
+
+.pill5 {
+    width: 500px;
+    height: 200px;
+    top: 60%;
+    left: -5%;
+}
+
+.pill6 {
+    width: 550px;
+    height: 200px;
+    bottom: 65%;
+    right: -10%;
+}
+
+.admin-login-card {
+    background-color: #ffffff;
+    display: flex;
+    width: 200%;
+    max-width: 1200px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    height: 400px;
+}
+
+.admin-login-form {
+    width: 100%;
+    max-width: 550px;
+    padding: 40px;
+}
+
+.admin-login-form h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.admin-login-form p {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-login-form label {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.admin-login-form input[type='email'],
+.admin-login-form input[type='password'] {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 16px;
+}
+
+.admin-login-form .forgot-link {
+    text-align: right;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.admin-login-form .forgot-link a {
+    color: #1d4ed8;
+    text-decoration: none;
+    margin-top: -20px;
+}
+
+.admin-login-form .forgot-link a:hover {
+    text-decoration: underline;
+}
+
+.login-password a {
+    color: #1d4ed8;
+    font-size: 13px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.admin-login-form button {
+    width: 100%;
+    background-color: #3b82f6;
+    color: #fff;
+    font-size: 16px;
+    padding: 10px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.admin-login-form button:hover {
+    background-color: #2563eb;
+}
+
+.admin-login-logo {
+    width: 70%;
+    background-color: #f5f7fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+@media screen and (max-width: 768px) {
+    .admin-login-card {
+        flex-direction: column;
+    }
+    .admin-login-logo {
+        display: none;
+    }
+}
+
+@media(max-width:1000px) {
+    .admin-login-logo {
+        display: none;
+        /* Hide logo on small screens */
+    }
+    .pill-shape {
+        display: none;
+        /* Hide background shapes on mobile */
+    }
+    .admin-login-card {
+        width: 350px;
+    }
+}
+
+.email-popup {
+    position: fixed;
+    top: 20px;
+    right: -300px;
+    /* start off-screen */
+    padding: 30px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    z-index: 1000;
+    transition: right 0.5s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+
+.email-popup.success {
+    background-color: #e6ffed;
+    color: #2a7a2e;
+    right: 20px;
+    opacity: 1;
+}
+
+.email-popup.error {
+    background-color: #ffe6e6;
+    color: #a12727;
+    right: 20px;
+    opacity: 1;
+}
+
+.email-popup.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}

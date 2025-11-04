@@ -1,0 +1,693 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.title {
+    margin-bottom: 20px;
+    text-align: left;
+    color: #888;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 22px;
+    font-weight: 10px;
+}
+
+.showEntries {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.addbtn {
+    background-color: #3478f7;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 1300px;
+}
+
+.addbtn:hover {
+    background-color: #6098ff;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #ffffff;
+    font-weight: 600;
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-badge.active {
+    background-color: #5eead4;
+    color: black;
+}
+
+.status-badge.inactive {
+    background-color: #d1d5db;
+    color: black;
+}
+
+.action {
+    font-size: 18px;
+    cursor: pointer;
+    color: #6b7280;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+}
+
+.active {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactive {
+    background-color: #fdecea;
+    color: #f44336;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* add-services css */
+
+
+/* Container */
+
+.addcontainer {
+    padding: 30px;
+    background-color: #f4f7fa;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addcontainer h2 {
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: #888;
+    font-weight: 600;
+    text-align: left;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font-size: 17px;
+}
+
+.addbreadcrumb {
+    color: #999;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #2885ff;
+    font-size: 15px;
+}
+
+.addform {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+
+/* Labels */
+
+.addcontainer label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #5f6c72;
+    margin-top: 18px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    text-align: left;
+}
+
+
+/* Inputs, Selects */
+
+.addcontainer input[type="text"],
+.addcontainer select,
+.addcontainer input[type="file"] {
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.addcontainer input[type="file"] {
+    padding: 6px;
+}
+
+
+/* Small hint text */
+
+.addcontainer small {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #888;
+    text-align: left;
+}
+
+
+/* Button */
+
+.buttonAddPrice {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: #f59e0b;
+    /* orange */
+    color: #fff;
+    font-weight: 15;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 15px;
+    margin-right: 1300px;
+}
+
+.buttonAddPrice:hover {
+    background-color: #d97706;
+}
+
+
+/* Flex row for price & display number */
+
+.flexRow {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.flexRowGap20 {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.flex1 {
+    flex: 1;
+    text-align: left;
+    font-size: 15px;
+}
+
+
+/* Dropdown Select Styling */
+
+.addcontainer select {
+    appearance: none;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 98%;
+    background-position-y: 50%;
+    padding-right: 30px;
+}
+
+
+/* Rich Text Editor styling */
+
+.jodit-wysiwyg {
+    min-height: 200px !important;
+    font-size: 14px;
+    background-color: #fff !important;
+    border-radius: 3px !important;
+    border: 1px solid #ccc !important;
+}
+
+.jodit-toolbar {
+    border-radius: 3px 3px 0 0 !important;
+    border: 1px solid #ccc !important;
+    border-bottom: none !important;
+    background-color: #f5f7fa !important;
+    font-size: 13px !important;
+}
+
+.submitButton {
+    margin-top: 30px;
+    padding: 10px 30px;
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 400;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 15px;
+    margin-right: 1500px;
+}
+
+.submitButton:hover {
+    background-color: #2563eb;
+}
+
+
+/* action on 3 dots */
+
+.action {
+    position: relative;
+    cursor: pointer;
+}
+
+.dropdownTrigger {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.dropdownMenu {
+    position: absolute;
+    right: 0;
+    top: 25px;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    border-radius: 6px;
+    width: 160px;
+}
+
+.dropdownMenu ul {
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+}
+
+.dropdownMenu li {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.dropdownMenu li:hover {
+    background-color: #f2f2f2;
+}
+
+
+/* edit services */
+
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.row>div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.image {
+    text-align: left;
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+
+/* manage media css */
+
+.mediacontainer {
+    padding: 20px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 2000px;
+    overflow-x: hidden;
+}
+
+.mediacontainer h3 {
+    text-align: left;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.mediaBox {
+    border: 1px solid #00BCD4;
+    padding: 20px;
+    width: 700px;
+    height: 500px;
+    text-align: center;
+    border-radius: 6px;
+}
+
+.mediaImage {
+    width: 50%;
+    height: auto;
+    border-radius: 4px;
+}
+
+.inputimage {
+    margin-top: 40px;
+}
+
+.note {
+    font-size: 12px;
+    margin: 10px 0;
+}
+
+.buttonGroup {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.updateBtn {
+    background-color: #00BCD4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.deleteBtn {
+    background-color: #F44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.addNewWrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.addNewBtn {
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.addcard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+
+/* add manage media css  */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    background-color: #fff;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    font-size: 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.modalHeader h4 {
+    color: #999;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 10px;
+}
+
+.modalClose {
+    background-color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #555;
+}
+
+.modalBody {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalBody label {
+    text-align: left;
+    font-size: 13PX;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.modalBody input[type="file"] {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.modalFooter {
+    padding: 16px;
+    border-top: 1px solid #eee;
+    text-align: right;
+}
+
+.submitBtn {
+    background-color: #5b82ec;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    margin-top: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16PX;
+    width: 100PX;
+}
+
+.submitBtn:hover {
+    background-color: #2885ff;
+}
+
+.addnote {
+    color: #888;
+    font-size: 13px;
+    text-align: left;
+}
+
+.closeBtn {
+    background-color: #374151;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16PX;
+}
+
+.closeBtn:hover {
+    background-color: #555;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.email-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 30px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+    transition: all 0.4s ease;
+    z-index: 9999;
+}
+
+.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.success {
+    background-color: #daf5e2;
+    color: #1a7f37;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.hide {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}

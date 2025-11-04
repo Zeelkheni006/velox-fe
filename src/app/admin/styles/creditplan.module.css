@@ -1,0 +1,337 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: left;
+    color: #888;
+}
+
+.priceRow {
+    display: flex;
+    gap: 10px;
+    align-items: left;
+    flex-direction: column;
+}
+
+.priceRow label {
+    margin-bottom: 6px;
+    font-weight: 400;
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.priceRow input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    outline: none;
+}
+
+.updateBtn {
+    padding: 8px 12px;
+    border: none;
+    background-color: #2563eb;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100px;
+    font-size: 15px;
+}
+
+.titleRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.addBtn {
+    padding: 6px 12px;
+    background-color: #4b76d1;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background-color: #4b76d1;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+}
+
+.active {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactive {
+    background-color: #fdecea;
+    color: #f44336;
+}
+
+.inactiveBtn {
+    background-color: #d9534f;
+}
+
+.inactiveBtn:hover {
+    background-color: #e26561;
+}
+
+.activeBtn {
+    background-color: #5cb85c;
+}
+
+.activeBtn:hover {
+    background-color: #6fc76f;
+}
+
+.editBtn {
+    background-color: #f0ad4e;
+}
+
+.editBtn,
+.inactiveBtn,
+.activeBtn {
+    margin-right: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 70px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* add-credit-plan */
+
+
+/* addCreditPlan.module.css */
+
+.addcontainer {
+    padding: 30px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addcontent {
+    display: flex;
+    gap: 20px;
+}
+
+.addright {
+    flex: 3;
+}
+
+.addheaderContainer {
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: #555;
+    text-align: left;
+}
+
+.addbreadcrumb {
+    font-weight: 500;
+}
+
+.addbreadcrumbActive {
+    font-weight: 600;
+    color: #6f89ff;
+}
+
+.addtitle {
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: #888;
+    text-align: left;
+}
+
+.addform {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+.addform label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+    text-align: left;
+    color: #888;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.addform input[type="text"],
+.addform select,
+.addform input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.addform input[type="text"]:focus,
+.addform select:focus {
+    border-color: #020202;
+}
+
+.addform span {
+    font-size: 12px;
+    color: #888;
+    margin-top: 3px;
+    text-align: left;
+}
+
+.submitBtn {
+    margin-top: 25px;
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 500;
+    background-color: #5a62d1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+    margin-right: 1400px;
+    /* Left side */
+}
+
+.submitBtn:hover {
+    background-color: #4d54bd;
+}
+
+.text {
+    text-align: left;
+}
+
+
+/* Jodit Editor */
+
+.jodit-container {
+    margin-top: 5px;
+}

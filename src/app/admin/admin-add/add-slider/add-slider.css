@@ -1,0 +1,108 @@
+.add-slider-container {
+    padding: 30px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.add-slider-form {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+.add-slider-container h2 {
+    margin-bottom: 20px;
+    color: #888;
+    text-align: left;
+    font-size: 20px;
+}
+
+.add-slider-form label {
+    display: block;
+    margin-top: 15px;
+    font-weight: 400px;
+    color: #888;
+    font-size: 15px;
+    text-align: left;
+}
+
+.add-slider-form input[type="text"],
+.add-slider-form select,
+.add-slider-form input[type="file"] {
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.add-slider-form small {
+    text-align: left;
+}
+
+.add-slider-form small {
+    display: block;
+    margin-top: 3px;
+    font-size: 12px;
+    color: #888;
+}
+
+.submit-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+.addcontent {
+    display: flex;
+    gap: 20px;
+}
+
+.addright {
+    flex: 3;
+}
+
+
+/* Rich Text Editor styling (optional) */
+
+.jodit-container {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}

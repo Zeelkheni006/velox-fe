@@ -1,0 +1,778 @@
+/* ===== Page Wrapper ===== */
+
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 2000px;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* ===== Card Container ===== */
+
+.card {
+    background-color: #ffffff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ===== Header (Breadcrumb + Button) ===== */
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.addButton {
+    background-color: #1e293b;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.addButton:hover {
+    background-color: #0f172a;
+}
+
+
+/* ===== Heading (optional if needed) ===== */
+
+.heading {
+    font-size: 20px;
+    font-weight: 10px;
+    color: #888;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+
+/* ===== Show Entries Dropdown ===== */
+
+.showEntries {
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+
+/* ===== Controls: PDF, Print, Filters, Search ===== */
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    /* ✅ vertical order */
+    align-items: flex-start;
+    gap: 10px;
+    /* ✅ spacing between buttons */
+    margin-bottom: 15px;
+}
+
+.buttonPrimary {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    height: 35px;
+    font-size: 15px;
+}
+
+.buttonSecondary {
+    background-color: #1e3a8a;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    height: 35px;
+    font-size: 15px;
+}
+
+.buttonPrimary:hover,
+.buttonSecondary:hover {
+    background-color: #4d5977;
+}
+
+.filterGroup {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.searchBox {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-left: 100px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.topRow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.react-select__control {
+    min-width: 230px;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+}
+
+.react-select__control--is-focused {
+    border-color: #0d6efd !important;
+}
+
+.react-select__menu {
+    z-index: 9999 !important;
+}
+
+.react-select__option--is-focused {
+    background: #e9ecef !important;
+}
+
+.react-select__option--is-selected {
+    background: #0d6efd !important;
+    color: #fff !important;
+}
+
+.middleRow {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.bottomRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.select {
+    padding: 8px 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.select1 {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filterButton {
+    background-color: #1d4ed8;
+    color: white;
+    padding: 7px 14px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.filterButton:hover {
+    background-color: #1d4ed8;
+}
+
+.exportButtons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.showEntries {
+    margin-top: 5px;
+}
+
+.categoryCell {
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.categoryContent {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.categoryLine {
+    cursor: pointer;
+    padding: 2px 4px;
+    background: #ffffff;
+    border-radius: 4px;
+}
+
+.categoryLine:hover {
+    background: #ffffff;
+}
+
+.showMoreBtn {
+    margin-top: 6px;
+    font-size: 12px;
+    background: none;
+    color: #0070f3;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    text-align: right;
+}
+
+
+/* ===== Table Wrapper ===== */
+
+.tableWrapper {
+    color: #888;
+}
+
+
+/* ===== Table Styles ===== */
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.table thead {
+    background-color: #e5e7eb;
+}
+
+.table th,
+.table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+    vertical-align: top;
+}
+
+.messageCell {
+    max-width: 220px;
+    white-space: pre-line;
+    position: relative;
+}
+
+.messageContent {
+    overflow: hidden;
+    line-height: 18px;
+}
+
+.showMoreBtn {
+    background: none;
+    border: none;
+    color: blue;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 4px;
+    padding: 0;
+    float: right;
+}
+
+.showMoreBtn:hover {
+    background-color: white;
+    color: #274cb1;
+}
+
+
+/* ===== Status Badge ===== */
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.pending {
+    background-color: #06b6d4;
+}
+
+.accept {
+    background-color: #22c55e;
+}
+
+
+/* ===== Action Buttons ===== */
+
+.editBtn {
+    background-color: #fb923c;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-right: 5px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.statusBtn {
+    background-color: #334155;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    margin-right: 5px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.statusBtn:hover {
+    background-color: #2f374e;
+}
+
+.franchiseBtn {
+    background-color: #10b981;
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.franchiseBtn:hover {
+    background-color: #10b981;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* edit css */
+
+
+/* Container for the page */
+
+.container {
+    background: white;
+    padding: 32px;
+    margin: 40px auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    width: 1500px;
+}
+
+
+/* Page title */
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #888;
+    text-align: left;
+}
+
+
+/* The form wrapper */
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    text-align: left;
+}
+
+
+/* Group for each label + input */
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Label styling */
+
+.label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+
+/* Input styling */
+
+.input {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    /* Tailwind blue-500 */
+}
+
+.editcontainer {
+    padding: 20px;
+    width: 1600px;
+}
+
+.editbreadcrumb {
+    color: #888;
+    font-size: 18px;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.editbreadcrumbActive {
+    color: #2563eb;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.editheader {
+    margin-bottom: 20px;
+    font-size: 16px;
+    text-align: left;
+}
+
+.editcard {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    font-weight: 10px;
+}
+
+.searchLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    white-space: nowrap;
+    color: #888;
+    font-size: 16px;
+    margin-right: 500px;
+}
+
+.search {
+    padding: 6px 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+
+/* Update button */
+
+.button {
+    width: 100px;
+    height: 36px;
+    background-color: #3b82f6;
+    /* Blue */
+    color: white;
+    font-weight: 400;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.2s ease-in-out;
+    font-size: 16px;
+}
+
+.button:hover {
+    background-color: #2563eb;
+    /* Darker blue */
+}
+
+
+/* Print styles */
+
+@media print {
+    /* Hide unnecessary UI elements */
+    .body * {
+        visibility: hidden;
+    }
+    .printableArea,
+    .printableArea * {
+        visibility: visible;
+    }
+    .printableArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        padding: 20px;
+    }
+    /* Table styles for print */
+    .printableArea table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    .printableArea th,
+    .printableArea td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    .printableArea th {
+        background-color: #f2f2f2;
+    }
+    /* Hide buttons and interactive elements */
+    .button,
+    .select,
+    .input,
+    .controls,
+    .pagination,
+    .header,
+    .footer {
+        display: none !important;
+    }
+}
+
+@media print {
+    /* Je elements print na karva hoi te hide karo */
+    .nav,
+    /* header footer sidebar je classes hoi te ahiya add karo */
+    .headerContainer,
+    .footer,
+    .sidebar,
+    .buttonPrimary,
+    .buttonSecondary,
+    .searchBox,
+    .dropdownGroup,
+    .pagination,
+    .showEntries,
+    .controls {
+        display: none !important;
+    }
+}
+
+
+/* manage status css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Background blur look */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 500px;
+    height: 250px;
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modalContent .closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+.acceptBtn {
+    background-color: #59be71;
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 100;
+}
+
+.declineBtn {
+    background-color: #e97480;
+    border: none;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 100;
+}
+
+.declineBtn:hover {
+    background-color: rgb(253, 109, 109);
+}
+
+.acceptBtn:hover {
+    background-color: #6dc481;
+}
+
+.h2 {
+    color: #535353;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 25px;
+    margin-top: 20px;
+}
+
+.p {
+    color: #535353;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        transform: translateY(-10%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+
+/* success message box css */
+
+.successPopup {
+    background: white;
+    border-radius: 8px;
+    padding: 30px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.checkmarkWrapper {
+    margin-bottom: 15px;
+}
+
+.checkmark {
+    width: 56px;
+    height: 56px;
+    stroke: #4caf50;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    animation: stroke 0.6s ease forwards;
+}
+
+.checkmarkCircle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke: #4caf50;
+    animation: dash 0.6s ease-in-out forwards;
+}
+
+.checkmarkCheck {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke: #4caf50;
+    animation: dash-check 0.3s 0.6s ease forwards;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes dash-check {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.okBtn {
+    background-color: #2f80ed;
+    color: white;
+    padding: 8px 18px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.decline {
+    background-color: #ffe0e0;
+    color: #d93025;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}

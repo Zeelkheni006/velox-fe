@@ -1,0 +1,164 @@
+.blog-container {
+    display: flex;
+    gap: 2rem;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+
+/* Main blog content */
+
+.blog-main {
+    flex: 1 1 65%;
+    min-width: 300px;
+    border: 1px solid #ddd;
+}
+
+.blog-image {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.blog-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.blog-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: #555;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.blog-meta .icon {
+    margin-right: 0.3rem;
+    color: #333;
+    font-size: 0.875rem;
+    vertical-align: middle;
+    background: none;
+    padding: 0;
+}
+
+.blog-content p {
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.blog-content li {
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+
+/* Sidebar */
+
+.blog-sidebar {
+    flex: 1 1 30%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+
+/* Box styling for sidebar sections */
+
+.blog-sidebar .categories,
+.blog-sidebar .recent-post,
+.tags-section {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+}
+
+.blog-sidebar h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px dotted #ccc;
+    padding: 15px 0;
+}
+
+.blog-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.blog-sidebar li {
+    padding: 10px 0;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.blog-sidebar a {
+    color: #0070f3;
+    text-decoration: none;
+}
+
+.blog-sidebar a:hover {
+    text-decoration: underline;
+}
+
+.post-date {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+
+/* Tags Section */
+
+.tags-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    /* space between tags */
+}
+
+.tag-box {
+    font-size: 0.875rem;
+    /* slightly smaller text */
+    padding: 0.4rem 0.8rem;
+    border-radius: 9999px;
+    /* fully rounded */
+    border: 1px solid #ddd;
+    background-color: #f3f4f6;
+    /* light gray background */
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tag-box:hover {
+    background-color: #eb6425;
+    /* blue background on hover */
+    color: #fff;
+    border-color: #eb8525;
+    transform: translateY(-2px);
+}
+
+
+/* Responsive */
+
+@media screen and (max-width: 768px) {
+    .blog-container {
+        flex-direction: column;
+    }
+    .blog-sidebar {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

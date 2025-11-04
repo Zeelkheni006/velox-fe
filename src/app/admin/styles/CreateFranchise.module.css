@@ -1,0 +1,115 @@
+.container {
+    padding: 2rem;
+    background-color: white;
+    margin: 1rem auto;
+    width: 1500px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: #888;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.row>div {
+    flex: 1;
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+}
+
+.row label {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    color: #888;
+    text-align: left;
+}
+
+.row input,
+.row select {
+    padding: 0.6rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.updateButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    align-self: flex-start;
+    cursor: pointer;
+    margin-top: 3rem;
+}
+
+.updateButton:hover {
+    background-color: #3a78c2;
+}
+
+.headerContainer1 {
+    text-align: left;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+
+/* styles/Map.module.css */
+
+.mapWrapper {
+    width: 100%;
+    height: 400px;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.resetButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #ca0000;
+    color: white;
+    border: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.resetButton:hover {
+    background-color: #ce0000;
+}
+
+.mapContainer {
+    height: 450px;
+}

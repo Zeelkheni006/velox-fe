@@ -1,0 +1,311 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #888;
+    font-size: 19px;
+    font-weight: 1px;
+}
+
+.header h2 {
+    font-size: 19px;
+    font-weight: 100px;
+}
+
+.addBtn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background-color: #477ef3;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.select {
+    margin: 0 5px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th {
+    text-align: left;
+    font-size: 13px;
+    color: #777;
+    padding: 10px 8px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+    color: #444;
+}
+
+.image {
+    width: 70px;
+    height: 50px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 90px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+}
+
+.active {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactive {
+    background-color: #fdecea;
+    color: #f44336;
+}
+
+.activeBtn {
+    background-color: #5cb85c;
+}
+
+.activeBtn:hover {
+    background-color: #6fc76f;
+}
+
+.inactiveBtn {
+    background-color: #d9534f;
+}
+
+.inactiveBtn:hover {
+    background-color: #e26561;
+}
+
+.editBtn {
+    background-color: #f0ad4e;
+}
+
+.editBtn,
+.inactiveBtn,
+.activeBtn {
+    margin-right: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 70px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.emptyStar {
+    color: lightgray;
+    /* Gray for empty stars */
+    font-size: 18px;
+    margin-right: 2px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+
+/* add testimonial css */
+
+.addcontainer {
+    padding: 30px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addpageTitle {
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #888;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addform {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+.addlabel {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+    text-align: left;
+    color: #888;
+    font-size: 15PX;
+}
+
+.addinput {
+    resize: vertical;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    flex-direction: column;
+}
+
+.addnote {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    text-align: left;
+}
+
+.adderror {
+    color: red;
+    font-size: 14px;
+}
+
+.addsubmitBtn {
+    margin-top: 25px;
+    padding: 10px 20px;
+    background-color: #6c91ee;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100px;
+    font-size: 15px;
+    margin-right: 1400px;
+}
+
+.addsubmitBtn:hover {
+    background-color: #578cff;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.addbreadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.addbreadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}

@@ -1,0 +1,360 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /* Full viewport height */
+    width: 200%;
+    padding: 20px;
+    background-color: #f4f6f9;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.headerContainer {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 24px;
+}
+
+.breadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.breadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #888;
+    font-size: 19px;
+    font-weight: 1px;
+}
+
+.header h2 {
+    font-size: 19px;
+    font-weight: 100px;
+}
+
+.search {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.select {
+    margin: 0 10px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.addBtn {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.addBtn:hover {
+    background-color: #477ef3;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    align-items: center;
+    font-size: 15px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 14px;
+    color: #888;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.status {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
+}
+
+.active {
+    background-color: #ccf5f8;
+    color: #00bcd4;
+}
+
+.inactive {
+    background-color: #fdecea;
+    color: #f44336;
+}
+
+.activeBtn {
+    background-color: #5cb85c;
+}
+
+.activeBtn:hover {
+    background-color: #6fc76f;
+}
+
+.inactiveBtn {
+    background-color: #d9534f;
+}
+
+.inactiveBtn:hover {
+    background-color: #e26561;
+}
+
+.editBtn {
+    background-color: #f0ad4e;
+}
+
+.editBtn,
+.inactiveBtn,
+.activeBtn {
+    margin-right: 6px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    min-width: 70px;
+}
+
+.filledStar {
+    color: gold;
+    /* Yellow color for filled stars */
+    font-size: 18px;
+    margin-right: 2px;
+}
+
+.emptyStar {
+    color: lightgray;
+    /* Gray for empty stars */
+    font-size: 18px;
+    margin-right: 2px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    align-items: center;
+    font-size: 15px;
+}
+
+.paginationControls button {
+    background: #f0f0f0;
+    border: none;
+    padding: 6px 10px;
+    margin: 0 2px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.pageNumber {
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.addcontainer {
+    padding: 30px;
+    background-color: #f4f7fa;
+    font-family: 'Segoe UI', sans-serif;
+    width: 1900px;
+}
+
+.addtitle {
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #888;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.addform {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    width: 1500px;
+    margin-top: 20px;
+}
+
+.addform label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 10px;
+    text-align: left;
+    color: #888;
+    font-size: 15px;
+}
+
+.addcontainer select {
+    display: block;
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.addstars {
+    display: flex;
+    gap: 5px;
+    font-size: 24px;
+}
+
+.addstar {
+    cursor: pointer;
+    color: lightgray;
+    transition: color 0.2s;
+}
+
+.addstar.filled {
+    color: gold;
+}
+
+.addsubmitBtn {
+    background-color: #4078f3;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-right: 1500px;
+}
+
+.addsubmitBtn:hover {
+    background-color: #477ef3;
+}
+
+.addheaderContainer {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.addbreadcrumb {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.addbreadcrumbActive {
+    font-size: 14px;
+    color: #2563eb;
+    font-weight: 500;
+}
+
+
+/* view descrption css */
+
+.viewDescription {
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modalBox {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: left;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modalBox h3 {
+    color: #888;
+}
+
+.modalBox p {
+    margin-top: 10px;
+}
+
+.modalText {
+    margin-top: 10px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 50px;
+}
+
+.modalFooter {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.closeBtn {
+    background-color: #253e58;
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.closeBtn:hover {
+    background-color: #0056b3;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
