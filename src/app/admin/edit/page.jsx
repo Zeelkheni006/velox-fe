@@ -24,7 +24,7 @@ export default function EditLeadPage() {
     country: "",
     state: "",
     city: "",
-    categories:"",
+    categories:[],
   });
 
   const [categoryOptions, setCategoryOptions] = useState([]);
@@ -41,6 +41,7 @@ const fetchCategories = async (existingIds = []) => {
 
     setCategoryOptions(formattedOptions);
 
+    // Pre-select existing categories
     const matched = formattedOptions.filter(opt =>
       existingIds.includes(opt.value)
     );
@@ -52,25 +53,34 @@ const fetchCategories = async (existingIds = []) => {
   }
 };
 
-useEffect(() => {
-  const existingCatIds = searchParams.get("category_ids")
-    ?.split(",")
-    .map(id => Number(id.trim()))
-    .filter(id => !isNaN(id)) || [];
 
+useEffect(() => {
+  const storedLead = localStorage.getItem("editLeadData");
+  if (!storedLead) return;
+
+  const leadData = JSON.parse(storedLead);
+
+  // Pre-fill normal fields
   setLead({
-    id: searchParams.get("id") || "",
-    name: searchParams.get("name") || "",
-    email: searchParams.get("email") || "",
-    phone: searchParams.get("phone") || "",
-    message: searchParams.get("message") || "",
-    country: searchParams.get("country") || "",
-    state: searchParams.get("state") || "",
-    city: searchParams.get("city") || "",
+    id: leadData._id || leadData.id || "",
+    name: leadData.name || "",
+    email: leadData.email || "",
+    phone: leadData.phone || "",
+    message: leadData.message || "",
+    city: leadData.city || "",
+    state: leadData.state || "",
+    country: leadData.country || "",
   });
 
-  fetchCategories(existingCatIds);
+  // Extract category IDs
+  const existingCatIds = (leadData.categories || []).map(c =>
+    Number(c.id ?? c.value)
+  ).filter(id => !isNaN(id));
+
+  fetchCategories(existingCatIds); // Fetch category options & pre-select
 }, []);
+
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -82,7 +92,7 @@ const handleSubmit = async (e) => {
     message: lead.message,
     category_list: selectedCategories.length > 0 
       ? selectedCategories.map(c => c.value)
-      : [], // ✅ allow empty
+      : [], // allow empty
   };
 
   try {
@@ -90,7 +100,6 @@ const handleSubmit = async (e) => {
 
     if (res.success) {
       showPopup("✅ Updated Successfully!", "success");
-
       setTimeout(() => router.push("/admin/lead"), 500);
     } else {
       showPopup(res.message || "❌ Update failed!", "error");
@@ -101,6 +110,7 @@ const handleSubmit = async (e) => {
     showPopup("❌ Server error!", "error");
   }
 };
+
 
 
 
@@ -142,7 +152,7 @@ const handleSubmit = async (e) => {
   <label className={styles.label}>Categories</label>
   <Select
     isMulti
-    placeholder="Select Categories (Optional)"
+    placeholder="Select Categories"
     options={categoryOptions}
     value={selectedCategories}
     onChange={(selected) => setSelectedCategories(selected || [])}
