@@ -1,27 +1,29 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
 
-export async function getLeads(page = 1, perPage = 10) {
-  try {
-    const token = localStorage.getItem("access_token");
-    if (!token) throw new Error("⚠️ Please login.");
+export async function getLeads(page = 1, perPage = 10, filters = {}) {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("⚠️ Please login.");
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get?page=${page}&per_page=${perPage}`, {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
+  const params = new URLSearchParams({
+    page,
+    per_page: perPage,
+    ...filters,
+  });
 
-    const data = await res.json();
+  const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get?${params.toString()}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 
-    if (!res.ok || !data.success) throw new Error(data.message || "Failed to fetch leads");
+  const data = await res.json();
 
-    return {
-      leads: data.data.services || [],  // ← correct path
-      total: data.data.total || 0,      // ← correct path
-    };
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  if (!res.ok || !data.success) throw new Error(data.message || "Failed to fetch leads");
+
+  return {
+    leads: data.data.services || [],
+    total: data.data.total || 0,
+  };
 }
+
 
 
 export async function updateLeadStatus(id, status) {

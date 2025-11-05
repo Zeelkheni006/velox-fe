@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Layout from "../pages/page"; 
 import styles from "../styles/Leads.module.css";
-import { useRouter } from 'next/navigation';
+import { useRouter,useSearchParams } from 'next/navigation';
 import dynamic from "next/dynamic";
 import { getLeads, updateLeadStatus,getFilterDropdownData} from "../../api/manage_users/lead";
 import Select from "react-select";
@@ -31,9 +31,9 @@ const [dropdownData, setDropdownData] = useState({
   name: [],
   email: [],
   phone: [],
-  categories: {},
-  city: {},
-  status:[],
+  categories: [],
+  city: [],
+  status: [],
 });
 const [selectedCategories, setSelectedCategories] = useState([]);
 const [selectedName, setSelectedName] = useState(null);
@@ -41,12 +41,11 @@ const [selectedEmail, setSelectedEmail] = useState(null);
 const [selectedPhone, setSelectedPhone] = useState(null);
 const [selectedCity, setSelectedCity] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
+const currentLeads = leads;
 
-
-  // Fetch leads
-const fetchLeadsData = async () => {
+const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
   try {
-    const { leads, total } = await getLeads(); // ✅ remove pagination from API call
+    const { leads, total } = await getLeads(page, perPage, filters); // backend should accept filters
     setLeads(leads);
     setTotalLeads(total);
   } catch (err) {
@@ -55,17 +54,40 @@ const fetchLeadsData = async () => {
 };
 
 useEffect(() => {
-  fetchLeadsData();
+  fetchLeadsData(currentPage, entriesPerPage);
+}, [currentPage, entriesPerPage]);
 
-}, []);
+const handleNextPage = () => {
+  if (currentPage < totalPages) {
+    setCurrentPage(prev => prev + 1);
+  }
+};
+
+const handlePrevPage = () => {
+  if (currentPage > 1) {
+    setCurrentPage(prev => prev - 1);
+  }
+};
+const totalPages = Math.ceil(totalLeads / entriesPerPage);
+const handleEntriesChange = (e) => {
+  const value = Number(e.target.value);
+  setEntriesPerPage(value);
+  setCurrentPage(1); // refresh from first page
+};
+
 
   // Sorting
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
-    else if (sortConfig.key === key && sortConfig.direction === "desc") direction = null;
-    setSortConfig({ key: direction ? key : null, direction });
-  };
+
+
+const handleSort = (key) => {
+  setSortConfig(prev => {
+    if (prev.key === key) {
+      if (prev.direction === "asc") return { key, direction: "desc" };
+      if (prev.direction === "desc") return { key: null, direction: null };
+    }
+    return { key, direction: "asc" };
+  });
+};
 
   const SortArrow = ({ direction }) => (
     <span style={{ marginLeft: "5px", fontSize: "12px" }}>
@@ -73,47 +95,14 @@ useEffect(() => {
     </span>
   );
 
-  // Filter + Sort
-const filteredLeads = useMemo(() => {
-  return leads.filter(lead => {
-    return (
-      (!selectedName || lead.name?.trim() === selectedName) &&
-      (!selectedEmail || lead.email?.trim() === selectedEmail) &&
-      (!selectedPhone || lead.phone?.trim() === selectedPhone) &&
-      (!selectedCity || lead.city?.trim() === selectedCity.label?.trim()) &&
-      (!selectedStatus || lead.status?.trim() === selectedStatus.label) &&
-      (selectedCategories.length === 0 ||
-        selectedCategories.some(cat =>
-          (Array.isArray(lead.categories) ? lead.categories : [lead.categories])
-            .map(c => c.toString().trim())
-            .includes(cat.label.trim())
-        )
-      )
-    );
-  });
-}, [leads, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
 
 
-
+ 
 
 useEffect(() => {
   setCurrentPage(1);
 }, [search]);
 
-const totalPages = Math.ceil(filteredLeads.length / entriesPerPage);
-const startIndex = (currentPage - 1) * entriesPerPage;
-const endIndex = Math.min(startIndex + entriesPerPage, filteredLeads.length);
-const currentLeads = filteredLeads.slice(startIndex, endIndex);
-
-useEffect(() => {
-  if (currentPage > totalPages) {
-    setCurrentPage(totalPages || 1);
-  }
-}, [totalPages, currentPage]);
-
- const handlePrevPage = () => setCurrentPage(p => Math.max(p - 1, 1));
-const handleNextPage = () => setCurrentPage(p => Math.min(p + 1, totalPages));
-  const handleEntriesChange = (e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); };
 
   // Status Management
   const handleManageStatusClick = (lead) => {
@@ -210,7 +199,7 @@ const handlePdfClick = async () => {
     l.country || "",
     l.state || "",
     l.city || "",
-    l.status || "PENDING"
+    l.status || "",
   ]);
 
   doc.autoTable({
@@ -258,62 +247,112 @@ function formatMessage(message, wordsPerLine = 11) {
   return lines.join("\n");
 }
 
-const selectStyles = {
-  menu: (base) => ({ ...base, zIndex: 9999 }),
-  control: (base) => ({
-    ...base,
-    minHeight: "38px",
-    borderColor: "#b3b3b3",
-    "&:hover": { borderColor: "#0d6efd" },
-    boxShadow: "none"
-  }),
-};
-
-
-
 useEffect(() => {
   const fetchDropdownData = async () => {
-  try {
-    const api = await getFilterDropdownData();
+    try {
+      const res = await getFilterDropdownData();
 
-    setDropdownData({
-      name: Array.isArray(api.name) ? api.name.map(n => n.trim()) : [],
-      email: Array.isArray(api.email) ? api.email.map(e => e.trim()) : [],
-      phone: Array.isArray(api.phone) ? api.phone.map(p => p.trim()) : [],
-      status: Array.isArray(api.status) ? api.status.map(p => p.trim()) : [],
-      categories: api.categories
-        ? Object.entries(api.categories).map(([id, title]) => ({
-            value: id,
-            label: title.trim(),
-          }))
-        : [],
+      // If res.name is empty, fallback to unique names from leads
+      const namesFromLeads = Array.isArray(leads) 
+        ? [...new Set(leads.map(l => l.name).filter(Boolean))]
+        : [];
 
-      city: api.city
-        ? Object.entries(api.city).map(([id, title]) => ({
-            value: id,
-            label: title.trim(),
-          }))
-        : [],
-    });
-
-  } catch (err) {
-    console.error("Dropdown Fetch Error:", err);
-    setDropdownData({
-      name: [],
-      email: [],
-      phone: [],
-      categories: [],
-      city: [],
-      status:[],
-    });
-  }
-};
-
+      setDropdownData({
+        name: Array.isArray(res?.name) && res.name.length > 0
+          ? res.name.map(n => ({ label: n.trim(), value: n.trim() }))
+          : namesFromLeads.map(n => ({ label: n, value: n })),
+        email: Array.isArray(res?.email) ? res.email.map(e => ({ label: e, value: e })) : [],
+        phone: Array.isArray(res?.phone) ? res.phone.map(p => ({ label: p, value: p })) : [],
+        categories: res?.categories ? Object.entries(res.categories).map(([id, title]) => ({ label: title, value: id })) : [],
+        city: res?.city ? Object.values(res.city).map(c => ({ label: c, value: c })) : [],
+        status: [
+          { label: "PENDING", value: "PENDING" },
+          { label: "ACCEPTED", value: "ACCEPTED" },
+          { label: "DECLINE", value: "DECLINE" },
+        ],
+      });
+    } catch (err) {
+      console.error("Dropdown fetch failed:", err);
+    }
+  };
 
   fetchDropdownData();
 }, []);
 
-// ✅ Call only ONCE in useEffect
+// First, filtered leads
+const filteredLeads = useMemo(() => {
+  if (!Array.isArray(leads)) return [];
+
+  // For categories, use IDs or labels from selectedCategories
+  const selectedCatValues = selectedCategories.map(c => c.value || c.label);
+
+  return leads.filter(lead => {
+    const leadName = lead.name?.trim() || "";
+    const leadEmail = lead.email?.trim() || "";
+    const leadPhone = lead.phone?.trim() || "";
+    const leadCity = lead.city?.trim() || "";
+    const leadStatus = lead.status?.trim() || "";
+
+ const leadCategoryValues = Array.isArray(lead.categories)
+  ? lead.categories.map(c => c.id || c.value)
+  : lead.categories
+    ? String(lead.categories).split(",").map(c => c.trim())
+    : [];
+
+    return (
+      (!selectedName || leadName === selectedName) &&
+      (!selectedEmail || leadEmail === selectedEmail) &&
+      (!selectedPhone || leadPhone === selectedPhone) &&
+      (!selectedCity || leadCity === selectedCity) &&
+      (!selectedStatus || leadStatus === selectedStatus) &&
+   (selectedCategories.length === 0 || leadCategoryValues.some(c => selectedCatValues.includes(c)))
+
+    );
+  });
+}, [leads, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
+
+
+const sortedLeads = useMemo(() => {
+  if (!filteredLeads) return [];
+
+  if (!sortConfig.key || !sortConfig.direction) return filteredLeads;
+
+  return [...filteredLeads].sort((a, b) => {
+    let valA = a[sortConfig.key];
+    let valB = b[sortConfig.key];
+
+    // Handle array values (like categories)
+    if (Array.isArray(valA)) valA = valA.map(c => c.title || c).join(", ");
+    if (Array.isArray(valB)) valB = valB.map(c => c.title || c).join(", ");
+
+    valA = String(valA || "").toLowerCase();
+    valB = String(valB || "").toLowerCase();
+
+    if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
+    if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
+    return 0;
+  });
+}, [filteredLeads, sortConfig]);
+
+
+
+const selectStyles = {
+  menuPortal: base => ({ ...base, zIndex: 9999 }),
+  menu: base => ({ ...base, zIndex: 9999 })
+};
+
+const getFilters = () => {
+  return {
+    name: selectedName || undefined,
+    email: selectedEmail || undefined,
+    phone: selectedPhone || undefined,
+    city: selectedCity || undefined,
+    status: selectedStatus || undefined,
+    categories: selectedCategories.length > 0
+      ? selectedCategories.map(c => c.value)
+      : undefined,
+  };
+};
 
   return (
     <Layout>
@@ -338,84 +377,94 @@ useEffect(() => {
       {showFilter ? "Hide Filter" : "Filter"}
     </button>
 
-    {showFilter && (
+{showFilter && (
   <div className={styles.filterGroup}>
-    
-    {/* Name Filter */}
-{/* Name Filter */}
- <Select
-      placeholder="All Names"
-      options={[
-        { label: "All Names", value: "" },
-        ...(dropdownData?.name?.map(n => ({ label: n.trim(), value: n.trim() })) || [])
-      ]}
-      value={selectedName ? { label: selectedName, value: selectedName } : { label: "All Names", value: "" }}
-      onChange={(opt) => setSelectedName(opt?.value || null)}
-      className={styles.select}
-    />
+<Select
+  placeholder="Select Name"
+  options={dropdownData.name}
+  value={selectedName ? { value: selectedName, label: selectedName } : null}
+  onChange={opt => {
+    const selected = opt?.value || null; // will be null if cleared
+    setSelectedName(selected);
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), name: selected });
+  }}
+  className={styles.select}
+  isClearable // ✅ this allows clearing the selection
+/>
 
-    {/* Email Filter */}
-    <Select
-      placeholder="All Emails"
-      options={[
-        { label: "All Emails", value: "" },
-        ...(dropdownData?.email?.map(e => ({ label: e.trim(), value: e.trim() })) || [])
-      ]}
-      value={selectedEmail ? { label: selectedEmail, value: selectedEmail } : { label: "All Emails", value: "" }}
-      onChange={(opt) => setSelectedEmail(opt?.value || null)}
-      className={styles.select}
-    />
+<Select
+  placeholder="Select Email"
+  options={dropdownData.email}
+  value={selectedEmail ? { value: selectedEmail, label: selectedEmail } : null}
+  onChange={opt => {
+    const selected = opt?.value || null;
+    setSelectedEmail(selected);
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), email: selected });
+  }}
+  className={styles.select}
+    isClearable 
+/>
 
-    {/* Phone Filter */}
-    <Select
-      placeholder="All Phones"
-      options={[
-        { label: "All Phones", value: "" },
-        ...(dropdownData?.phone?.map(p => ({ label: p.trim(), value: p.trim() })) || [])
-      ]}
-      value={selectedPhone ? { label: selectedPhone, value: selectedPhone } : { label: "All Phones", value: "" }}
-      onChange={(opt) => setSelectedPhone(opt?.value || null)}
-      className={styles.select}
-    />
+<Select
+  placeholder="Select Phone"
+  options={dropdownData.phone}
+  value={selectedPhone ? { value: selectedPhone, label: selectedPhone } : null}
+  onChange={opt => {
+    const selected = opt?.value || null;
+    setSelectedPhone(selected);
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), phone: selected });
+  }}
+  className={styles.select}
+    isClearable 
+/>
+<Select
+  isMulti
+  placeholder="Select Category"
+  options={dropdownData.categories}
+  value={selectedCategories}
+  onChange={opt => {
+    setSelectedCategories(opt || []); // empty array if cleared
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), categories: (opt || []).map(c => c.value) });
+  }}
+  className={styles.select}
+  isClearable // ✅ clear all selected categories
+/>
 
-    {/* Category Filter */}
-    <Select
-      isMulti
-      placeholder="All Categories"
-      options={dropdownData?.categories || []}
-      value={selectedCategories}
-      onChange={(opt) => setSelectedCategories(opt || [])}
-      className={styles.select}
-    />
+<Select
+  placeholder="Select City"
+  options={dropdownData.city}
+  value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
+  onChange={opt => {
+    const selected = opt?.value || null;
+    setSelectedCity(selected);
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), city: selected });
+  }}
+  className={styles.select}
+    isClearable 
+/>
 
-    {/* City Filter */}
-    <Select
-      placeholder="All Cities"
-      options={[
-        { value: "", label: "All Cities" },
-        ...(dropdownData?.city || [])
-      ]}
-      value={selectedCity?.value ? selectedCity : { value: "", label: "All Cities" }}
-      onChange={(opt) => setSelectedCity(opt?.value ? opt : null)}
-      className={styles.select}
-    />
-
-    {/* Status Filter */}
-    <Select
-      placeholder="All Status"
-      options={[
-        { label: "All Status", value: "" },
-        { label: "PENDING", value: "PENDING" },
-        { label: "ACCEPTED", value: "ACCEPTED" },
-        { label: "DECLINE", value: "DECLINE" },
-      ]}
-      value={selectedStatus?.value ? selectedStatus : { label: "All Status", value: "" }}
-      onChange={(opt) => setSelectedStatus(opt?.value ? opt : null)}
-      className={styles.select}
-    />
+<Select
+  placeholder="Select Status"
+  options={dropdownData.status}
+  value={selectedStatus ? { value: selectedStatus, label: selectedStatus } : null}
+  onChange={opt => {
+    const selected = opt?.value || null;
+    setSelectedStatus(selected);
+    setCurrentPage(1);
+    fetchLeadsData(1, entriesPerPage, { ...getFilters(), status: selected });
+  }}
+  className={styles.select}
+    isClearable 
+/>
 
   </div>
 )}
+
   </div>
 
   {/* ✅ Row 2 */}
@@ -441,31 +490,20 @@ useEffect(() => {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  {["name","email","mobile","skill","categories","country","state","city","status"].map((key) => (
-                    <th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
-                      {key.charAt(0).toUpperCase() + key.slice(1)} <SortArrow direction={sortConfig.key===key ? sortConfig.direction : null} />
-                    </th>
+                  {["name","email","phone","message","categories","country","state","city","status"].map((key) => (
+                  <th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
+  {key.charAt(0).toUpperCase() + key.slice(1)} 
+  <SortArrow direction={sortConfig.key === key ? sortConfig.direction : null} />
+</th>
                   ))}
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {currentLeads.map((lead, index) => (
+               {sortedLeads.map((lead, index) => (
                  <tr
-  key={startIndex + index}
-  onDoubleClick={() =>
-    router.push(
-      `/admin/edit?id=${lead._id || lead.id}` 
-        `&name=${encodeURIComponent(lead.name || "")}` 
-        `&email=${encodeURIComponent(lead.email || "")}` 
-        `&phone=${encodeURIComponent(lead.phone || "")}` 
-        `&message=${encodeURIComponent(lead.message || "")}` 
-         `&categories=${encodeURIComponent(lead.categories || "")}` 
-        `&country=${encodeURIComponent(lead.country || "")}` 
-        `&state=${encodeURIComponent(lead.state || "")}` 
-        `&city=${encodeURIComponent(lead.city || "")}`
-    )
-  }
+  key={index}
+onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   style={{ cursor: "pointer" }}
 >
                     <td
@@ -508,31 +546,49 @@ useEffect(() => {
 </td>        
 <td className={styles.categoryCell}>
   <div className={styles.categoryContent}>
-    {(Array.isArray(lead.categories) ? lead.categories : lead.categories?.split(",") || [])
-      .slice(0, expandedMessageIndex === index ? lead.categories.length : 2)
-      .map((cat, i) => (
-        <div
-          key={i}
-          className={styles.categoryLine}
-          onClick={(e) => handleCopy(e, cat, "Category", showPopup)}
-        >
-          {cat}
-        </div>
-      ))}
+    {(() => {
+      const list = Array.isArray(lead.categories)
+        ? lead.categories
+        : (lead.categories || "").split(",").map((c) => c.trim()); // ✅ Convert string to array
 
-    {Array.isArray(lead.categories) && lead.categories.length > 2 && (
-      <button
-        className={styles.showMoreBtn}
-        onClick={(e) => {
-          e.stopPropagation();
-          setExpandedMessageIndex(expandedMessageIndex === index ? null : index);
-        }}
-      >
-        {expandedMessageIndex === index ? "Show Less" : "Show More"}
-      </button>
-    )}
+      const isExpanded = expandedMessageIndex === index;
+      const limited = list.slice(0, isExpanded ? list.length : 2);
+
+      return (
+        <>
+          {limited.map((cat, i) => (
+            <div
+              key={i}
+              className={styles.categoryLine}
+              onClick={(e) =>
+                handleCopy(e, cat, "Category", showPopup)
+              }
+            >
+              {cat}
+            </div>
+          ))}
+
+          {list.length > 2 && (
+            <button
+              className={styles.showMoreBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedMessageIndex(
+                  isExpanded ? null : index
+                );
+              }}
+            >
+              {isExpanded ? "Show Less" : "Show More"}
+            </button>
+          )}
+        </>
+      );
+    })()}
   </div>
 </td>
+
+
+
                     <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
                     <td onClick={(e) => handleCopy(e, lead.state, "state", showPopup)}>{lead.state}</td>
                     <td onClick={(e) => handleCopy(e, lead.city, "city", showPopup)}>{lead.city}</td>
@@ -545,25 +601,15 @@ useEffect(() => {
                       </span>
                     </td>
                     <td>
-                    <button
+<button
   className={styles.editBtn}
-  onClick={() =>
-    router.push(
-      `/admin/edit?id=${lead._id || lead.id}
-      &name=${encodeURIComponent(lead.name)}
-      &email=${encodeURIComponent(lead.email)}
-      &phone=${encodeURIComponent(lead.phone)}
-      &categories=${encodeURIComponent(
-  Array.isArray(lead.categories)
-    ? lead.categories.join(",")
-    : ""
-)}
-      &message=${encodeURIComponent(lead.message)}
-      &country=${encodeURIComponent(lead.country)}
-      &state=${encodeURIComponent(lead.state)}
-      &city=${encodeURIComponent(lead.city)}`
-    )
-  }
+  onClick={() => {
+    // Save lead data in localStorage
+    localStorage.setItem("editLeadData", JSON.stringify(lead));
+
+    // Navigate with only ID in URL
+    router.push(`/admin/edit?id=${lead._id || lead.id}`);
+  }}
 >
   Edit
 </button>
@@ -576,15 +622,33 @@ useEffect(() => {
                 ))}
               </tbody>
             </table>
-            <div className={styles.pagination}>
-              <span>Showing {startIndex + 1} to {endIndex} of {filteredLeads.length} entries</span>
-              <div className={styles.paginationControls}>
-                <button className={styles.paginationButton} onClick={handlePrevPage} disabled={currentPage === 1}>Previous</button>
-                <span className={styles.pageNumber}>{currentPage}</span>
-                <button disabled={currentPage >= totalPages}>Next</button>
+       <div className={styles.pagination}>
+  <span>
+Showing {(currentPage - 1) * entriesPerPage + 1} to 
+{Math.min(currentPage * entriesPerPage, totalLeads)} 
+of {totalLeads} entries
+  </span>
 
-              </div>
-            </div>
+  <div className={styles.paginationControls}>
+    <button
+      className={styles.paginationButton}
+      onClick={handlePrevPage}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+
+    <span className={styles.pageNumber}>{currentPage}</span>
+
+    <button
+      className={styles.paginationButton}
+      onClick={handleNextPage}
+      disabled={currentPage >= totalPages}
+    >
+      Next
+    </button>
+  </div>
+</div>
           </div>
         </div>
 
