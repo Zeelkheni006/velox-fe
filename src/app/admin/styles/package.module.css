@@ -105,6 +105,10 @@
     border-bottom: 1px solid #eee;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .table td {
     padding: 12px 8px;
     border-bottom: 1px solid #eee;

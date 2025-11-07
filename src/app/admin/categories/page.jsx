@@ -4,11 +4,15 @@ import Layout from "../pages/page";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchCategories, updateCategoryStatus } from "../../api/admin-category/category";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl";
+
 function SortArrow({ direction }) {
   return (
     <span style={{ marginLeft: '5px', fontSize: '12px' }}>
-      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
+      {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : ''}
     </span>
   );
 }
@@ -22,8 +26,7 @@ export default function Categories() {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState('');
-   const [popupMessage, setPopupMessage] = useState(""); 
-  const [popupType, setPopupType] = useState(""); 
+const { popupMessage, popupType, showPopup } = usePopup();
 
   const [sortConfig, setSortConfig] = useState({
     key: searchParams.get('sortBy') || null,
@@ -101,17 +104,17 @@ try {
       newCats[globalIndex] = { ...newCats[globalIndex], status: newStatus };
       return newCats;
     });
-    setPopupMessage("✅ Status updated successfully!", "success"); // ✅ popup
-    setPopupType("success");
+    showPopup("✅ Status updated successfully!", "success"); // ✅ popup
+    
   } else {
-    setPopupMessage(res.message || "❌ Failed to update status", "error"); // ❌ popup
-   setPopupType("error");
+    showPopup(res.message || "❌ Failed to update status", "error"); // ❌ popup
+  
   }
 
 } catch (err) {
   console.error("Error updating status:", err);
-  setPopupMessage("❌ Something went wrong while updating status", "error"); // ❌ popup
- setPopupType("error");
+  showPopup("❌ Something went wrong while updating status", "error"); // ❌ popup
+ 
 }
 };
 
@@ -137,44 +140,30 @@ try {
     }
     setSortConfig({ key, direction });
   };
-
-  useEffect(() => {
-    if (!popupMessage) return;
-    const timer = setTimeout(() => {
-      setPopupType(prev => prev + " hide"); 
-      setTimeout(() => {
-        setPopupMessage("");
-        setPopupType("");
-      }, 400);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
-   useEffect(() => {
-    const load = async () => {
-      const data = await fetchCategories();
-      setCategories(data);
-    };
-    load();
-  }, []);
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
+       <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+          <span className={styles.breadcrumb}
+            style={{ cursor: "pointer"}}>Category</span>
+             <span className={styles.separator}> | </span> 
+              <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+                     <span> &gt; </span>
           <span className={styles.breadcrumbActive}>Category</span>
         </div>
 </div>
         <div className={styles.card}>
           <h3>Categories</h3>
-          {popupMessage && (
-            <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-              {popupType.startsWith("success") ? 
-                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-            </div>
-          )}
+     
           <button className={styles.addBtn} onClick={handleAddCategory}>+ Add New</button>
 
           <div className={styles.showEntries}>
@@ -234,16 +223,19 @@ try {
                   
                 ) : (
                   currentCategories.map((cat, i) => (
-                    <tr key={i}>
-                      <td>{cat.title}</td>
-                      <td>
+                    <tr key={i} onDoubleClick={() =>
+    router.push(
+      `/admin/edit-category?id=${cat.id}&title=${encodeURIComponent(cat.title)}&logo=${encodeURIComponent(cat.logo)}&description=${encodeURIComponent(cat.description)}`
+    )}>
+                      <td onClick={(e)=>handleCopy(e,cat.title , "title" , showPopup )}>{cat.title}</td>
+                      <td onClick={(e)=>handleCopy(e, cat.img , "img" , showPopup)}>
                         <img
                           src={cat.logo ? `http://192.168.29.69:5000${cat.logo}` : "/placeholder.jpg"}
                           alt={cat.title}
                           className={styles.logo}
                         />
                       </td>
-                     <td>
+                     <td onClick={(e)=>handleCopy(e, cat.description , "description" , showPopup)}>
   <div dangerouslySetInnerHTML={{ __html: cat.description }} />
 </td>
                       <td>

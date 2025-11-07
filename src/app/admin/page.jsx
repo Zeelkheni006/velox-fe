@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { initiateAdminLogin, loginWithPassword, sendOtp, loginWithOtp } from '../../api/auth/admin-login';
+import { initiateAdminLogin, loginWithPassword, sendOtp, loginWithOtp } from '../api/auth/admin-login';
 import Image from 'next/image';
 import Link from "next/link";
 import './admin-login.css';

@@ -4,17 +4,19 @@ import styles from '../../styles/Categories.module.css';
 import Layout from "../../pages/page";
 import dynamic from 'next/dynamic';
 import { createCategory } from "../../../api/admin-category/category"; 
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
-
+import usePopup from "../../components/popup"
+import PopupAlert from "../../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function AddCategory() {
+  const router = useRouter();
   const [formData, setFormData] = useState({ title: '', logo: null });
   const [description, setDescription] = useState('');
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [popupMessage, setPopupMessage] = useState(""); 
-  const [popupType, setPopupType] = useState(""); 
+const { popupMessage, popupType, showPopup } = usePopup();
   const editor = useRef(null);
 
   const handleChange = (e) => {
@@ -37,20 +39,20 @@ const handleSubmit = async (e) => {
     });
 
     if(result.success){
-      setPopupMessage("✅ Category created successfully!");
-      setPopupType("success");
+      showPopup("✅ Category created successfully!");
+   
 
       // Reset form
       setFormData({ title: '', logo: null });
       setDescription('');
     } else {
-      setPopupMessage(`❌ ${result.message}`);
-      setPopupType("error");
+      showPopup(`❌ ${result.message}`);
+      
     }
 
   } catch (err) {
-    setPopupMessage("❌ Something went wrong while creating category.");
-    setPopupType("error");
+    showPopup("❌ Something went wrong while creating category.");
+   
   } finally {
     setLoading(false);
   }
@@ -61,24 +63,29 @@ const handleSubmit = async (e) => {
   useEffect(() => setMounted(true), []);
 
   // Popup auto-hide
-useEffect(() => {
-  if (!popupMessage) return;
-  const timer = setTimeout(() => {
-    setPopupType(prev => prev + " hide"); 
-    setTimeout(() => {
-      setPopupMessage("");
-      setPopupType("");
-    }, 400);
-  }, 4000);
-  return () => clearTimeout(timer);
-}, [popupMessage]);
 
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/categories"); // Customer page
+  };
   return (
     <Layout>
+      <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.addcontainer}>
          <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+          <span className={styles.breadcrumb}
+            style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Category</span> 
+        <span className={styles.separator}> | </span>
+         <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+                  <span> &gt; </span>
           <span className={styles.breadcrumbActive}>Add Category</span>
         </div>
 </div>
@@ -86,14 +93,7 @@ useEffect(() => {
           <h2 className={styles.addheading}>Add Category</h2>
 
           {/* Popup */}
-{popupMessage && (
-  <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-    {popupType.startsWith("success") ? 
-      <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-      <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-    <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-  </div>
-)}
+
 
 
           <form className={styles.addform} onSubmit={handleSubmit}>

@@ -9,6 +9,7 @@ import Select from "react-select";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl";
 
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
@@ -210,22 +211,22 @@ const handlePdfClick = async () => {
     headStyles: { fillColor: [22, 160, 133] },
 
     // ✅ STATUS COLOR SUPPORT IN PDF
-    didParseCell: function(data) {
-      if (data.column.index === 7) { // status column index
-        const status = data.cell.text[0];
+didParseCell: function(data) {
+  if (data.column.index === 8) { // ✅ Correct index for Status
+    const status = data.cell.text[0]?.trim();
 
-        if (status === "ACCEPT") {
-          data.cell.styles.fillColor = [46, 204, 113]; // green
-          data.cell.styles.textColor = [255, 255, 255];
-        } else if (status === "DECLINE") {
-          data.cell.styles.fillColor = [231, 76, 60]; // red
-          data.cell.styles.textColor = [255, 255, 255];
-        } else { // Default PENDING
-          data.cell.styles.fillColor = [243, 156, 18]; // orange
-          data.cell.styles.textColor = [255, 255, 255];
-        }
-      }
+    if (status === "ACCEPTED") {
+      data.cell.styles.fillColor = [46, 204, 113]; // green
+      data.cell.styles.textColor = [255, 255, 255];
+    } else if (status === "DECLINE") {
+      data.cell.styles.fillColor = [231, 76, 60]; // red
+      data.cell.styles.textColor = [255, 255, 255];
+    } else if (status === "PENDING") {
+      data.cell.styles.fillColor = [243, 156, 18]; // orange
+      data.cell.styles.textColor = [255, 255, 255];
     }
+  }
+}
   });
 
   doc.save("leads.pdf");
@@ -283,8 +284,7 @@ useEffect(() => {
 const filteredLeads = useMemo(() => {
   if (!Array.isArray(leads)) return [];
 
-  // For categories, use IDs or labels from selectedCategories
-  const selectedCatValues = selectedCategories.map(c => c.value || c.label);
+  const selectedCatValues = selectedCategories.map(c => c.value);
 
   return leads.filter(lead => {
     const leadName = lead.name?.trim() || "";
@@ -293,11 +293,14 @@ const filteredLeads = useMemo(() => {
     const leadCity = lead.city?.trim() || "";
     const leadStatus = lead.status?.trim() || "";
 
- const leadCategoryValues = Array.isArray(lead.categories)
-  ? lead.categories.map(c => c.id || c.value)
+    // Normalize lead categories
+  const leadCategoryValues = Array.isArray(lead.categories)
+  ? lead.categories.map(c => c.title || c)  // Use title
   : lead.categories
     ? String(lead.categories).split(",").map(c => c.trim())
     : [];
+
+const selectedCatValues = selectedCategories.map(c => c.label);
 
     return (
       (!selectedName || leadName === selectedName) &&
@@ -305,8 +308,7 @@ const filteredLeads = useMemo(() => {
       (!selectedPhone || leadPhone === selectedPhone) &&
       (!selectedCity || leadCity === selectedCity) &&
       (!selectedStatus || leadStatus === selectedStatus) &&
-   (selectedCategories.length === 0 || leadCategoryValues.some(c => selectedCatValues.includes(c)))
-
+      (selectedCatValues.length === 0 || leadCategoryValues.some(c => selectedCatValues.includes(c)))
     );
   });
 }, [leads, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
@@ -353,14 +355,24 @@ const getFilters = () => {
       : undefined,
   };
 };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.pageWrapper}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Lead</span> &gt; <span className={styles.breadcrumbActive}>Lead</span>
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Lead</span>
+            <span className={styles.separator}> | </span>
+                <SlHome
+                                   style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                   onClick={goToDashboard}
+                                   title="Go to Dashboard"
+                                 />
+                <span> &gt; </span>
+            <span className={styles.breadcrumbActive}>Lead</span>
           </div>
         </div>
         <div className={styles.card}>
@@ -587,19 +599,21 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   </div>
 </td>
 
-
-
                     <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
                     <td onClick={(e) => handleCopy(e, lead.state, "state", showPopup)}>{lead.state}</td>
                     <td onClick={(e) => handleCopy(e, lead.city, "city", showPopup)}>{lead.city}</td>
-                    <td>
-                      <span className={`${styles.badge} ${
-                        lead.status === "PENDING" ? styles.pending :
-                        lead.status === "ACCEPTED" ? styles.accept : styles.decline
-                      }`}>
-                        {lead.status}
-                      </span>
-                    </td>
+                  <td>
+  <span
+    className={`${styles.badge} ${
+      lead.status === "PENDING" ? styles.pending :
+      lead.status === "ACCEPTED" ? styles.accept : styles.decline
+    }`}
+    onClick={() => handleManageStatusClick(lead)} // ✅ Added click handler
+    style={{ cursor: "pointer" }} // ✅ Pointer style for clarity
+  >
+    {lead.status}
+  </span>
+</td>
                     <td>
 <button
   className={styles.editBtn}

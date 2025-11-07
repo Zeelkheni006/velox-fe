@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Layout from "../pages/page";
 import styles from "../styles/Franchises.module.css";
 import dynamic from "next/dynamic";
-
+import { SlHome } from "react-icons/sl";
 const franchiseData = [
   { id: 34, name: "ABC ENTERPRICE JAM", country: "India", state: "Gujarat", city: "Jamnagar", commission: "20%", status: "Active" },
   { id: 33, name: "Velox Ahmedabad", country: "India", state: "Gujarat", city: "Ahmedabad", commission: "0%", status: "Active" },
@@ -83,12 +83,23 @@ export default function FranchisesPage() {
     doc.autoTable({ head: [["ID","Name","Country","State","City","Commission","Status"]], body: tableBody, startY: 30 });
     doc.save("franchises.pdf");
   };
+        const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
     <div className={styles.container}>
         <div className={styles.headerContainer}>
             <div>
-                <span className={styles.breadcrumb}>Franchise</span> &gt; <span className={styles.breadcrumbActive}>Franchise</span>
+                <span className={styles.breadcrumb}  style={{ cursor: "pointer"}}>Franchise</span>
+                 <span className={styles.separator}> | </span>
+                   <SlHome
+                     style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                                      />
+                   <span> &gt; </span>
+                    <span className={styles.breadcrumbActive}>Franchise</span>
             </div>
             </div>
                <div className={styles.card}>

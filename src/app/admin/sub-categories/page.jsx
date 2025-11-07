@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import styles from '../styles/SubCategories.module.css';
 import Layout from "../pages/page";
 import { getSubCategories, updateSubCategoryStatus } from '../../api/admin-category/sub-category';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl"
 function SortArrow({ direction }) {
   return <span style={{ marginLeft: '5px', fontSize: '12px' }}>
     {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
@@ -21,9 +24,9 @@ export default function SubCategories() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-   const [popupMessage, setPopupMessage] = useState(""); 
-  const [popupType, setPopupType] = useState("");
+  
   const router = useRouter();
+const { popupMessage, popupType, showPopup } = usePopup();
 
 const fetchData = async () => {
   setLoading(true);
@@ -94,16 +97,16 @@ useEffect(() => {
         setSubCategories(prev =>
           prev.map(i => i.id === item.id ? { ...i, status: newStatus } : i)
         );
-        setPopupMessage("✅ Status updated successfully!", "success"); // ✅ popup
-    setPopupType("success");
+        showPopup("✅ Status updated successfully!", "success"); // ✅ popup
+   
       } else {
-        setPopupMessage(res.message || "❌ Failed to update status", "error"); // ❌ popup
-   setPopupType("error");
+        showPopup(res.message || "❌ Failed to update status", "error"); // ❌ popup
+   
       }
     } catch (err) {
       console.error("Error updating subcategory:", err);
-       setPopupMessage("❌ Something went wrong while updating status", "error"); // ❌ popup
- setPopupType("error");
+       showPopup("❌ Something went wrong while updating status", "error"); // ❌ popup
+ 
     }
   };
 
@@ -117,23 +120,23 @@ useEffect(() => {
 
  const handlePrevPage = () => currentPage > 1 && setCurrentPage(prev => prev - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage(prev => prev + 1);
-  useEffect(() => {
-    if (!popupMessage) return;
-    const timer = setTimeout(() => {
-      setPopupType(prev => prev + " hide"); 
-      setTimeout(() => {
-        setPopupMessage("");
-        setPopupType("");
-      }, 400);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
+       <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.wrapper}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Sub Category</span> &gt;{" "}
+            <span className={styles.breadcrumb}  style={{ cursor: "pointer"}}>Sub Category</span>
+            <span className={styles.separator}> | </span>
+                <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                /> 
+                               <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Sub Category</span>
           </div>
         </div>
@@ -141,14 +144,7 @@ useEffect(() => {
         <div className={styles.card}>
           <div className={styles.header}>
             <h3>Sub Categories</h3>
-                {popupMessage && (
-                        <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-                          {popupType.startsWith("success") ? 
-                            <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                            <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-                          <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-                        </div>
-                      )}
+               
             <button className={styles.addBtn} onClick={() => router.push('/admin/admin-add/add-subcategory')}>
               + Add new
             </button>
@@ -201,55 +197,66 @@ useEffect(() => {
               </tr>
             </thead>
 
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
-                    <div className={styles.spinner}></div>
-                  </td>
-                </tr>
-              ) : sortedItems.length === 0 ? (
-                <tr>
-                  <td colSpan={5} style={{ textAlign: "center" }}>No subcategories found</td>
-                </tr>
-              ) : (
-                sortedItems.map((item, i) => (
-                  <tr key={i}>
-                    <td>{item.title}</td>
-                    <td>{item.category_title}</td>
-                    <td>
-                      <img 
-                        src={item.logo ? `http://192.168.29.69:5000${item.logo}` : '/default-logo.svg'} 
-                        alt={item.title} 
-                        className={styles.logo} 
-                      />
-                    </td>
-                    <td>
-                      <span className={`${styles.status} ${item.status === 'ACTIVE' ? styles.active : styles.inactive}`}>
-                        {item.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className={styles.editBtn}
-                        onClick={() =>
-                          router.push(`/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`)
-                        }
-                      >
-                        Edit
-                      </button>
+         <tbody>
+  {loading ? (
+    <tr>
+      <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+        <div className={styles.spinner}></div>
+      </td>
+    </tr>
+  ) : sortedItems.length === 0 ? (
+    <tr>
+      <td colSpan={5} style={{ textAlign: "center" }}>No subcategories found</td>
+    </tr>
+  ) : (
+    sortedItems.map((item, i) => (
+      <tr 
+        key={i} 
+        style={{ cursor: "pointer" }} 
+        onDoubleClick={() => router.push(
+          `/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`
+        )}
+      >
+        <td onClick={(e)=> handleCopy(e,item.title ,"title",  showPopup)}>{item.title}</td>
+        <td onClick={(e)=> handleCopy(e, item.category_title,"category" , showPopup)}>{item.category_title}</td>
+        <td onClick={(e)=> handleCopy(e, item.img , "img" , showPopup)}>
+          <img 
+            src={item.logo ? `http://192.168.29.69:5000${item.logo}` : '/default-logo.svg'} 
+            alt={item.title} 
+            className={styles.logo} 
+          />
+        </td>
+        <td>
+          <span className={`${styles.status} ${item.status === 'ACTIVE' ? styles.active : styles.inactive}`}>
+            {item.status}
+          </span>
+        </td>
+        <td>
+          <button
+            className={styles.editBtn}
+            onClick={(e) => {
+              e.stopPropagation(); // prevent double-click when clicking button
+              router.push(`/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`);
+            }}
+          >
+            Edit
+          </button>
 
-                      <button
-                        className={item.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}
-                        onClick={() => handleStatusToggle(item)}
-                      >
-                        {item.status === 'ACTIVE' ? 'In Active' : 'Active'}
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+          <button
+            className={item.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              handleStatusToggle(item); 
+            }}
+          >
+            {item.status === 'ACTIVE' ? 'In Active' : 'Active'}
+          </button>
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
           </table>
 
           <div className={styles.pagination}>

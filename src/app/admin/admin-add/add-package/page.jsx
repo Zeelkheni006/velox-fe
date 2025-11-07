@@ -3,11 +3,13 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic"; // ✅ for SSR issue
 import styles from "../../styles/package.module.css";
 import Layout from "../../pages/page";
-
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 // ✅ Dynamically import JoditEditor
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function AddPackage() {
+    const router = useRouter();
   const [formData, setFormData] = useState({
     category: "",
     subcategory: "",
@@ -42,13 +44,27 @@ export default function AddPackage() {
     console.log("Form Data Submitted:", { ...formData, description });
     alert("Package Submitted!");
   };
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/package"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.wrapper}>
      <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Package</span> &gt;{" "}
+            <span className={styles.breadcrumb}
+             style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Package</span>
+          <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Package</span>
           </div>
         </div>

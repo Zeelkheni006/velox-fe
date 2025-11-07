@@ -89,6 +89,10 @@
     border-bottom: 1px solid #eee;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .status {
     padding: 4px 12px;
     border-radius: 12px;

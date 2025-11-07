@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../pages/page";
 import styles from '../styles/services.module.css'; // ✅ updated CSS import
-
+import { SlHome } from "react-icons/sl";
 export default function ManageMedia() {
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -28,15 +28,29 @@ export default function ManageMedia() {
     alert("Media deleted!");
     // Delete logic here
   };
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/package"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.mediacontainer}>
-           <div className={styles.addheaderContainer}>
-          <span className={styles.addbreadcrumb}>Package</span> &gt;{' '}
-          <span className={styles.addbreadcrumb}>Package</span> &gt;{' '}
-          <span className={styles.addbreadcrumbActive}>Package Media</span>
-        </div>
+           <div className={styles.headerContainer}>
+                 <div>
+                   <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+               onClick={goToManageCustomer}>Package</span>
+                       <span className={styles.separator}> | </span>
+                      <SlHome
+                             style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                             onClick={goToDashboard}
+                             title="Go to Dashboard"
+                           />
+                  <span> &gt; </span>
+                   <span className={styles.breadcrumbActive}>Media Package</span>
+                 </div>
+               </div>
         <div className={styles.addcard}>
         <h3>Package Media</h3>
 

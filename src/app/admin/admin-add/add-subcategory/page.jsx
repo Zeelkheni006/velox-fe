@@ -4,17 +4,20 @@ import styles from '../../styles/SubCategories.module.css';
 import Layout from '../../pages/page';
 import { createSubCategory } from '../../../api/admin-category/sub-category';
 import { getCategories } from '../../../api/admin-category/sub-category';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
-
+import usePopup from "../../components/popup"
+import PopupAlert from "../../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 export default function AddSubCategory() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: '',
     category_id: '', // use numeric ID for backend
     logo: null,
   });
   const [loading, setLoading] = useState(false);
-  const [popupMessage, setPopupMessage] = useState(""); 
-    const [popupType, setPopupType] = useState(""); 
+ const { popupMessage, popupType, showPopup } = usePopup();
+  
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -24,12 +27,12 @@ export default function AddSubCategory() {
       if (file) {
         // ✅ SVG validation
         if (file.type !== 'image/svg+xml') {
-          alert('❌ Only SVG files are allowed!');
+          showPopup('❌ Only SVG files are allowed!');
           e.target.value = null;
           return;
         }
         if (file.size > 2 * 1024 * 1024) {
-          alert('❌ File size cannot exceed 2MB!');
+          showPopup('❌ File size cannot exceed 2MB!');
           e.target.value = null;
           return;
         }
@@ -44,7 +47,7 @@ export default function AddSubCategory() {
     e.preventDefault();
 
     if (!formData.title || !formData.category_id) {
-      alert('❌ Please fill all required fields.');
+      showPopup('❌ Please fill all required fields.');
       return;
     }
 
@@ -60,19 +63,19 @@ export default function AddSubCategory() {
 
       if (!res.success) {
         const messages = Object.values(res.message).flat().join('\n');
-        setPopupMessage('❌ Failed to add subcategory:\n' + messages);
-        setPopupType("error")
+        showPopup('❌ Failed to add subcategory:\n' + messages);
+        
         return;
       }
 
-      setPopupMessage('✅ Subcategory added successfully!');
-      setPopupType("success")
+      showPopup('✅ Subcategory added successfully!');
+      
       setFormData({ title: '', category_id: '', logo: null });
       document.querySelector('input[name="logo"]').value = null;
     } catch (err) {
       console.error('API Error:', err);
-      setPopupMessage('❌ Unexpected error: ' + err.message);
-      setPopupType("error")
+      showPopup('❌ Unexpected error: ' + err.message);
+  
     } finally {
       setLoading(false);
     }
@@ -88,25 +91,30 @@ useEffect(() => {
   fetchCategories();
 }, []);
   // Popup auto-hide
-useEffect(() => {
-  if (!popupMessage) return;
-  const timer = setTimeout(() => {
-    setPopupType(prev => prev + " hide"); 
-    setTimeout(() => {
-      setPopupMessage("");
-      setPopupType("");
-    }, 400);
-  }, 4000);
-  return () => clearTimeout(timer);
-}, [popupMessage]);
 
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/sub-categories"); // Customer page
+  };
 
   return (
     <Layout>
+       <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.wrapper}>
              <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Sub Category</span> &gt;{" "}
+            <span className={styles.breadcrumb}
+              style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Sub Category</span>
+         <span className={styles.separator}> | </span> 
+             <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+                     <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Subcategory</span>
           </div>
         </div>
@@ -114,14 +122,7 @@ useEffect(() => {
         <div className={styles.addcard}>
           <h3>Add Sub Categories</h3>
                     {/* Popup */}
-          {popupMessage && (
-            <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-              {popupType.startsWith("success") ? 
-                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-            </div>
-          )}
+          
           <form className={styles.addform} onSubmit={handleSubmit}>
             <label>TITLE</label>
             <input

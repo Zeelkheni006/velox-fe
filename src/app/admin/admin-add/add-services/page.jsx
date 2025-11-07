@@ -6,13 +6,16 @@
   import 'react-quill/dist/quill.snow.css';
   import dynamic from 'next/dynamic';
   import { getCategoriesWithSubcategories,createService } from '../../../api/admin-service/category-list';
- import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
+import usePopup from "../../components/popup"
+import PopupAlert from "../../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
   const JoditEditor = dynamic(() => import('jodit-react'), {
     ssr: false,
   }); 
 
   export default function AddServices() {
-
+  const router = useRouter();
     const [categories, setCategories] = useState([]);
     const [subCategories, setSubCategories] = useState([]);
       const [category, setCategory] = useState('');
@@ -28,8 +31,8 @@
     const [description, setDescription] = useState('');
   const [longDescription, setLongDescription] = useState('');
   const [mounted, setMounted] = useState(false);
-   const [popupMessage, setPopupMessage] = useState(""); 
-  const [popupType, setPopupType] = useState(""); 
+const { popupMessage, popupType, showPopup } = usePopup();
+
   const editor = useRef(null);
     
 
@@ -71,12 +74,12 @@ const handleSubmit = async (e) => {
     // 4️⃣ Send to API
     const response = await createService(formData);
 
-    setPopupMessage('Service created successfully!');
-    setPopupType("success");
+    showPopup('Service created successfully!');
+
     console.log('Created service:', response);
 
   } catch (err) {
-    alert('Error creating service: ' + err.message);
+    showPopup('Error creating service: ' + err.message);
     console.error(err);
   }
 };
@@ -91,8 +94,8 @@ const handleSubmit = async (e) => {
       const cats = await getCategoriesWithSubcategories();
       setCategories(cats);
     } catch (error) {
-      setPopupMessage.error("Error fetching categories:", error);
-      setPopupType("error");
+      showPopup.error("Error fetching categories:", error);
+  
     }
   };
 
@@ -109,36 +112,35 @@ const handleSubmit = async (e) => {
     const categoryObj = categories.find(cat => cat.id === parseInt(selectedCategoryId));
   setSubCategories(categoryObj?.subcategories || []);
   };
-useEffect(() => {
-  if (!popupMessage) return;
-  const timer = setTimeout(() => {
-    setPopupType(prev => prev + " hide"); 
-    setTimeout(() => {
-      setPopupMessage("");
-      setPopupType("");
-    }, 400);
-  }, 4000);
-  return () => clearTimeout(timer);
-}, [popupMessage]);
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/services"); // Customer page
+  };
   
     return (
       <Layout>
+               <PopupAlert message={popupMessage} type={popupType} />
+        
       <div className={styles.addcontainer}>
          <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Service</span> &gt;{" "}
+            <span className={styles.breadcrumb}
+             style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Service</span> 
+          <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Service</span>
           </div>
         </div>
        
-{popupMessage && (
-  <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-    {popupType.startsWith("success") ? 
-      <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-      <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-    <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-  </div>
-)}
+
         <form onSubmit={handleSubmit} className={styles.addform}>
            <h2>Add Services</h2>
     <label htmlFor="category">CATEGORY</label>

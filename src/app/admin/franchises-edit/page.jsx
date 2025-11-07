@@ -8,8 +8,11 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
 import styles from "../styles/Franchises.module.css";
 import { fetchGooglePoints } from "../../api/admin-franchise/franchise"; 
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function EditFranchise() {
+    const router = useRouter();
   const [selectedServices, setSelectedServices] = useState([]);
   const [workingCities, setWorkingCities] = useState([{ label: "Jamnagar", value: "jamnagar" }]);
   const [form, setForm] = useState({
@@ -164,13 +167,27 @@ workingCities.forEach(city => {
   };
 
   const handleSubmit = (e) => { e.preventDefault(); alert("✅ Franchise updated!"); };
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/franchises"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.editcontainer}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Franchise</span> &gt;{" "}
+            <span className={styles.breadcrumb}
+              style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Franchise</span>
+               <span className={styles.separator}> | </span> 
+                 <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Edit Franchise</span>
           </div>
         </div>

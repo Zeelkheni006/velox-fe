@@ -9,9 +9,11 @@ import {
   faEdit, faTrash, faCircleCheck, faCircleXmark,
   faImage, faFileAlt, faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
-
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
 import { getServices } from "../../api/admin-service/category-list";
-
+import { SlHome } from "react-icons/sl";
 export default function ServicesPage() {
   const router = useRouter();
   const [servicesList, setServicesList] = useState([]);
@@ -21,6 +23,7 @@ export default function ServicesPage() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+const { popupMessage, popupType, showPopup } = usePopup();
 
   // 🔹 Fetch data from API
 useEffect(() => {
@@ -109,26 +112,36 @@ useEffect(() => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const handleToggleStatus = (index) => {
-    const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
-    if (originalIndex !== -1) {
-      const updated = [...servicesList];
-      updated[originalIndex].status =
-        updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-      setServicesList(updated);
-    }
-    setOpenDropdownIndex(null);
-  };
+const handleToggleStatus = (index) => {
+  const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
+  if (originalIndex !== -1) {
+    const updated = [...servicesList];
+    updated[originalIndex].status =
+      updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+    setServicesList(updated);
 
-  const handleDelete = (index) => {
-    const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
-    if (originalIndex !== -1) {
-      const updated = [...servicesList];
-      updated.splice(originalIndex, 1);
-      setServicesList(updated);
-    }
-    setOpenDropdownIndex(null);
-  };
+    // ✅ Show popup
+    showPopup(
+      `Service "${updated[originalIndex].title}" status changed to ${updated[originalIndex].status}`,
+      "success"
+    );
+  }
+  setOpenDropdownIndex(null);
+};
+
+ const handleDelete = (index) => {
+  const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
+  if (originalIndex !== -1) {
+    const deletedService = servicesList[originalIndex].title;
+    const updated = [...servicesList];
+    updated.splice(originalIndex, 1);
+    setServicesList(updated);
+
+    // ✅ Show popup
+    showPopup(`Service "${deletedService}" deleted successfully!`, "success");
+  }
+  setOpenDropdownIndex(null);
+};
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -143,13 +156,23 @@ useEffect(() => {
       {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
     </span>
   );
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
+       <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Service</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Service</span> 
+           <span className={styles.separator}> | </span>
+             <SlHome
+                         style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                         onClick={goToDashboard}
+                         title="Go to Dashboard"
+                               /> 
+                              <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Services</span>
           </div>
         </div>
@@ -231,12 +254,22 @@ useEffect(() => {
                 <tr><td colSpan="8" style={{ textAlign: "center" }}>Loading services...</td></tr>
               ) : currentItems.length > 0 ? (
                 currentItems.map((service, index) => (
-                  <tr key={index}>
+                   <tr
+        key={index}
+        onDoubleClick={() => {
+          // Row double-click -> navigate to edit page
+          localStorage.setItem("selectedService", JSON.stringify(service));
+          router.push(
+            `/admin/edit-services?service_id=${service.id}&sub_category_id=${service.sub_category_id}`
+          );
+        }}
+        style={{ cursor: "pointer" }} // optional, pointer cursor for UX
+      >
                     <td>{startIndex + index + 1}</td>
-                    <td>{service.title}</td>
-                    <td>{service.category}</td>
-                    <td>{service.sub_category}</td>
-                    <td>
+                    <td onClick={(e)=>handleCopy(e, service.title , "title" , showPopup)}>{service.title}</td>
+                    <td onClick={(e)=>handleCopy(e, service.category , "category" ,showPopup)}>{service.category}</td>
+                    <td onClick={(e)=>handleCopy(e, service.sub_category, "subcategory" , showPopup)}>{service.sub_category}</td>
+                    <td onClick={(e)=>handleCopy(e, service.img , "img" , showPopup)}>
                       <img
                         src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.image}`}
                         alt={service.title}
@@ -244,7 +277,7 @@ useEffect(() => {
                         style={{ width: "40px", height: "40px" }}
                       />
                     </td>
-                    <td>{service.duration}</td>
+                    <td onClick={(e)=>handleCopy(e, service.duration, "duration" ,showPopup)}>{service.duration}</td>
                     <td>
                       <span className={`${styles.status} ${service.status === "INACTIVE" ? styles.inactive : styles.active}`}>
                         {service.status || "ACTIVE"}

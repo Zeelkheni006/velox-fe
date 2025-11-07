@@ -3,7 +3,7 @@ import Layout from "../pages/page";
 import { useState } from "react";
 import styles from "../styles/package.module.css";
 import { useRouter } from "next/navigation"; 
-
+import { SlHome } from "react-icons/sl";
 export default function PackagesTable() {
   const router = useRouter();  
 
@@ -72,13 +72,22 @@ export default function PackagesTable() {
 
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
   const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Package</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Package</span>
+             <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Package</span>
           </div>
         </div>

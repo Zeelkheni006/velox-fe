@@ -29,6 +29,17 @@
         margin-bottom: 24px;
     }
     
+    .breadcrumb .active {
+        color: #007bff;
+        font-weight: 500;
+        font-size: 15px;
+    }
+    
+    .breadcrumb span {
+        color: #888;
+        font-size: 18px;
+    }
+    
     .breadcrumb {
         font-size: 18px;
         color: #6b7280;
@@ -109,7 +120,7 @@
     .table th {
         text-align: left;
         padding: 10px 40px;
-        background-color: #f9fafb;
+        background-color: #e5e7eb;
         color: #6b7280;
         font-weight: 500;
         border-bottom: 1px solid #e5e7eb;
@@ -123,6 +134,10 @@
         word-break: break-word;
         vertical-align: top;
         text-align: left;
+    }
+    
+    .table thead {
+        background-color: #e5e7eb;
     }
     
     .actions {

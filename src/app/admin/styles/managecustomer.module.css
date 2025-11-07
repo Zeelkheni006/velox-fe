@@ -104,6 +104,10 @@
         text-align: left;
     }
     
+    .table thead {
+        background-color: #e5e7eb;
+    }
+    
     .deletebtn {
         background-color: #ff5c5c;
         border: none;
