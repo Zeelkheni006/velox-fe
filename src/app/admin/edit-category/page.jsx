@@ -6,16 +6,20 @@ import styles from '../styles/Categories.module.css';
 import Layout from '../pages/page';
 import dynamic from 'next/dynamic';
 import { updateCategory } from '../../api/admin-category/category';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function EditCategory() {
+   const router = useRouter();
   const searchParams = useSearchParams();
   const titleFromURL = searchParams.get('title');
   const logoFromURL = searchParams.get('logo');
   const descriptionFromURL = searchParams.get('description');
     const categoryId = searchParams.get('id'); // fallback ID
-
+const { popupMessage, popupType, showPopup } = usePopup();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [logoFile, setLogoFile] = useState(null);
@@ -24,8 +28,7 @@ export default function EditCategory() {
   const [longDescription, setLongDescription] = useState('');
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [popupMessage, setPopupMessage] = useState("");
-const [popupType, setPopupType] = useState(""); 
+
 
   const editor = useRef(null);
 
@@ -47,13 +50,13 @@ const [popupType, setPopupType] = useState("");
     if (!file) return;
 
     if (file.type !== 'image/svg+xml') {
-      alert('❌ Only SVG files are allowed!');
+      showPopup('❌ Only SVG files are allowed!');
       e.target.value = null;
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) { // 2MB
-      alert('❌ File size exceeds 2MB!');
+      showPopup('❌ File size exceeds 2MB!');
       e.target.value = null;
       return;
     }
@@ -76,17 +79,17 @@ const handleSubmit = async (e) => {
 
     if (!res.success) {
       const messages = Object.values(res.message).flat().join("\n");
-      setPopupMessage("❌ Failed to update category:\n" + messages);
-      setPopupType("error");
+      showPopup("❌ Failed to update category:\n" + messages);
+      
       return;
     }
 
-    setPopupMessage("✅ Category Updated Successfully!");
-      setPopupType("success");
+    showPopup("✅ Category Updated Successfully!");
+      
   } catch (err) {
     console.error("Update Error:", err);
-    setPopupMessage("❌ Unexpected error: " + err.message);
-    setPopupType("error");
+    showPopup("❌ Unexpected error: " + err.message);
+    
   } finally {
     setLoading(false);
   }
@@ -96,40 +99,36 @@ const handleSubmit = async (e) => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-  if (!popupMessage) return;
 
-  const timer = setTimeout(() => {
-    setPopupType(prev => prev + " hide");
-    setTimeout(() => {
-      setPopupMessage("");
-      setPopupType("");
-    }, 400);
-  }, 4000);
-
-  return () => clearTimeout(timer);
-}, [popupMessage]);
+    const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/categories"); // Customer page
+  };
 
   return (
     <Layout>
+      <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.editcontainer}>
                 <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>Category</span> &gt;{" "}
+          <span className={styles.breadcrumb}    style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Category</span> 
+        <span className={styles.separator}> | </span>
+          <SlHome
+                              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                              onClick={goToDashboard}
+                              title="Go to Dashboard"
+                            />
+                            <span> &gt; </span>
           <span className={styles.breadcrumbActive}>Edit Category</span>
         </div>
 </div>
 
         <div className={styles.editcard}>
           <h3>Edit Category</h3>
-          {popupMessage && (
-            <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-              {popupType.startsWith("success") ? 
-                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-            </div>
-          )}
+       
           <form onSubmit={handleSubmit}>
             {/* TITLE */}
             <label className={styles.editlabel}>TITLE</label>

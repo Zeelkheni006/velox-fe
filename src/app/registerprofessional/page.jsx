@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from "next/image";
 import './main.css';  
-import { getCountries ,getCategoryList, getStates, getCities} from "../api/user-side/register-professional/location";
+import { getCountries ,getCategoryList, getStates, getCities ,getSubcategoriesAndServices} from "../api/user-side/register-professional/location";
 import { useState, useEffect } from "react";
  const data = [
     {
@@ -49,23 +49,29 @@ import { useState, useEffect } from "react";
   
   ];
 const EasyRegisterProcess = () => {
-
   const [countries, setCountries] = useState([]);
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [categories, setCategories] = useState([]);
-
+  const [showCategoryInfoBox, setShowCategoryInfoBox] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+const [showPopup, setShowPopup] = useState(false);
+const [popupCategoryTitle, setPopupCategoryTitle] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
+const [subcategories, setSubcategories] = useState([]);
+const [services, setServices] = useState([]);
 
-  // ✅ Fetch Countries & Categories on load
+  // Fetch Countries & Categories on load
   useEffect(() => {
     getCountries().then(setCountries);
     getCategoryList().then(setCategories);
   }, []);
 
-  // ✅ Fetch States when Country changes
+  // Fetch States when Country changes
   useEffect(() => {
     if (!selectedCountry) {
       setStates([]);
@@ -77,7 +83,7 @@ const EasyRegisterProcess = () => {
     getStates(selectedCountry).then(setStates);
   }, [selectedCountry]);
 
-  // ✅ Fetch Cities when State changes
+  // Fetch Cities when State changes
   useEffect(() => {
     if (!selectedState) {
       setCities([]);
@@ -87,7 +93,6 @@ const EasyRegisterProcess = () => {
     getCities(selectedState).then(setCities);
   }, [selectedState]);
 
-  // ✅ Handle submit
   const handleSubmit = (e) => {
     e.preventDefault();
     alert("Form successfully submitted ✅");
@@ -95,8 +100,16 @@ const EasyRegisterProcess = () => {
       country: selectedCountry,
       state: selectedState,
       city: selectedCity,
+      category: selectedCategory,
     });
   };
+
+const handleCategoryClick = async (cat) => { setPopupCategoryTitle(cat.title); setShowPopup(true); setSelectedCategoryId(cat.id); const response = await getSubcategoriesAndServices(cat.id); console.log("Popup Response:", response); setSubcategories(response || []); setServices([]); setSelectedSubcategoryId(null); };
+
+const handleSubcategoryClick = (subcat) => {
+  setSelectedSubcategoryId(subcat.subcategory);
+  setServices(subcat.services || []);
+};
   return (
     
     <div className="container">
@@ -219,27 +232,93 @@ const EasyRegisterProcess = () => {
             </div>
 
             {/* ✅ Category */}
-            <select required>
+ <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
               <option value="">Select Category</option>
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.title}
-                </option>
-              ))}
+              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>)}
             </select>
-  <button
-    type="button"
-    className="category-info-btn"
-    onClick={() => alert("Category information coming soon ✅")}
-  >
-    Category Info
-  </button>
+   <button type="button" className="category-info-btn" onClick={() => setShowCategoryInfoBox(prev => !prev)}>
+              Category Info
+            </button>
+
+
             <textarea placeholder="What do you do?" rows={4}></textarea>
 
             <button type="submit">Submit</button>
           </form>
         </div>
       </div>
+{showCategoryInfoBox && (
+  <div className="category-info-container">
+    {categories.map(cat => (
+      <div key={cat.id} className="category-box" 
+        onClick={() => handleCategoryClick(cat)}
+        style={{cursor:"pointer"}}
+      >
+        <h4>{cat.title}</h4>
+      </div>
+    ))}
+  </div>
+)}
+
+{/* ✅ Popup Overlay */}
+{showPopup && (
+  <div className="popup-overlay" onClick={() => setShowPopup(false)}>
+    <div className="popup-container" onClick={(e) => e.stopPropagation()}>
+      
+      {/* ✅ Category dropdown inside popup */}
+      <select 
+        className="popup-category-dropdown"
+        value={selectedCategoryId || ""} 
+        onChange={(e) => {
+          const selectedCat = categories.find(c => c.id == e.target.value);
+          if (selectedCat) handleCategoryClick(selectedCat);
+        }}
+      >
+        <option value="" disabled>Select Category</option>
+        {categories.map(cat => (
+          <option key={cat.id} value={cat.id}>{cat.title}</option>
+        ))}
+      </select>
+
+      <div className="popup-content">
+        
+        {/* ✅ Subcategories */}
+        <div className="popup-left-box">
+          <h4>Subcategories</h4>
+          {subcategories.length > 0 ? (
+            <ul className="subcategory-list">
+              {subcategories.map((sc, i) => (
+                <li key={i}
+                  className={selectedSubcategoryId === sc.subcategory ? "active" : ""}
+                  onClick={() => handleSubcategoryClick(sc)}
+                >
+                  {sc.subcategory}
+                </li>
+              ))}
+            </ul>
+          ) : <p>No Subcategories found</p>}
+        </div>
+
+        {/* ✅ Services */}
+        <div className="popup-right-box">
+          <h4>Services</h4>
+          {services.length > 0 ? (
+            <ul className="services-list">
+              {services.map((srv, i) => <li key={i}>{srv}</li>)}
+            </ul>
+          ) : <p>Select subcategory to view services</p>}
+        </div>
+
+      </div>
+
+      <button className="popup-close" onClick={() => setShowPopup(false)}>
+        Close
+      </button>
+
+    </div>
+  </div>
+)}
+
       <div className="container-benefits">
       <h2 className="heading">
         Benefits for <span>Vendors</span>
@@ -260,10 +339,10 @@ const EasyRegisterProcess = () => {
           </div>
         ))}
       </div>
+      
     </div>
-    </div>
-    
-    
+    </div> 
+
   );
 };
 

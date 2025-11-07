@@ -4208,6 +4208,12 @@
         z-index: 5;
     }
     /* Slide text */
+    /* Ensure fade transition duration is 1s */
+    
+    .swiper-fade .swiper-slide {
+        transition: opacity 1s ease-in-out !important;
+        /* 1 second fade */
+    }
     
     .heroContent {
         position: absolute;

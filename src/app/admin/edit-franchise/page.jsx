@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import styles from "../styles/Franchises.module.css"; // you’ll create this CSS file
 import Layout from "../pages/page";
-
-
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function EditFranchiseUser() {
   const searchParams = useSearchParams();
-
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -44,13 +44,26 @@ export default function EditFranchiseUser() {
     // 🚀 Submit logic here
     console.log("Updated Data:", formData);
   };
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/franchises-user"); // Customer page
+  };
   return (
     <Layout>
        <div className={styles.container1}>
               <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>FranchiseUesr</span> &gt;{" "}
+          <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>FranchiseUesr</span> 
+           <span className={styles.separator}> | </span>
+           <SlHome
+                                 style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                 onClick={goToDashboard}
+                                 title="Go to Dashboard"
+                               />
+                               <span> &gt; </span>
           <span className={styles.breadcrumbActive}>Edit Franchiseuser</span>
         </div>
 </div>

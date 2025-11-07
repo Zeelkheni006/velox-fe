@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -212,34 +212,35 @@ useEffect(() => {
           <div className="spinner"></div>
         </div>
         ) : slides.length > 0 ? (
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            navigation
-            pagination={{ clickable: true }}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
-            loop
-            className="absolute inset-0 w-full h-full -z-10"
-          >
-{slides.map((slide, index) => (
-  <SwiperSlide key={slide.id || index}>
-    <div className="heroSlide">
-       <img
-          src={slide.image ? `http://192.168.29.69:5000${slide.image}` : "https://via.placeholder.com/800x500"}
+         <Swiper
+  modules={[Navigation, Pagination, Autoplay, EffectFade]}
+  navigation
+  pagination={{ clickable: true }}
+  autoplay={{ delay: 5000, disableOnInteraction: false }}
+  effect="fade"
+  fadeEffect={{ crossFade: true }}
+  allowTouchMove={false} // Disable swipe
+  loop
+  className="absolute inset-0 w-full h-full -z-10"
+>
+  {slides.map((slide, index) => (
+    <SwiperSlide key={slide.id || index}>
+      <div className="heroSlide">
+        <img
+          src={slide.image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}` : "https://via.placeholder.com/800x500"}
           alt={slide.title || "Slide"}
           className="heroSlide max-w-full max-h-full object-contain"
         />
-      <div className="heroOverlay"></div>
-      <div className="heroContent">
-        <h1 className="heroTitle">{slide.title}</h1>
-       <div
-  className="heroDesc"
-  dangerouslySetInnerHTML={{ __html: slide.description || "" }}
-/>
+        <div className="heroOverlay"></div>
+        <div className="heroContent">
+          <h1 className="heroTitle">{slide.title}</h1>
+          <div className="heroDesc" dangerouslySetInnerHTML={{ __html: slide.description || "" }} />
+        </div>
       </div>
-    </div>
-  </SwiperSlide>
-))}
-          </Swiper>
+    </SwiperSlide>
+  ))}
+</Swiper>
+
         ) : (
           <p className="noSliders">No sliders available</p>
       )}

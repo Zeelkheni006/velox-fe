@@ -5,9 +5,13 @@ import Layout from "../pages/page";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { addCustomer } from "../../api/manage_users/manage_customer"; // ✅ Import API function
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
 
 export default function AddCustomerPage() {
   const router = useRouter();
+  const { popupMessage, popupType, showPopup } = usePopup();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -26,30 +30,49 @@ export default function AddCustomerPage() {
     e.preventDefault();
 
     if (formData.password !== formData.confirm_password) {
-      alert("Passwords do not match");
+      showPopup("Passwords do not match");
       return;
     }
 
     try {
       const response = await addCustomer(formData);
       if (response.success) {
-        alert("✅ Customer added successfully!");
+        showPopup("✅ Customer added successfully!");
         router.push("/admin/customer");
       } else {
-        alert("❌ " + (response.message || "Failed to add customer"));
+        showPopup("❌ " + (response.message || "Failed to add customer"));
       }
     } catch (err) {
       console.error(err);
-      alert("Error: " + err.message);
+      showPopup("Error: " + err.message);
     }
   };
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/customer"); // Customer page
+  };
   return (
     <Layout>
+         <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.addcontainer}>
         <div className={styles.topCard}>
           <div>
-            <span className={styles.breadcrumb}>Manage Customer</span> &gt;{" "}
+                  <span
+        className={styles.breadcrumb}
+        style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}
+      >
+        Manage Customer
+      </span>
+              <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Customer</span>
           </div>
         </div>

@@ -99,8 +99,8 @@
     text-align: left;
 }
 
-.table tbody tr:hover {
-    background: #f9fafb;
+.table thead {
+    background-color: #e5e7eb;
 }
 
 .pagination {

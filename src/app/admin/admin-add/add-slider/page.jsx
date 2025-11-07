@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { addSlider } from "../../../api/add-image/add-slider";
 import React, { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
+import usePopup from "../../components/popup"
+import PopupAlert from "../../components/PopupAlert";// ✅ Import icons
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function AddSlider() {
@@ -16,8 +17,8 @@ export default function AddSlider() {
   const [image, setImage] = useState(null);
   const [mobileImage, setMobileImage] = useState(null);
   const [description, setDescription] = useState("");
-    const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState(""); 
+   const { popupMessage, popupType, showPopup } = usePopup();
+    
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -35,8 +36,8 @@ export default function AddSlider() {
     try {
       setLoading(true);
       await addSlider(formData);
-      setPopupMessage("✅ Slider added successfully!");
-      setPopupType("success")
+      showPopup("✅ Slider added successfully!");
+      
       // Reset form
       setTitle("");
       setService("");
@@ -44,8 +45,8 @@ export default function AddSlider() {
       setMobileImage(null);
       setDescription("");
     } catch (err) {
-      setPopupMessage(err.message || "Something went wrong!");
-      setPopupType("error")
+      showPopup(err.message || "Something went wrong!");
+  
       console.error(err);
     } finally {
       setLoading(false);
@@ -54,22 +55,10 @@ export default function AddSlider() {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-   useEffect(() => {
-    if (!popupMessage) return;
-  
-    const timer = setTimeout(() => {
-      setPopupType(prev => prev + " hide");
-      setTimeout(() => {
-        setPopupMessage("");
-        setPopupType("");
-      }, 400);
-    }, 4000);
-  
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
   return (
     <Layout>
+             <PopupAlert message={popupMessage} type={popupType} />
+      
       <div className="add-slider-container">
          <div className="headerContainer">
             <div>
@@ -81,14 +70,7 @@ export default function AddSlider() {
  <div className="addcontent">
           <div className="addright">
         
-         {popupMessage && (
-                    <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-                      {popupType.startsWith("success") ? 
-                        <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                        <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-                      <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-                    </div>
-                  )}
+        
         <form className="add-slider-form" onSubmit={handleSubmit}>
             <h2>Add Slider</h2>
           <label>Titel

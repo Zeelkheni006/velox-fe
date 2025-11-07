@@ -9,6 +9,7 @@ import Select from "react-select";
 import usePopup from "../components/popup";
 import PopupAlert from "../components/PopupAlert";
 import { getCategoryList } from "../../api/user-side/register-professional/location";
+import { SlHome } from "react-icons/sl";
 
 export default function EditLeadPage() {
   const router = useRouter();
@@ -24,114 +25,131 @@ export default function EditLeadPage() {
     country: "",
     state: "",
     city: "",
-    categories:[],
+    categories: [],
   });
 
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-const fetchCategories = async (existingIds = []) => {
-  try {
-    const list = await getCategoryList();
+  useEffect(() => {
+    const storedLead = localStorage.getItem("editLeadData");
+    if (!storedLead) return;
 
-    const formattedOptions = list.map(c => ({
-      label: c.title,
-      value: Number(c.id)
-    }));
+    const leadData = JSON.parse(storedLead);
 
-    setCategoryOptions(formattedOptions);
+    setLead({
+      id: leadData._id || leadData.id || "",
+      name: leadData.name || "",
+      email: leadData.email || "",
+      phone: leadData.phone || "",
+      message: leadData.message || "",
+      country: leadData.country || "",
+      state: leadData.state || "",
+      city: leadData.city || "",
+      categories: leadData.categories || [],
+    });
 
-    // Pre-select existing categories
-    const matched = formattedOptions.filter(opt =>
-      existingIds.includes(opt.value)
-    );
+    const existingCatTitles = (leadData.categories || []).map(c => c.title || c);
+    fetchCategories(existingCatTitles);
+  }, []);
 
-    setSelectedCategories(matched);
+  const fetchCategories = async (existingTitles = []) => {
+    try {
+      const list = await getCategoryList(); // [{id, title}, ...]
 
-  } catch (err) {
-    showPopup("Failed to load categories ❌", "error");
-  }
-};
+      const formattedOptions = list.map(c => ({
+        label: c.title,
+        value: c.title,
+      }));
 
+      setCategoryOptions(formattedOptions);
 
-useEffect(() => {
-  const storedLead = localStorage.getItem("editLeadData");
-  if (!storedLead) return;
+      const preSelected = formattedOptions.filter(opt =>
+        existingTitles.includes(opt.value)
+      );
 
-  const leadData = JSON.parse(storedLead);
+      setSelectedCategories(preSelected);
 
-  // Pre-fill normal fields
-  setLead({
-    id: leadData._id || leadData.id || "",
-    name: leadData.name || "",
-    email: leadData.email || "",
-    phone: leadData.phone || "",
-    message: leadData.message || "",
-    city: leadData.city || "",
-    state: leadData.state || "",
-    country: leadData.country || "",
-  });
-
-  // Extract category IDs
-  const existingCatIds = (leadData.categories || []).map(c =>
-    Number(c.id ?? c.value)
-  ).filter(id => !isNaN(id));
-
-  fetchCategories(existingCatIds); // Fetch category options & pre-select
-}, []);
-
-
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const payload = {
-    name: lead.name,
-    email: lead.email,
-    phone: lead.phone,
-    message: lead.message,
-    category_list: selectedCategories.length > 0 
-      ? selectedCategories.map(c => c.value)
-      : [], // allow empty
+    } catch (err) {
+      showPopup("Failed to load categories ❌", "error");
+    }
   };
 
-  try {
-    const res = await updateLead(lead.id, payload);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    if (res.success) {
-      showPopup("✅ Updated Successfully!", "success");
-      setTimeout(() => router.push("/admin/lead"), 500);
-    } else {
-      showPopup(res.message || "❌ Update failed!", "error");
+    try {
+      const categoryListData = await getCategoryList();
+
+      const payload = {
+        name: lead.name,
+        email: lead.email,
+        phone: lead.phone,
+        message: lead.message,
+
+        // Send typed values as strings
+        country_id: lead.country || null,
+        state_id: lead.state || null,
+        city_id: lead.city || null,
+
+        category_list: selectedCategories
+          .map(sel => categoryListData.find(c => c.title === sel.label)?.id)
+          .filter(Boolean),
+      };
+
+      console.log("✅ Final Payload Sent:", payload);
+
+      const res = await updateLead(lead.id, payload);
+
+      if (res.success) {
+        showPopup("✅ Updated Successfully!", "success");
+        setTimeout(() => router.push("/admin/lead"), 500);
+      } else {
+        showPopup(res.message || "❌ Update failed!", "error");
+      }
+
+    } catch (err) {
+      console.error("updateLead error:", err);
+      showPopup("❌ Server error!", "error");
     }
-
-  } catch (err) {
-    console.error(err);
-    showPopup("❌ Server error!", "error");
-  }
-};
-
-
-
+  };
 
   const handleChange = (e) => {
     setLead({ ...lead, [e.target.name]: e.target.value });
   };
-
+      const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <PopupAlert message={popupMessage} type={popupType} />
 
       <div className={styles.editcontainer}>
         <div className={styles.headerContainer}>
-          <span className={styles.breadcrumb}>Lead</span> &gt;
-          <span className={styles.breadcrumbActive}> Edit Lead</span>
+          <div>
+            <span
+              className={styles.breadcrumb}
+              onClick={() => router.push("/admin/lead")}
+              style={{ cursor: "pointer" }}
+            >
+              Lead
+            </span>
+             <span className={styles.separator}> | </span>
+              <SlHome
+                                   style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                   onClick={goToDashboard}
+                                   title="Go to Dashboard"
+                                 />
+           <span> &gt; </span>  
+            <span className={styles.breadcrumbActive}> Edit Lead</span>
+          </div>
         </div>
 
         <div className={styles.editcard}>
           <h2 className={styles.title}>Edit Lead</h2>
 
           <form onSubmit={handleSubmit} className={styles.form}>
+            {/* Free text inputs for country, state, city */}
             {["country", "state", "city", "name", "email", "phone", "message"].map(field => (
               <div key={field} className={styles.formGroup}>
                 <label className={styles.label}>
@@ -148,17 +166,18 @@ const handleSubmit = async (e) => {
               </div>
             ))}
 
-           <div className={styles.formGroup}>
-  <label className={styles.label}>Categories</label>
-  <Select
-    isMulti
-    placeholder="Select Categories"
-    options={categoryOptions}
-    value={selectedCategories}
-    onChange={(selected) => setSelectedCategories(selected || [])}
-    isClearable={true}
-  />
-</div>
+            {/* Categories */}
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Categories</label>
+              <Select
+                isMulti
+                placeholder="Select Categories"
+                options={categoryOptions}
+                value={selectedCategories}
+                onChange={(selected) => setSelectedCategories(selected || [])}
+                isClearable={true}
+              />
+            </div>
 
             <button type="submit" className={styles.button}>
               Update Lead

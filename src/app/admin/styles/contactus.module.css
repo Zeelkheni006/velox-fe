@@ -82,6 +82,10 @@
     text-align: left;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .viewText {
     color: rgb(86, 75, 241);
     cursor: pointer;

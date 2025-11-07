@@ -6,8 +6,9 @@ import styles from '../styles/SubCategories.module.css';
 import Layout from '../pages/page';
 import { updateSubCategory } from '../../api/admin-category/sub-category';
 import { getCategories } from '../../api/admin-category/sub-category';
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai"; // ✅ Import icons
-
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { SlHome } from "react-icons/sl";
 export default function EditCategory() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -16,15 +17,12 @@ export default function EditCategory() {
   const titleFromURL = searchParams.get('title');
   const logoFromURL = searchParams.get('logo');
   const categoryFromURL = searchParams.get('category');
-  
-
+  const { popupMessage, popupType, showPopup } = usePopup();
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoUrl, setLogoUrl] = useState('/icon/default.svg');
-    const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState(""); 
   const [mounted, setMounted] = useState(false);
 
   // Load initial data from URL
@@ -51,7 +49,7 @@ useEffect(() => {
     const file = e.target.files[0];
     if (!file) return;
     if (file.type !== 'image/svg+xml') {
-      alert('Only SVG files are allowed!');
+      showPopup('Only SVG files are allowed!');
       return;
     }
     setLogoFile(file);
@@ -66,7 +64,7 @@ useEffect(() => {
   e.preventDefault();
 
   if (!title || !categoryId) {
-    alert('Please fill all required fields!');
+    showPopup('Please fill all required fields!');
     return;
   }
 
@@ -79,57 +77,53 @@ data.append('category_id', categoryId);
     const res = await updateSubCategory(Number(idFromURL), data); // 👈 ensure ID is number
     console.log('API response:', res); // debug
     if (res.success) {
-      setPopupMessage('Sub Category updated successfully!');
-      setPopupType("success")
+      showPopup('Sub Category updated successfully!');
+    
       router.push('/admin/sub-categories'); // go back to list
     } else {
-      setPopupMessage(res.message || 'Update failed!');
-      setPopupType("error")
+      showPopup(res.message || 'Update failed!');
+     
     }
   } catch (err) {
     console.error(err);
-    setPopupMessage('Something went wrong!');
-    setPopupType("error")
+    showPopup('Something went wrong!');
+   
   }
 };
  useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-  if (!popupMessage) return;
-
-  const timer = setTimeout(() => {
-    setPopupType(prev => prev + " hide");
-    setTimeout(() => {
-      setPopupMessage("");
-      setPopupType("");
-    }, 400);
-  }, 4000);
-
-  return () => clearTimeout(timer);
-}, [popupMessage]);
+        const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/sub-categories"); // Customer page
+  };
 
   return (
     <Layout>
+             <PopupAlert message={popupMessage} type={popupType} />
+      
       <div className={styles.editcontainer}>
             <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Sub Category</span> &gt;{" "}
+            <span className={styles.breadcrumb}
+             style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Sub Category</span> 
+        <span className={styles.separator}> | </span>
+         <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+                    <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Edit Subcategory</span>
           </div>
         </div>
 
         <div className={styles.editcard}>
           <h2>Edit Sub Category</h2>
-            {popupMessage && (
-                      <div className={`${styles["email-popup"]} ${styles[popupType]} ${styles.show} flex items-center gap-2`}>
-                        {popupType.startsWith("success") ? 
-                          <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                          <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-                        <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-                      </div>
-                    )}
           <form onSubmit={handleSubmit}>
             <label className={styles.editlabel}>TITLE</label>
             <input

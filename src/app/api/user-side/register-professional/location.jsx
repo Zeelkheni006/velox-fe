@@ -47,3 +47,15 @@ export async function getCategoryList() {
     return [];
   }
 }
+
+export async function getSubcategoriesAndServices(categoryId) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/category/get/sub-categorys-and-services/${categoryId}`);
+    const result = await res.json();
+
+    return result?.data || [];
+  } catch (error) {
+    console.error("Subcategories Fetch Error:", error);
+    return [];
+  }
+}

@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { FaEdit } from "react-icons/fa";
 import styles from "../styles/roles.module.css"; // use .module.css if CSS Modules
 import Layout from "../pages/page"; // Ensure Layout contains Sidebar + Header
-// update path if needed
+import { SlHome } from "react-icons/sl";
 import { useRouter } from "next/navigation";
 
 
@@ -108,14 +108,26 @@ const Roles = () => {
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = startIndex + entriesPerPage;
   const currentRoles = filteredRoles.slice(startIndex, endIndex);
+
+       const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
-     
+  
     <Layout>
       <div className={styles.container}>
         <div className={styles.header}>
-          <div className={styles.breadcrumb}>
-            <span>Roles</span> &gt; <span className={styles.active}>Manage Roles</span>
-          </div>
+       <div className={styles.breadcrumb}>
+      <span  style={{cursor:"pointer"}}>Roles</span>
+      <span className={styles.separator}> | </span>
+      <SlHome
+        style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+        onClick={goToDashboard}
+        title="Go to Dashboard"
+      />
+      <span> &gt; </span>
+      <span className={styles.active}>Manage Roles</span>
+    </div>
          <button className={styles.addButton} onClick={() => router.push("/admin/admin-add/add-roles")}>
   + Add New Staff
 </button>
@@ -151,7 +163,7 @@ const Roles = () => {
               />
             </div>
           </div>
-
+<div className={styles.tableWrapper}>
           <table className={styles.table}>
             <thead>
               <tr>
@@ -225,7 +237,7 @@ const Roles = () => {
     </button>
   </div>
 </div>
-
+</div>
          </div>
       </div>
    

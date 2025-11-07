@@ -6,14 +6,12 @@ import { FaLayerGroup, FaNetworkWired, FaCogs, FaList,FaProjectDiagram,FaStore,
   FaGift,FaTags,FaChartBar,FaCreditCard,FaStar,FaImage,FaGlobe,FaUserCog
  } from "react-icons/fa";
 import styles from "../../styles/roles.module.css";
-import { faL } from "@fortawesome/free-solid-svg-icons";
-
-import { updateService } from "@/app/api/admin-service/category-list";
-
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 export default function ServiceDashboard() {
   const [expanded, setExpanded] = useState("categories");
   const [roleName, setRoleName] = useState("");
-
+  const router = useRouter();
   // ===== Category lists =====
   const [categories, setCategories] = useState([
     { name: "Category", enabled: false },
@@ -515,15 +513,33 @@ if (type === "categories") setCategories(updated);
       </div>
     </div>
   );
+       const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
 
+    const goToRoles = () => {
+    router.push("/admin/roles"); // roles page
+  };
   // ===== Render page =====
   return (
     <Layout>
       <div className={styles.rols}>
         <div className={styles.header}>
-          <div className={styles.breadcrumb}>
-            <span>Roles</span> &gt; <span className={styles.active}>Add Roles</span>
-          </div>
+         <div className={styles.breadcrumb}>
+              <span style={{ cursor: "pointer"}}
+        onClick={goToRoles}
+      >
+        Roles
+      </span>
+              <span className={styles.separator}> | </span>
+              <SlHome
+                style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                onClick={goToDashboard}
+                title="Go to Dashboard"
+              />
+              <span> &gt; </span>
+              <span className={styles.active}>Edit Roles</span>
+            </div>
         </div>
 
         <div className={styles.card1}>

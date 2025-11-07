@@ -139,6 +139,10 @@
     text-align: left;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .status {
     padding: 6px 12px;
     border-radius: 12px;

@@ -123,6 +123,10 @@
     text-align: left;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .logo {
     width: 32px;
     height: 32px;

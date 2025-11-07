@@ -5,8 +5,10 @@ import styles from "../styles/managecustomer.module.css";
 import Layout from "../pages/page";
 import { useRouter } from "next/navigation";
 import { deleteCustomer,getCustomers } from "../../api/manage_users/manage_customer";
-
-
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl";
 
 export default function ManageCustomerPage() {
   const router = useRouter();
@@ -16,7 +18,7 @@ export default function ManageCustomerPage() {
   const [selectedCity, setSelectedCity] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
-
+const { popupMessage, popupType, showPopup } = usePopup();
   // Sorting
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
@@ -39,7 +41,7 @@ const normalized = res.map(c => ({
 
       setCustomers(normalized);
     } catch (err) {
-      alert("Error fetching customers: " + err.message);
+      showPopup("Error fetching customers: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -103,9 +105,9 @@ const handleDelete = async (id) => {
   try {
     await deleteCustomer(id); // This should mark the user as deleted
     setCustomers((prev) => prev.filter((cust) => cust.id !== id)); // remove from ManageCustomerPage table
-    alert("Customer moved to Deleted Accounts!");
+    showPopup("Customer moved to Deleted Accounts!");
   } catch (err) {
-    alert("Error deleting customer: " + err.message);
+    showPopup("Error deleting customer: " + err.message);
   }
 };
 
@@ -114,14 +116,25 @@ const handleDelete = async (id) => {
 
   const uniqueCities = [...new Set(customers.map((c) => c.city))];
 
- 
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
 
   return (
     <Layout>
+      <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.container}>
         <div className={styles.topCard}>
           <div>
-            <span className={styles.breadcrumb}>Customers</span> &gt; <span className={styles.breadcrumbActive}>Manage Customers</span>
+            <span className={styles.breadcrumb}>Customers</span> 
+            <span className={styles.separator}> | </span>
+             <SlHome
+                    style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                    onClick={goToDashboard}
+                    title="Go to Dashboard"
+                  />
+            <span> &gt; </span>
+             <span className={styles.breadcrumbActive}>Manage Customers</span>
           </div>
                     <button
   className={styles.deletedAccountBtn}
@@ -186,23 +199,28 @@ const handleDelete = async (id) => {
                 <th>Options</th>
               </tr>
             </thead>
-            <tbody>
-              {currentCustomers.length > 0 ? currentCustomers.map((cust) => (
-                <tr key={cust.id}>
-                <td>{cust.username}</td>
-<td>{cust.email}</td>
-<td>{cust.phonenumber}</td>
-<td>{cust.city}</td>
-                  <td>
-                    <button className={styles.deletebtn} onClick={() => handleDelete(cust.id)}>Delete</button>
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan={5}>No matching records found.</td>
-                </tr>
-              )}
-            </tbody>
+           <tbody>
+  {currentCustomers.length > 0 ? currentCustomers.map((cust) => (
+    <tr key={cust.id}>
+      {/* ✅ Add onClick to each td */}
+  <td onClick={(e) => handleCopy(e, cust.username, "Username", showPopup)}>
+  {cust.username}
+</td>
+     <td onClick={(e) => handleCopy(e, cust.email, "Email", showPopup)}>{cust.email}</td>
+<td onClick={(e) => handleCopy(e, cust.phonenumber, "Phone", showPopup)}>{cust.phonenumber}</td>
+<td onClick={(e) => handleCopy(e, cust.city, "City", showPopup)}>{cust.city}</td>
+
+      <td>
+        <button className={styles.deletebtn} onClick={() => handleDelete(cust.id)}>Delete</button>
+      </td>
+    </tr>
+  )) : (
+    <tr>
+      <td colSpan={5}>No matching records found.</td>
+    </tr>
+  )}
+</tbody>
+
           </table>
 
           <div className={styles.pagination}>

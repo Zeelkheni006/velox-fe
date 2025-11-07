@@ -19,7 +19,7 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
   if (!res.ok || !data.success) throw new Error(data.message || "Failed to fetch leads");
 
   return {
-    leads: data.data.services || [],
+    leads: data.data.leads || [],
     total: data.data.total || 0,
   };
 }

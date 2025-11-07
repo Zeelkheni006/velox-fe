@@ -127,8 +127,12 @@
 }
 
 .table thead {
-    background-color: #f9fafc;
+    background-color: #e5e7eb;
     border-bottom: 2px solid #e5e5e5;
+}
+
+.tableWrapper {
+    color: #888;
 }
 
 .table th {
@@ -148,10 +152,6 @@
     word-break: break-word;
     vertical-align: top;
     text-align: left;
-}
-
-.table tr:hover {
-    background-color: #f8f9fb;
 }
 
 .editBtn {

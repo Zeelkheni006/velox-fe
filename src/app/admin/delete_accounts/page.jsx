@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import styles from "../styles/managecustomer.module.css";
 import Layout from "../pages/page";
 import { getCustomer, recoverCustomer } from "../../api/manage_users/manage_customer";
-
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl";
 export default function DeletedAccountsPage() {
   const router = useRouter();
 
@@ -16,7 +19,7 @@ export default function DeletedAccountsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-
+const { popupMessage, popupType, showPopup } = usePopup();
   // Fetch deleted accounts
   useEffect(() => {
     const fetchDeletedAccounts = async () => {
@@ -38,10 +41,10 @@ const handleRecoverAccount = async (id) => {
 
   try {
     await recoverCustomer(id);
-    alert("✅ Account recovered successfully!");
+    showPopup("✅ Account recovered successfully!");
     setCustomers(customers.filter(c => (c._id || c.id) !== id)); // remove from deleted list
   } catch (err) {
-    alert("❌ " + err.message);
+    showPopup("❌ " + err.message);
   }
 };
 
@@ -96,13 +99,32 @@ const handleRecoverAccount = async (id) => {
   const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
 
   const uniqueCities = [...new Set(customers.map((c) => c.city))];
-
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/customer"); // Customer page
+  };
   return (
     <Layout>
+          <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.container}>
         <div className={styles.topCard}>
           <div>
-            <span className={styles.breadcrumb}>Customers</span> &gt;{" "}
+            <span
+               className={styles.breadcrumb}
+               style={{ cursor: "pointer"}}
+               onClick={goToManageCustomer}
+             >
+               Manage Customer
+             </span>
+                     <span className={styles.separator}> | </span>
+                      <SlHome
+                             style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                             onClick={goToDashboard}
+                             title="Go to Dashboard"
+                           />
+                  <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Deleted Accounts</span>
           </div>
         </div>
@@ -174,10 +196,10 @@ const handleRecoverAccount = async (id) => {
                 {currentCustomers.length > 0 ? (
                   currentCustomers.map((cust) => (
                     <tr key={cust.id}>
-                      <td>{cust.name}</td>
-                      <td>{cust.email}</td>
-                      <td>{cust.mobile}</td>
-                      <td>{cust.city}</td>
+                      <td onClick={(e) => handleCopy(e, cust.name, "name", showPopup)}>{cust.name}</td>
+                      <td onClick={(e) => handleCopy(e, cust.email, "Email", showPopup)}>{cust.email}</td>
+                      <td onClick={(e) => handleCopy(e, cust.mobile, "mobile", showPopup)}>{cust.mobile}</td>
+                      <td onClick={(e) => handleCopy(e, cust.city, "City", showPopup)}>{cust.city}</td>
                       <td>
                         <button
                           className={styles.deletebtn}

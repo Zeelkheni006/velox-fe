@@ -90,6 +90,10 @@
     border-bottom: 1px solid #ddd;
 }
 
+.table thead {
+    background-color: #e5e7eb;
+}
+
 .search {
     padding: 6px 12px;
     border-radius: 5px;
