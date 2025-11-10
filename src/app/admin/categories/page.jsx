@@ -230,7 +230,11 @@ try {
                       <td onClick={(e)=>handleCopy(e,cat.title , "title" , showPopup )}>{cat.title}</td>
                       <td onClick={(e)=>handleCopy(e, cat.img , "img" , showPopup)}>
                         <img
-                          src={cat.logo ? `http://192.168.29.69:5000${cat.logo}` : "/placeholder.jpg"}
+                          src={
+  cat.logo
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${cat.logo}`
+    : "/placeholder.jpg"
+}
                           alt={cat.title}
                           className={styles.logo}
                         />
@@ -244,13 +248,15 @@ try {
                         </span>
                       </td>
                       <td>
-                       <button
+           <button
   className={styles.editBtn}
-  onClick={() =>
-    router.push(
-      `/admin/edit-category?id=${cat.id}&title=${encodeURIComponent(cat.title)}&logo=${encodeURIComponent(cat.logo)}&description=${encodeURIComponent(cat.description)}`
-    )
-  }
+  onClick={() => {
+    // ✅ Store category data locally
+    localStorage.setItem("editCategoryData", JSON.stringify(cat));
+
+    // ✅ Only ID in URL
+    router.push(`/admin/edit-category?id=${cat.id}`);
+  }}
 >
   Edit
 </button>

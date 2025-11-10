@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styles from '../styles/paymet.module.css';
 import Layout from '../pages/page';
 import { useRouter } from 'next/navigation';
+import { SlHome } from "react-icons/sl";
 
 export default function PaymentPage({ data }) {
   const router = useRouter();
@@ -75,13 +76,22 @@ export default function PaymentPage({ data }) {
   const endIndex = Math.min(startIndex + entries, sortedRows.length);
   const paginatedRows = sortedRows.slice(startIndex, endIndex);
   const totalPages = Math.ceil(sortedRows.length / entries);
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Payment</span> &gt;{' '}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Payment</span> 
+             <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Payment</span>
           </div>
         </div>

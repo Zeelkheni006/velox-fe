@@ -3,7 +3,7 @@ import { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/offers.module.css";
 import { useRouter } from "next/navigation"; 
-
+import { SlHome } from "react-icons/sl";
 export default function Offer() {
   const [offerlist, setOfferlist] = useState([
     {
@@ -75,12 +75,22 @@ export default function Offer() {
   const handlePrevPage = () => currentPage > 1 && setCurrentPage((p) => p - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage((p) => p + 1);
 
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Best Offers</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Best Offers</span> 
+                   <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Best Offers</span>
           </div>
         </div>

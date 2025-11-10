@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/request.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function Followup() {
   // ---------- States ----------
@@ -15,6 +17,7 @@ export default function Followup() {
   const [search, setSearch] = useState("");
   const [entries, setEntries] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
 
   // ---------- Filtering ----------
   const filteredRequests = useMemo(() => {
@@ -42,12 +45,23 @@ export default function Followup() {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   // ---------- JSX ----------
+
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Followup</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Followup</span>
+                    <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Followup</span>
           </div>
         </div>

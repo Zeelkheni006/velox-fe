@@ -4,10 +4,15 @@ import Layout from "../pages/page";
 import dynamic from "next/dynamic";
 import styles from "../styles/gift.module.css";
 import { useSearchParams } from "next/navigation";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
+
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function SendGift() {
+    const router = useRouter();
+  
   const searchParams = useSearchParams();
   const giftId = searchParams.get("id");
 
@@ -51,16 +56,27 @@ export default function SendGift() {
     console.log("Form Data:", form, "Editing ID:", giftId);
     alert(giftId ? "Gift updated!" : "Gift sent!");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/gift"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
-          <span className={styles.breadcrumbActive}>
-            {giftId ? "Edit Gift" : "Send Gift"}
-          </span>
+          <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Gift</span>     
+            <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+          <span className={styles.breadcrumbActive}>Edit Gift</span>
         </div>
         </div>
 

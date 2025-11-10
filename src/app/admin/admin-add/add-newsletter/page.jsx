@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import Layout from "../../pages/page";
 import styles from "../../styles/newsletter.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 // Load JoditEditor dynamically (client-side only)
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
@@ -13,23 +15,36 @@ export default function SendNewsletter() {
   const [selectedMail, setSelectedMail] = useState("");
   const [description, setDescription] = useState("");
   const editor = useRef(null); // ref for JoditEditor
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ sendAll, selectedMail, description });
     alert("Newsletter submitted!");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/news-latter "); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addcontainer}>
-         <div className="headerContainer">
-            <div>
-                                <span className="breadcrumb">Slider</span> &gt;{' '}
-                                <span className="breadcrumbActive">Add Slider</span>
-                              </div>
-         
-        </div>
+        <div className={styles.headerContainer}>
+                <div>
+                  <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+              onClick={goToManageCustomer}>Newsletter</span>
+                      <span className={styles.separator}> | </span>
+                     <SlHome
+                            style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                            onClick={goToDashboard}
+                            title="Go to Dashboard"
+                          />
+                 <span> &gt; </span>
+                  <span className={styles.breadcrumbActive}>Add Newsletter</span>
+                </div>
+              </div>
         
  <div className="addcontent">
           <div className="addright">

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Layout from "../pages/page";
 import styles from "../styles/adminAbout.module.css";
+import { SlHome } from "react-icons/sl";
 
 export default function EditAbout() {
   const searchParams = useSearchParams();
@@ -36,13 +37,27 @@ export default function EditAbout() {
     alert("Team member updated!");
     router.push("/admin/admin-about"); // redirect back to team list
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/admin-about"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>About Us</span> &gt; <span className={styles.breadcrumbActive}>Edit Our Team</span>
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>About Us</span> 
+              <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+         <span className={styles.breadcrumbActive}>Edit Our Team</span>
           </div>
         </div>
 

@@ -220,11 +220,11 @@ useEffect(() => {
         <td onClick={(e)=> handleCopy(e,item.title ,"title",  showPopup)}>{item.title}</td>
         <td onClick={(e)=> handleCopy(e, item.category_title,"category" , showPopup)}>{item.category_title}</td>
         <td onClick={(e)=> handleCopy(e, item.img , "img" , showPopup)}>
-          <img 
-            src={item.logo ? `http://192.168.29.69:5000${item.logo}` : '/default-logo.svg'} 
-            alt={item.title} 
-            className={styles.logo} 
-          />
+        <img 
+  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${item.logo}`}
+  alt={item.title}
+  className={styles.logo}
+/>
         </td>
         <td>
           <span className={`${styles.status} ${item.status === 'ACTIVE' ? styles.active : styles.inactive}`}>
@@ -232,15 +232,18 @@ useEffect(() => {
           </span>
         </td>
         <td>
-          <button
-            className={styles.editBtn}
-            onClick={(e) => {
-              e.stopPropagation(); // prevent double-click when clicking button
-              router.push(`/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`);
-            }}
-          >
-            Edit
-          </button>
+      <button
+  className={styles.editBtn}
+  onClick={(e) => {
+    e.stopPropagation(); 
+    
+    localStorage.setItem("editSubCategoryData", JSON.stringify(item)); // ✅ store full data
+
+    router.push(`/admin/edit-subcategory?id=${item.id}`); // ✅ only id in URL
+  }}
+>
+  Edit
+</button>
 
           <button
             className={item.status === 'ACTIVE' ? styles.inactiveBtn : styles.activeBtn}

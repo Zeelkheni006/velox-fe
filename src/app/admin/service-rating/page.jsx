@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Layout from "../pages/page";
 import styles from "../styles/serviceratind.module.css";
-
+import { SlHome } from "react-icons/sl";
 export default function ServiceRating() {
   const [ratings, setRatings] = useState([
     { id: 1, user: "divya sagathiya", service: "SOFA CLEANING", rating: 5, description: "Great service!", status: "ACTIVE" },
@@ -78,12 +78,22 @@ export default function ServiceRating() {
   const handlePrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
   const handleNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
 
+    const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Service Rating</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Service Rating</span> 
+              <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Service Rating</span>
           </div>
         </div>

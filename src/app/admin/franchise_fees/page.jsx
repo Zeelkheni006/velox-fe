@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import styles from '../styles/franchiseFees.module.css';
 import Layout from '../pages/page'; // adjust path if needed
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function FranchiseFees({ data }) {
   const sample = [
@@ -10,6 +12,7 @@ export default function FranchiseFees({ data }) {
     { id: 2, user: 'Meena Shah', franchiseName: 'Meena Car Service', email: 'meena@example.com', mobile: '+91-9123456780', commission: '7.5%' },
     { id: 3, user: 'Jay Desai', franchiseName: 'AutoFix Hub', email: 'jay@example.com', mobile: '+91-9823412390', commission: '6%' },
   ];
+  const router = useRouter();
 
   const allRows = Array.isArray(data) && data.length ? data : sample;
 
@@ -62,14 +65,23 @@ export default function FranchiseFees({ data }) {
 
   const handlePrevPage = () => currentPage > 1 && setCurrentPage((prev) => prev - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage((prev) => prev + 1);
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Franchise Fees</span> &gt;{' '}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Franchise Fees</span> 
+                 <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Franchise Fees</span>
           </div>
         </div>

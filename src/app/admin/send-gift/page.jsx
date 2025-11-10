@@ -3,6 +3,8 @@ import { useState } from "react";
 import Layout from "../pages/page";
 import dynamic from "next/dynamic";
 import styles from "../styles/gift.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
@@ -12,6 +14,7 @@ export default function SendGift() {
     file: null,
     description: "",
   });
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -27,14 +30,27 @@ export default function SendGift() {
     console.log("Form Data:", form);
     alert("Gift sent! Check console for details.");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/gift"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
        <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Gift</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Gift</span> 
+                <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Send Gift</span>
           </div>
         </div>

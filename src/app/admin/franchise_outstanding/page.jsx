@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import styles from '../styles/franchiseFees.module.css';
 import Layout from '../pages/page'; // Adjust path if needed
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function FranchiseOutstandingPage({ data }) {
   const sampleData = [
@@ -10,6 +12,7 @@ export default function FranchiseOutstandingPage({ data }) {
     { id: 2, franchiseName: 'Meena Car Service', outstanding: '0 CREDIT' },
     { id: 3, franchiseName: 'AutoFix Hub', outstanding: '0 CREDIT' },
   ];
+  const router = useRouter();
 
   const rows = Array.isArray(data) && data.length ? data : sampleData;
 
@@ -68,14 +71,23 @@ export default function FranchiseOutstandingPage({ data }) {
 
   const handlePrevPage = () => currentPage > 1 && setCurrentPage((prev) => prev - 1);
   const handleNextPage = () => currentPage < totalPages && setCurrentPage((prev) => prev + 1);
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Franchise Outstandings</span> &gt;{' '}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Franchise Outstandings</span>
+                  <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Franchise Outstandings</span>
           </div>
         </div>

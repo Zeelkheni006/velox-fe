@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/contactus.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function ContactUsPage() {
   const [contacts, setContacts] = useState([
@@ -15,6 +17,7 @@ export default function ContactUsPage() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [currentPage, setCurrentPage] = useState(1);
   const [entries, setEntries] = useState(10);
+  const router = useRouter();
 
   // 🔹 Sorting function
   const handleSort = (key) => {
@@ -50,14 +53,23 @@ export default function ContactUsPage() {
 
   const handlePrevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
   const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Contact Us</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Contact Us</span> 
+              <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Contact Us</span>
           </div>
         </div>

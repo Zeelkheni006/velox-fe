@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../styles/testimonial.module.css";
 import Layout from "../pages/page";
-
+import { SlHome } from "react-icons/sl";
 export default function TestimonialPage() {
   const router = useRouter();
 
@@ -75,13 +75,24 @@ export default function TestimonialPage() {
 
   const handlePrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
   const handleNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
-
+  
+ const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Testimonial</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+       >Testimonial</span> 
+         <span className={styles.separator}> | </span>
+                       <SlHome
+                              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                              onClick={goToDashboard}
+                              title="Go to Dashboard"
+                            />
+                   <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Testimonial</span>
           </div>
         </div>

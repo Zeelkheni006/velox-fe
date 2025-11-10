@@ -44,15 +44,7 @@ const [selectedCity, setSelectedCity] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
 
-const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
-  try {
-    const { leads, total } = await getLeads(page, perPage, filters); // backend should accept filters
-    setLeads(leads);
-    setTotalLeads(total);
-  } catch (err) {
-    alert(err.message);
-  }
-};
+const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => { try { const { leads, total } = await getLeads(page, perPage, filters); const normalizedLeads = leads.map(l => ({ ...l, city: l.city || l.city_id || "", state: l.state || l.state_id || "", country: l.country || l.country_id || "" , categories: l.categories || l.categories||"", })); setLeads(normalizedLeads); setTotalLeads(total); } catch (err) { alert(err.message); } };
 
 useEffect(() => {
   fetchLeadsData(currentPage, entriesPerPage);
@@ -281,60 +273,7 @@ useEffect(() => {
 }, []);
 
 // First, filtered leads
-const filteredLeads = useMemo(() => {
-  if (!Array.isArray(leads)) return [];
 
-  const selectedCatValues = selectedCategories.map(c => c.value);
-
-  return leads.filter(lead => {
-    const leadName = lead.name?.trim() || "";
-    const leadEmail = lead.email?.trim() || "";
-    const leadPhone = lead.phone?.trim() || "";
-    const leadCity = lead.city?.trim() || "";
-    const leadStatus = lead.status?.trim() || "";
-
-    // Normalize lead categories
-  const leadCategoryValues = Array.isArray(lead.categories)
-  ? lead.categories.map(c => c.title || c)  // Use title
-  : lead.categories
-    ? String(lead.categories).split(",").map(c => c.trim())
-    : [];
-
-const selectedCatValues = selectedCategories.map(c => c.label);
-
-    return (
-      (!selectedName || leadName === selectedName) &&
-      (!selectedEmail || leadEmail === selectedEmail) &&
-      (!selectedPhone || leadPhone === selectedPhone) &&
-      (!selectedCity || leadCity === selectedCity) &&
-      (!selectedStatus || leadStatus === selectedStatus) &&
-      (selectedCatValues.length === 0 || leadCategoryValues.some(c => selectedCatValues.includes(c)))
-    );
-  });
-}, [leads, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
-
-
-const sortedLeads = useMemo(() => {
-  if (!filteredLeads) return [];
-
-  if (!sortConfig.key || !sortConfig.direction) return filteredLeads;
-
-  return [...filteredLeads].sort((a, b) => {
-    let valA = a[sortConfig.key];
-    let valB = b[sortConfig.key];
-
-    // Handle array values (like categories)
-    if (Array.isArray(valA)) valA = valA.map(c => c.title || c).join(", ");
-    if (Array.isArray(valB)) valB = valB.map(c => c.title || c).join(", ");
-
-    valA = String(valA || "").toLowerCase();
-    valB = String(valB || "").toLowerCase();
-
-    if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
-    if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
-    return 0;
-  });
-}, [filteredLeads, sortConfig]);
 
 
 
@@ -342,7 +281,17 @@ const selectStyles = {
   menuPortal: base => ({ ...base, zIndex: 9999 }),
   menu: base => ({ ...base, zIndex: 9999 })
 };
+const handleAddToFranchise = (lead) => {
+  // Example: check if mobile already exists in franchise
+  const isMobileTaken = true; // Replace with your actual API check
 
+  if (isMobileTaken) {
+    showPopup("⚠️ This Mobile Number Has Already Been Taken", "error");
+  } else {
+    // Proceed to add to franchise
+    showPopup("✅ Added to Franchise Successfully", "success");
+  }
+};
 const getFilters = () => {
   return {
     name: selectedName || undefined,
@@ -395,12 +344,17 @@ const getFilters = () => {
   placeholder="Select Name"
   options={dropdownData.name}
   value={selectedName ? { value: selectedName, label: selectedName } : null}
-  onChange={opt => {
-    const selected = opt?.value || null; // will be null if cleared
-    setSelectedName(selected);
-    setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), name: selected });
-  }}
+onChange={opt => {
+  const selected = opt?.value || null;
+  setSelectedName(selected);
+  setCurrentPage(1);
+
+  if (selected) {
+    fetchLeadsData(1, entriesPerPage, { name: selected });
+  } else {
+    fetchLeadsData(1, entriesPerPage, {}); // reset filter
+  }
+}}
   className={styles.select}
   isClearable // ✅ this allows clearing the selection
 />
@@ -409,12 +363,17 @@ const getFilters = () => {
   placeholder="Select Email"
   options={dropdownData.email}
   value={selectedEmail ? { value: selectedEmail, label: selectedEmail } : null}
-  onChange={opt => {
-    const selected = opt?.value || null;
-    setSelectedEmail(selected);
-    setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), email: selected });
-  }}
+onChange={opt => {
+  const selected = opt?.value || null;
+  setSelectedEmail(selected);
+  setCurrentPage(1);
+
+  if (selected) {
+    fetchLeadsData(1, entriesPerPage, { email: selected });
+  } else {
+    fetchLeadsData(1, entriesPerPage, {});
+  }
+}}
   className={styles.select}
     isClearable 
 />
@@ -423,12 +382,17 @@ const getFilters = () => {
   placeholder="Select Phone"
   options={dropdownData.phone}
   value={selectedPhone ? { value: selectedPhone, label: selectedPhone } : null}
-  onChange={opt => {
-    const selected = opt?.value || null;
-    setSelectedPhone(selected);
-    setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), phone: selected });
-  }}
+ onChange={opt => {
+  const selected = opt?.value || null;
+  setSelectedPhone(selected);
+  setCurrentPage(1);
+
+  if (selected) {
+    fetchLeadsData(1, entriesPerPage, { phone: selected });
+  } else {
+    fetchLeadsData(1, entriesPerPage, {});
+  }
+}}
   className={styles.select}
     isClearable 
 />
@@ -437,11 +401,17 @@ const getFilters = () => {
   placeholder="Select Category"
   options={dropdownData.categories}
   value={selectedCategories}
-  onChange={opt => {
-    setSelectedCategories(opt || []); // empty array if cleared
-    setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), categories: (opt || []).map(c => c.value) });
-  }}
+ onChange={opt => {
+  const values = (opt || []).map(c => c.value);
+  setSelectedCategories(opt || []);
+  setCurrentPage(1);
+
+  if (values.length > 0) {
+    fetchLeadsData(1, entriesPerPage, { categories: values });
+  } else {
+    fetchLeadsData(1, entriesPerPage, {});
+  }
+}}
   className={styles.select}
   isClearable // ✅ clear all selected categories
 />
@@ -454,22 +424,32 @@ const getFilters = () => {
     const selected = opt?.value || null;
     setSelectedCity(selected);
     setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), city: selected });
+
+    if (selected) {
+      fetchLeadsData(1, entriesPerPage, { city: selected });
+    } else {
+      fetchLeadsData(1, entriesPerPage, {}); // reset filter
+    }
   }}
   className={styles.select}
-    isClearable 
+  isClearable 
 />
 
 <Select
   placeholder="Select Status"
   options={dropdownData.status}
   value={selectedStatus ? { value: selectedStatus, label: selectedStatus } : null}
-  onChange={opt => {
-    const selected = opt?.value || null;
-    setSelectedStatus(selected);
-    setCurrentPage(1);
-    fetchLeadsData(1, entriesPerPage, { ...getFilters(), status: selected });
-  }}
+onChange={opt => {
+  const selected = opt?.value || null;
+  setSelectedStatus(selected);
+  setCurrentPage(1);
+
+  if (selected) {
+    fetchLeadsData(1, entriesPerPage, { status: selected });
+  } else {
+    fetchLeadsData(1, entriesPerPage, {});
+  }
+}}
   className={styles.select}
     isClearable 
 />
@@ -502,17 +482,21 @@ const getFilters = () => {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  {["name","email","phone","message","categories","country","state","city","status"].map((key) => (
-                  <th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
-  {key.charAt(0).toUpperCase() + key.slice(1)} 
+              {[
+ "name","email","phone","message",
+ "categories","country","state","city",
+ "status"
+].map((key) => (
+<th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
+  {key.charAt(0).toUpperCase() + key.slice(1)}
   <SortArrow direction={sortConfig.key === key ? sortConfig.direction : null} />
 </th>
-                  ))}
+))}
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-               {sortedLeads.map((lead, index) => (
+               {leads.map((lead, index) => (
                  <tr
   key={index}
 onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
@@ -630,7 +614,14 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
 
                       <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>Manage Status</button>
 
-                      {lead.status === "ACCEPT" && <button className={styles.franchiseBtn}>Add To Franchises</button>}
+{lead.status?.toUpperCase() === "ACCEPTED" && (
+  <button 
+    className={styles.franchiseBtn}
+    onClick={() => handleAddToFranchise(lead)}
+  >
+    Add To Franchises
+  </button>
+)}
                     </td>
                   </tr>
                 ))}

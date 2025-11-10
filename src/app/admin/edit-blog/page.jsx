@@ -5,6 +5,8 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Layout from "../pages/page";
 import styles from "../styles/blog.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 // Load JoditEditor dynamically
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
@@ -18,6 +20,7 @@ export default function EditBlog() {
   const [source, setSource] = useState("");
   const [author, setAuthor] = useState("");
   const [tags, setTags] = useState("");
+  const router = useRouter();
 
   const editor = useRef(null);
   const [mounted, setMounted] = useState(false);
@@ -52,13 +55,26 @@ export default function EditBlog() {
     console.log({ id, category, subCategory, title, image, description, source, author, tags });
     alert("Blog updated successfully!");
   };
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/admin-blog"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addcontainer}>
          <div className={styles.headerContainer}>
             <div>
-                                <span className={styles.breadcrumb}>Blog</span> &gt;{' '}
+                                <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Blog</span>
+                                       <span className={styles.separator}> | </span>
+                                               <SlHome
+                                                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                                      onClick={goToDashboard}
+                                                      title="Go to Dashboard"
+                                                    />
+                                           <span> &gt; </span>
                                 <span className={styles.breadcrumbActive}>Edit Blog</span>
                               </div>
          

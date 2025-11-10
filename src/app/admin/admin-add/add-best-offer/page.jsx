@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import styles from "../../styles/bestservice.module.css";
 import Layout from '../../pages/page'; // adjust path if needed
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function AddSubCategory() {
   const [formData, setFormData] = useState({
@@ -9,6 +11,7 @@ export default function AddSubCategory() {
     category: '',
     logo: null,
   });
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -27,12 +30,27 @@ export default function AddSubCategory() {
     alert('Sub Category Submitted!');
   };
 
+     const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+
+      const goToManageCustomer = () => {
+    router.push("/admin/best-offer"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.wrapper}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>BestOffer</span> &gt;{" "}
+            <span className={styles.breadcrumb}  style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>BestOffer</span> 
+         <span className={styles.separator}> | </span>
+                     <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add BestOffer</span>
           </div>
         </div>

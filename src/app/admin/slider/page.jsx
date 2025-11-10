@@ -7,6 +7,7 @@ import { getSliders } from "../../api/add-image/add-slider";
 import usePopup from "../components/popup";
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
+import { SlHome } from "react-icons/sl";
 
 
 export default function SliderTable() {
@@ -98,7 +99,9 @@ const sortedSliders = useMemo(() => {
     showPopup("Status Updated ✅", "success");
   };
 
- 
+    const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
 
 
   return (
@@ -107,9 +110,19 @@ const sortedSliders = useMemo(() => {
 
       <div className="slider-table-container">
         <div className="topCard">
+           <div className="headerContainer">
           <div>
-          <span className="breadcrumb">Slider</span> &gt;
-          <span className="breadcrumbActive">Slider List</span>
+            <span className="breadcrumb" style={{ cursor: "pointer"}}
+        >Slider</span>
+                <span className="separator"> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+            <span className="breadcrumbActive">Slider</span>
+          </div>
         </div>
 </div>
         <div className="tableCard">
