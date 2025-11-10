@@ -2,6 +2,8 @@
 
 import styles from "../styles/income.module.css";
 import Layout from "../pages/page";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function IncomePage() {
   const incomeData = {
@@ -13,12 +15,24 @@ export default function IncomePage() {
     commission: 9717.0,
     totalIncome: 50371.4,
   };
-
+  const router = useRouter();
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Header (breadcrumb) */}
-        <div className={styles.headerContainer}> <div> <span className={styles.breadcrumb}>Income</span> &gt;{" "} <span className={styles.breadcrumbActive}>Income</span> </div> </div>
+        <div className={styles.headerContainer}> <div> 
+          <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Income</span> 
+           <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+        <span className={styles.breadcrumbActive}>Income</span> </div> </div>
 
         {/* Page Title */}
         <div className={styles.titleSection}>

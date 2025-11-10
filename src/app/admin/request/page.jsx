@@ -3,6 +3,8 @@
 import { useState, useMemo, useEffect } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/request.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 // Sort Arrow Component
 
@@ -15,6 +17,8 @@ export default function RequestPage() {
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openActionId, setOpenActionId] = useState(null);
+    const router = useRouter();
+  
   const SortArrow = ({ direction }) => (
     <span style={{ marginLeft: '5px', fontSize: '12px' }}>
       {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
@@ -165,14 +169,24 @@ export default function RequestPage() {
     alert(`Referred ${selectedRequest.name} to ${selectedFranchise}\nMessage: ${referMessage}`);
     setIsReferOpen(false);
   };
-
+const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}>Request</span> &gt; <span className={styles.breadcrumbActive}>Request</span>
+          <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Request</span> 
+             <span className={styles.separator}> | </span>
+                         <SlHome
+                                style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                onClick={goToDashboard}
+                                title="Go to Dashboard"
+                              />
+                     <span> &gt; </span>
+                      <span className={styles.breadcrumbActive}>Request</span>
         </div>
         </div>
 

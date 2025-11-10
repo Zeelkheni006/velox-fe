@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/customcreditplan.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function CustomCreditPlanPage() {
   const [checked, setChecked] = useState(false);
@@ -28,14 +30,23 @@ export default function CustomCreditPlanPage() {
     setCredit(value);
     if (price) setAmount(Number(price) * Number(value));
   };
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Custome Credit plan</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Custome Credit plan</span>
+                  <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Custom Credit Plan</span>
           </div>
         </div>

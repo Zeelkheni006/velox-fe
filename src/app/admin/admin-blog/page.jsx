@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/blog.module.css";
 import { useRouter } from "next/navigation";
+import { SlHome } from "react-icons/sl";
 
 export default function BlogAdmin() {
   const [search, setSearch] = useState("");
@@ -72,13 +73,22 @@ export default function BlogAdmin() {
   const toggleStatus = (id) => {
     setBlogs(blogs.map(blog => blog.id === id ? { ...blog, status: blog.status === "Active" ? "Inactive" : "Active" } : blog));
   };
-
+ const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Blog</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Blog</span> 
+             <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Blog List</span>
           </div>
         </div>

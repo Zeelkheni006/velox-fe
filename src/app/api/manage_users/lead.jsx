@@ -7,22 +7,60 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
   const params = new URLSearchParams({
     page,
     per_page: perPage,
-    ...filters,
   });
 
-  const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get?${params.toString()}`, {
+  const hasFilters = Object.keys(filters).length > 0 &&
+    Object.values(filters).some(v =>
+      v !== undefined &&
+      v !== null &&
+      v !== "" &&
+      !(Array.isArray(v) && v.length === 0)
+    );
+
+  if (hasFilters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach(v => params.append(`${key}[]`, v));
+      } else {
+        params.append(key, value);
+      }
+    });
+  }
+
+  const endpoint = hasFilters
+    ? `/api/v1/admin/manage-users/leads/filter`
+    : `/api/v1/admin/manage-users/leads/get`;
+
+  const res = await fetch(`${API_BASE_URL}${endpoint}?${params.toString()}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
 
   const data = await res.json();
-
   if (!res.ok || !data.success) throw new Error(data.message || "Failed to fetch leads");
 
+  let leads = data.data.leads || [];
+
+  /** ✅ NORMALIZE FILTER RESPONSE */
+  if (hasFilters) {
+    leads = leads.map(l => ({
+      ...l,
+      categories: l.category_list || [],
+      city: l.city || l.city_name || "",   // ✅ If city name exists, use it
+      state: l.state || l.state_name || "",
+      country: l.country || l.country_name || "",
+      status:
+        l.status === 1 ? "PENDING" :
+        l.status === 2 ? "ACCEPTED" :
+        l.status === 3 ? "DECLINE" : "PENDING"
+    }));
+  }
+
   return {
-    leads: data.data.leads || [],
-    total: data.data.total || 0,
+    leads,
+    total: data.data.total || leads.length,
   };
 }
+
 
 
 

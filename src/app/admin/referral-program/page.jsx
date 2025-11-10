@@ -3,25 +3,38 @@
 import { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/referral.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function ReferralProgram() {
   const [referralValue, setReferralValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
   const [isActive, setIsActive] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log({ referralValue, maxValue, isActive });
     alert("Referral Program submitted!");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+  
   return (
     <Layout>
       <div className={styles.container}>
                <div className={styles.headerContainer}>
                   <div>
-                    <span className={styles.breadcrumb}>Credit Plan</span> &gt;{' '}
-                    <span className={styles.breadcrumbActive}>Credit Plan</span>
+                    <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Referral Program</span>
+                                   <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+                    <span className={styles.breadcrumbActive}>Referral Program</span>
                   </div>
                 </div>
                  <div className={styles.card}>

@@ -4,7 +4,7 @@ import Layout from '../pages/page';
 import styles from '../styles/order.module.css';
 import { FaEye, FaBuilding, FaTasks } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
-
+import { SlHome } from "react-icons/sl";
 // Mock data
 const MOCK_ORDERS = [
   { id: 1, user_name: 'John Doe', order_number: 'ORD001', services: 'Split AC Check', total_quantity: 2, total_amount: 500, city: 'Jamnagar', status: 'pending' },
@@ -145,12 +145,22 @@ export default function OrdersTable() {
     doc.save('orders.pdf');
   };
 
+    const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
     return (
       <Layout>
         <div className={styles.container}>
           <div className={styles.headerContainer}>
             <div>
-            <span className={styles.breadcrumb}>Unallocated Orders View</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>Unallocated Orders View</span>
+                <span className={styles.separator}> | </span>
+                            <SlHome
+                                   style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                   onClick={goToDashboard}
+                                   title="Go to Dashboard"
+                                 />
+                        <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Unallocated Orders View</span>
           </div>
 </div>

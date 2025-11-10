@@ -3,21 +3,33 @@
 import { useState } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/logo.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 export default function LogoPage() {
   const [headerLogo, setHeaderLogo] = useState(null);
   const [footerLogo, setFooterLogo] = useState(null);
   const [invoiceLogo, setInvoiceLogo] = useState(null);
+  const router = useRouter();
 
   const handleSubmit = (type) => {
     alert(`${type} uploaded successfully!`);
   };
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
        <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Logo</span> &gt;{" "}
+            <span className={styles.breadcrumb}style={{ cursor: "pointer"}}>Logo</span> 
+               <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Logo</span>
           </div>
         </div>

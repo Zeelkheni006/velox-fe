@@ -1,142 +1,147 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from 'react';
 import styles from '../styles/Categories.module.css';
 import Layout from '../pages/page';
 import dynamic from 'next/dynamic';
 import { updateCategory } from '../../api/admin-category/category';
-import usePopup from "../components/popup"
+import usePopup from "../components/popup";
 import PopupAlert from "../components/PopupAlert";
 import { SlHome } from "react-icons/sl";
-import { useRouter } from "next/navigation";
+
 const JoditEditor = dynamic(() => import('jodit-react'), { ssr: false });
 
 export default function EditCategory() {
-   const router = useRouter();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const titleFromURL = searchParams.get('title');
-  const logoFromURL = searchParams.get('logo');
-  const descriptionFromURL = searchParams.get('description');
-    const categoryId = searchParams.get('id'); // fallback ID
-const { popupMessage, popupType, showPopup } = usePopup();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [logoFile, setLogoFile] = useState(null);
-  const [logoPreview, setLogoPreview] = useState(null);
-  const [logoUrl, setLogoUrl] = useState('/icon/default.svg');
-  const [longDescription, setLongDescription] = useState('');
+  const id = searchParams.get("id");
+  const { popupMessage, popupType, showPopup } = usePopup();
+
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
-
-
   const editor = useRef(null);
 
-  useEffect(() => {
-    if (titleFromURL) setTitle(titleFromURL);
-    if (logoFromURL) setLogoUrl(logoFromURL);
-    if (descriptionFromURL) {
-      setDescription(descriptionFromURL);
-      setLongDescription(descriptionFromURL);
-    } else if (titleFromURL) {
-      const defaultDesc = `${titleFromURL} By Velox`;
-      setDescription(defaultDesc);
-      setLongDescription(defaultDesc);
-    }
-  }, [titleFromURL, logoFromURL, descriptionFromURL]);
+  const [category, setCategory] = useState({
+    id: "",
+    title: "",
+    logo: "",
+    description: "",
+    status: "",
+  });
 
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+
+  // ✅ Load data from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("editCategoryData");
+    if (!stored) return;
+
+    const cat = JSON.parse(stored);
+    setCategory({
+      id: cat.id,
+      title: cat.title || "",
+      logo: cat.logo || "",
+      description: cat.description || "",
+      status: cat.status || "INACTIVE",
+    });
+    setLogoPreview(cat.logo ? process.env.NEXT_PUBLIC_API_BASE_URL + cat.logo : null);
+  }, [id]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // ✅ Only SVG upload Allow & Preview
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.type !== 'image/svg+xml') {
-      showPopup('❌ Only SVG files are allowed!');
-      e.target.value = null;
+    if (file.type !== "image/svg+xml") {
+      showPopup("❌ Only SVG format allowed!", "error");
       return;
     }
-
-    if (file.size > 2 * 1024 * 1024) { // 2MB
-      showPopup('❌ File size exceeds 2MB!');
-      e.target.value = null;
+    if (file.size > 2 * 1024 * 1024) {
+      showPopup("❌ Max file size 2MB allowed!", "error");
       return;
     }
 
     setLogoFile(file);
     setLogoPreview(URL.createObjectURL(file));
   };
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
+
+  // ✅ Update Category Handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    if (logoFile) formData.append("logo", logoFile);
+    try {
+      const payload = new FormData();
+      payload.append("title", category.title);
+      payload.append("description", category.description);
 
-    // ✅ Use categoryId, not Id
-    const res = await updateCategory(categoryId, formData);
+      if (logoFile) payload.append("logo", logoFile);
 
-    if (!res.success) {
-      const messages = Object.values(res.message).flat().join("\n");
-      showPopup("❌ Failed to update category:\n" + messages);
-      
-      return;
+      const res = await updateCategory(category.id, payload);
+
+      if (res.success) {
+        showPopup("✅ Category Updated!", "success");
+        localStorage.removeItem("editCategoryData");
+
+        setTimeout(() => router.push("/admin/categories"), 700);
+      } else {
+        showPopup("❌ Update Failed!", "error");
+      }
+    } catch (err) {
+      console.log(err);
+      showPopup("❌ Something went wrong!", "error");
     }
 
-    showPopup("✅ Category Updated Successfully!");
-      
-  } catch (err) {
-    console.error("Update Error:", err);
-    showPopup("❌ Unexpected error: " + err.message);
-    
-  } finally {
     setLoading(false);
-  }
-};
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-
-    const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
   };
-    const goToManageCustomer = () => {
-    router.push("/admin/categories"); // Customer page
+
+  const goBack = () => {
+    router.push("/admin/categories");
+  };
+
+  const goToDashboard = () => {
+    router.push("/admin/dashboard");
   };
 
   return (
     <Layout>
       <PopupAlert message={popupMessage} type={popupType} />
+
       <div className={styles.editcontainer}>
-                <div className={styles.headerContainer}>
+        <div className={styles.headerContainer}>
           <div>
-          <span className={styles.breadcrumb}    style={{ cursor: "pointer"}}
-        onClick={goToManageCustomer}>Category</span> 
-        <span className={styles.separator}> | </span>
+          <span className={styles.breadcrumb} onClick={goBack} style={{ cursor: "pointer" }}>
+            Category
+          </span>
+          <span className={styles.separator}> | </span>
           <SlHome
-                              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
-                              onClick={goToDashboard}
-                              title="Go to Dashboard"
-                            />
-                            <span> &gt; </span>
+            style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+            onClick={goToDashboard}
+            title="Go to Dashboard"
+          />
+          <span> &gt; </span>
           <span className={styles.breadcrumbActive}>Edit Category</span>
+          </div>
         </div>
-</div>
 
         <div className={styles.editcard}>
           <h3>Edit Category</h3>
-       
+
           <form onSubmit={handleSubmit}>
             {/* TITLE */}
             <label className={styles.editlabel}>TITLE</label>
             <input
               type="text"
               className={styles.editinput}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={category.title}
+              onChange={(e) => setCategory({ ...category, title: e.target.value })}
+              required
             />
 
             {/* LOGO */}
@@ -147,18 +152,10 @@ const handleSubmit = async (e) => {
               accept="image/svg+xml"
               onChange={handleLogoChange}
             />
-            <p className={styles.edithint}>
-              Only allowed SVG format. Image resolution must be 64x64. Max file size allowed: 2MB.
-            </p>
 
-            {(logoPreview || logoUrl) && (
+            {logoPreview && (
               <div className={styles.editimagePreview}>
-                <img
-                  src={logoPreview || logoUrl}
-                  alt="Logo Preview"
-                  width={64}
-                  height={64}
-                />
+                <img src={logoPreview} width={64} height={64} alt="Preview" />
               </div>
             )}
 
@@ -170,7 +167,7 @@ const handleSubmit = async (e) => {
               {mounted && (
                 <JoditEditor
                   ref={editor}
-                  value={longDescription}
+              value={category.description}
                   config={{
                     readonly: false,
                     height: 200,

@@ -4,10 +4,14 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import Layout from "../../pages/page"; // adjust path
 import styles from "../../styles/serviceratind.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function AddServiceRating() {
+    const router = useRouter();
+  
   const [user, setUser] = useState("");
   const [service, setService] = useState("");
   const [rating, setRating] = useState(0); // current rating
@@ -30,14 +34,27 @@ export default function AddServiceRating() {
     setHoverRating(0);
     setComment("");
   };
-
+ const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/service-rating"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addcontainer}>
               <div className={styles.headerContainer}>
             <div>
-                                <span className={styles.breadcrumb}>Service Rating</span> &gt;{' '}
-                                <span className={styles.breadcrumbActive}>Add Rating</span>
+                    <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Service Rating</span> 
+                          <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+                       <span className={styles.breadcrumbActive}>Add Rating</span>
                               </div>
          
         </div>

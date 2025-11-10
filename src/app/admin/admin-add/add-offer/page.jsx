@@ -2,11 +2,13 @@
 import { useState } from "react";
 import Layout from "../../pages/page"; // adjust path if needed
 import styles from "../../styles/offers.module.css";
-import dynamic from "next/dynamic"; 
+import dynamic from "next/dynamic";
+import { SlHome } from "react-icons/sl"; 
+import { useRouter } from "next/navigation";
 export default function AddOfferPage() {
   const [isGlobal, setIsGlobal] = useState(false);
   const [assignToServices, setAssignToServices] = useState(false);
-
+  const router = useRouter();
   const [form, setForm] = useState({
     title: "",
     subcategory: "",
@@ -38,12 +40,27 @@ export default function AddOfferPage() {
     alert("Form submitted (mock)\nCheck console for payload.");
   };
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
+
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/offer"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addOfferContainer}>
        <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Offer</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+             onClick={goToManageCustomer}>Offer</span> 
+                <span className={styles.separator}> | </span>
+                           <SlHome
+                                  style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                  onClick={goToDashboard}
+                                  title="Go to Dashboard"
+                                />
+                       <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Offer</span>
           </div>
         </div>

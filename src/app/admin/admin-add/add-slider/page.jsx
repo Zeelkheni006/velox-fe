@@ -9,6 +9,8 @@ import React, { useState, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 import usePopup from "../../components/popup"
 import PopupAlert from "../../components/PopupAlert";// ✅ Import icons
+import { SlHome } from "react-icons/sl";
+
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function AddSlider() {
@@ -55,6 +57,12 @@ export default function AddSlider() {
   useEffect(() => {
     setMounted(true);
   }, []);
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+      const goToManageCustomer = () => {
+    router.push("/admin/services"); // Customer page
+  };
   return (
     <Layout>
              <PopupAlert message={popupMessage} type={popupType} />
@@ -62,7 +70,15 @@ export default function AddSlider() {
       <div className="add-slider-container">
          <div className="headerContainer">
             <div>
-                                <span className="breadcrumb">Slider</span> &gt;{' '}
+                                <span className="breadcrumb"style={{ cursor: "pointer"}}
+                                onClick={goToManageCustomer}>Slider</span> 
+                                   <span className={styles.separator}> | </span>
+                                               <SlHome
+                                                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                                      onClick={goToDashboard}
+                                                      title="Go to Dashboard"
+                                                    />
+                                           <span> &gt; </span>
                                 <span className="breadcrumbActive">Add Slider</span>
                               </div>
          

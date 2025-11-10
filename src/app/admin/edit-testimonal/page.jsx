@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Layout from "../pages/page";
 import styles from "../styles/testimonial.module.css";
+import { SlHome } from "react-icons/sl";
 
 export default function EditTestimonial() {
   const router = useRouter();
@@ -67,15 +68,28 @@ export default function EditTestimonial() {
     // After submit, navigate back to testimonial page
     router.push("/admin/testimonial");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/testimonial"); // Customer page
+  };
   return (
     <Layout>
       
 <div className={styles.addcontainer}>
         <div className={styles.headerContainer}>
             <div>
-                                <span className={styles.breadcrumb}>Testimonial</span> &gt;{' '}
-                                <span className={styles.breadcrumbActive}>Add Testimonial</span>
+                 <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Testimonial</span>
+        <span className={styles.separator}> | </span>
+               <SlHome
+                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                      onClick={goToDashboard}
+                      title="Go to Dashboard"
+                    />
+           <span> &gt; </span>
+                  <span className={styles.breadcrumbActive}>Add Testimonial</span>
                               </div>
          
         </div>

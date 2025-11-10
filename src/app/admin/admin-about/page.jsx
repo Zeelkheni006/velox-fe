@@ -6,6 +6,7 @@ import Layout from "../pages/page";
 import styles from "../styles/adminAbout.module.css";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import { SlHome } from "react-icons/sl";
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
@@ -120,12 +121,23 @@ const sortedTeam = useMemo(() => {
     return 0;
   });
 }, [team, teamSearch, sortConfig]);
+
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
   return (
     <Layout>
       <div className={styles.container}>
            <div className={styles.headerContainer}>
                   <div>
-                    <span className={styles.breadcrumb}>About</span> &gt;{" "}
+                    <span className={styles.breadcrumb} style={{ cursor: "pointer"}}>About</span> 
+                        <span className={styles.separator}> | </span>
+                                   <SlHome
+                                          style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                          onClick={goToDashboard}
+                                          title="Go to Dashboard"
+                                        />
+                               <span> &gt; </span>
                     <span className={styles.breadcrumbActive}>About</span>
                   </div>
                 </div>

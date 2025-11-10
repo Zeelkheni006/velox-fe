@@ -4,13 +4,14 @@ import Layout from "../pages/page"; // adjust path
 import dynamic from "next/dynamic";
 import styles from "../styles/offers.module.css";
 import { useState, useEffect } from "react";
-
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function EditOfferPage() {
   const params = useParams(); // gets [id]
   const searchParams = useSearchParams(); // gets query
-
+  const router = useRouter();
   const index = params.id;
 
   const [form, setForm] = useState({
@@ -73,13 +74,26 @@ export default function EditOfferPage() {
     console.log("Updated Offer:", { index, ...form, isGlobal, assignToUsers });
     alert("Offer updated! Check console for data.");
   };
-
+   const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/offer"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addOfferContainer}>
          <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}>Offer</span> &gt;{" "}
+            <span className={styles.breadcrumb} style={{ cursor: "pointer"}}
+            onClick={goToManageCustomer}>Offer</span>
+                        <span className={styles.separator}> | </span>
+                            <SlHome
+                                   style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                                   onClick={goToDashboard}
+                                   title="Go to Dashboard"
+                                 />
+                        <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Edit Offer</span>
           </div>
         </div>

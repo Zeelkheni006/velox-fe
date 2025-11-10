@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import styles from '../../styles/paymet.module.css';
 import Layout from '../../pages/page'; // Adjust path if needed
 import { useRouter } from 'next/navigation';
+import { SlHome } from "react-icons/sl";
 
 export default function AddPaymentPage() {
   const router = useRouter();
@@ -32,15 +33,28 @@ export default function AddPaymentPage() {
     console.log('Payment Submitted:', formData);
     // Here you can call your API to save the payment
     alert('Payment added successfully!');
-    router.push('/admin/payment'); // redirect back to Payment page
+    router.push('/admin/payments'); // redirect back to Payment page
   };
-
+  const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/payments"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addcontainer}>
            <div className={styles.headerContainer}>
             <div>
-                                <span className={styles.breadcrumb}>Payment</span> &gt;{' '}
+                                <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Payment</span>
+          <span className={styles.separator}> | </span>
+                       <SlHome
+                              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                              onClick={goToDashboard}
+                              title="Go to Dashboard"
+                            />
+                   <span> &gt; </span>
                                 <span className={styles.breadcrumbActive}>Add Payment</span>
                               </div>
          

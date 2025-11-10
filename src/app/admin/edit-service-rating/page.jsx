@@ -5,12 +5,15 @@ import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import Layout from "../pages/page"; // adjust path
 import styles from "../styles/serviceratind.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
 
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function EditServiceRating() {
   const searchParams = useSearchParams();
   const ratingId = searchParams.get("id");
+  const router = useRouter();
 
   // Mock data – replace this with your real data source or API fetch
   const existingRatings = [
@@ -57,14 +60,27 @@ export default function EditServiceRating() {
     console.log("Updated Rating:", updatedData);
     alert("Rating updated successfully!");
   };
-
+ const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+    const goToManageCustomer = () => {
+    router.push("/admin/service-rating"); // Customer page
+  };
   return (
     <Layout>
       <div className={styles.addcontainer}>
         <div className={styles.headerContainer}>
             <div>
-                                <span className={styles.breadcrumb}>Testimonial</span> &gt;{' '}
-                                <span className={styles.breadcrumbActive}>Add Testimonial</span>
+                                <span className={styles.breadcrumb}style={{ cursor: "pointer"}}
+        onClick={goToManageCustomer}>Service Rating</span>
+            <span className={styles.separator}> | </span>
+                       <SlHome
+                              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                              onClick={goToDashboard}
+                              title="Go to Dashboard"
+                            />
+                   <span> &gt; </span>
+             <span className={styles.breadcrumbActive}>Edit Service Rating</span>
                               </div>
          
         </div>
