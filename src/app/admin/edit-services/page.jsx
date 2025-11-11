@@ -41,6 +41,31 @@ const { popupMessage, popupType, showPopup } = usePopup();
     fetchData();
   }, []);
 
+  useEffect(() => {
+  const storedService = localStorage.getItem("selectedService");
+  if (storedService) {
+    const service = JSON.parse(storedService);
+
+    // ✅ Duration split (HH:MM)
+    const [hrs, mins] = service.duration ? service.duration.split(":") : ["00", "00"];
+
+    setFormData({
+      title: service.title || "",
+      category_id: service.category_id || "",
+      sub_category_id: service.sub_category_id || "",
+      price: service.price || "",
+      displayNumber: service.display_number || "",
+      image: service.image || null,
+      banner: service.banner || null,
+      hours: hrs || "",
+      minutes: mins || "",
+    });
+
+    setDescription(service.description || "");
+    setLongDescription(service.long_description || "");
+  }
+}, []);
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -152,13 +177,53 @@ const handleSubmit = async (e) => {
             <input type="text" name="title" value={formData.title} onChange={handleChange} />
 
             {/* IMAGE */}
-            <label>IMAGE</label>
-            <input type="file" name="image" accept=".svg" onChange={handleChange} />
+  <label>IMAGE</label>
+<input 
+  type="file" 
+  name="image" 
+  accept=".svg" 
+  onChange={handleChange} 
+/>
 
+{/* ✅ Preview existing image or newly selected */}
+{formData.image && (
+  <img
+    src={
+      formData.image instanceof File
+        ? URL.createObjectURL(formData.image)
+        : formData.image.startsWith("http")
+          ? formData.image
+          : `${API_BASE_URL}${formData.image}`
+    }
+    alt="Service Image"
+    className={styles.previewImage}
+    width={70}
+    height={70}
+  />
+)}
             {/* BANNER */}
-            <label>BANNER</label>
-            <input type="file" name="banner" accept=".jpg,.png,.jpeg" onChange={handleChange} />
+           <label>BANNER</label>
+<input 
+  type="file" 
+  name="banner" 
+  accept=".jpg,.png,.jpeg" 
+  onChange={handleChange}
+/>
 
+{/* ✅ Preview existing banner or newly selected */}
+{formData.banner && (
+  <img
+    src={
+      formData.banner instanceof File
+        ? URL.createObjectURL(formData.banner)
+        : formData.banner.startsWith("http")
+          ? formData.banner
+          : `${API_BASE_URL}${formData.banner}`
+    }
+    alt="Banner"
+    className={styles.previewBanner}
+  />
+)}
             {/* PRICE | DISPLAY NUMBER */}
             <div className={styles.flexRow}>
               <div className={styles.flex1}>

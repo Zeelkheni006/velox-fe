@@ -47,6 +47,14 @@
     font-weight: 1px;
 }
 
+.header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #b9b9b9;
+    text-align: left;
+}
+
 .pagination {
     display: flex;
     justify-content: space-between;

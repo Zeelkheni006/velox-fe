@@ -10,7 +10,7 @@ import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
-
+import { FcCancel } from "react-icons/fc";
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
@@ -43,9 +43,38 @@ const [selectedPhone, setSelectedPhone] = useState(null);
 const [selectedCity, setSelectedCity] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
+const [franchiseMessage, setFranchiseMessage] = useState("");
+const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
+  try {
+    const { leads, total } = await getLeads(page, perPage, filters);
 
-const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => { try { const { leads, total } = await getLeads(page, perPage, filters); const normalizedLeads = leads.map(l => ({ ...l, city: l.city || l.city_id || "", state: l.state || l.state_id || "", country: l.country || l.country_id || "" , categories: l.categories || l.categories||"", })); setLeads(normalizedLeads); setTotalLeads(total); } catch (err) { alert(err.message); } };
+    const normalizedLeads = leads.map(l => {
+   
+      const categoryObj = l.categories || l.category_list || {};
 
+      const categoryNames = Array.isArray(categoryObj)
+        ? categoryObj
+        : Object.values(categoryObj);
+
+      return {
+        ...l,
+      
+        city: l.city || l.city_id || "",
+        state: l.state || l.state_id || "",
+        country: l.country || l.country_id || "",
+
+      
+        categories: categoryNames,
+      };
+    });
+
+    setLeads(normalizedLeads);
+    setTotalLeads(total);
+  } catch (err) {
+    showPopup(err.message || "Something went wrong!", "error");
+  }
+};
+const [showFranchisePopup, setShowFranchisePopup] = useState(false);
 useEffect(() => {
   fetchLeadsData(currentPage, entriesPerPage);
 }, [currentPage, entriesPerPage]);
@@ -65,13 +94,11 @@ const totalPages = Math.ceil(totalLeads / entriesPerPage);
 const handleEntriesChange = (e) => {
   const value = Number(e.target.value);
   setEntriesPerPage(value);
-  setCurrentPage(1); // refresh from first page
+  setCurrentPage(1);
 };
 
 
   // Sorting
-
-
 const handleSort = (key) => {
   setSortConfig(prev => {
     if (prev.key === key) {
@@ -87,9 +114,50 @@ const handleSort = (key) => {
       {direction === "asc" ? "▲" : direction === "desc" ? "▼" : ""}
     </span>
   );
+const sortedLeads = useMemo(() => {
+  if (!sortConfig.key) return leads;
+
+  const sorted = [...leads].sort((a, b) => {
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+
+    // Handle null/undefined
+    aValue = aValue ?? "";
+    bValue = bValue ?? "";
+
+    // If array (categories), join to string for comparison
+    if (Array.isArray(aValue)) aValue = aValue.join(", ");
+    if (Array.isArray(bValue)) bValue = bValue.join(", ");
+
+    // If number, compare as numbers
+    if (!isNaN(aValue) && !isNaN(bValue)) {
+      return sortConfig.direction === "asc"
+        ? Number(aValue) - Number(bValue)
+        : Number(bValue) - Number(aValue);
+    }
+
+    // Compare strings case-insensitively
+    return sortConfig.direction === "asc"
+      ? String(aValue).toLowerCase().localeCompare(String(bValue).toLowerCase())
+      : String(bValue).toLowerCase().localeCompare(String(aValue).toLowerCase());
+  });
+
+  return sorted;
+}, [leads, sortConfig]);
 
 
+const handleAddToFranchise = (lead) => {
+ 
+  const isTaken = false; 
 
+  if (isTaken) {
+    setFranchiseMessage("⚠️ This Mobile Number Has Already Been Taken");
+  } else {
+    setFranchiseMessage(" This Mobile Number Has Already Been Taken");
+  }
+
+  setShowFranchisePopup(true);
+};
  
 
 useEffect(() => {
@@ -97,9 +165,8 @@ useEffect(() => {
 }, [search]);
 
 
-  // Status Management
+ 
   const handleManageStatusClick = (lead) => {
-    // Map backend _id to id for API call
     setActiveLead({ ...lead, id: lead._id || lead.id });
     setShowModal(true);
   };
@@ -108,7 +175,7 @@ const handleAccept = async () => {
   if (!activeLead?.id) return alert("Lead ID is missing!");
 
   try {
-    const res = await updateLeadStatus(activeLead.id, 1); // ✅ numeric for backend
+    const res = await updateLeadStatus(activeLead.id, 1); 
 
     if (res.success) {
       setLeads(prev =>
@@ -121,8 +188,7 @@ const handleAccept = async () => {
 
       setShowModal(false);
 
-      // ✅ Popup show here
-      showPopup("✅ Status updated to ACCEPT", "success");
+      showPopup(" Status updated to ACCEPT", "success");
 
     } else {
       alert(res.message || "Failed to update status");
@@ -150,8 +216,7 @@ const handleDecline = async () => {
 
       setShowModal(false);
 
-      // ✅ Popup show here
-      showPopup("❌ Status updated to DECLINE", "error");
+      showPopup(" Status updated to DECLINE", "error");
 
     } else {
       alert(res.message || "Failed to update status");
@@ -202,9 +267,9 @@ const handlePdfClick = async () => {
     styles: { fontSize: 8, cellPadding: 2, overflow: "linebreak" },
     headStyles: { fillColor: [22, 160, 133] },
 
-    // ✅ STATUS COLOR SUPPORT IN PDF
+   
 didParseCell: function(data) {
-  if (data.column.index === 8) { // ✅ Correct index for Status
+  if (data.column.index === 8) { 
     const status = data.cell.text[0]?.trim();
 
     if (status === "ACCEPTED") {
@@ -257,7 +322,9 @@ useEffect(() => {
         email: Array.isArray(res?.email) ? res.email.map(e => ({ label: e, value: e })) : [],
         phone: Array.isArray(res?.phone) ? res.phone.map(p => ({ label: p, value: p })) : [],
         categories: res?.categories ? Object.entries(res.categories).map(([id, title]) => ({ label: title, value: id })) : [],
-        city: res?.city ? Object.values(res.city).map(c => ({ label: c, value: c })) : [],
+city: res?.city
+  ? Object.entries(res.city).map(([id, name]) => ({ label: name, value: Number(id) }))
+  : [],
         status: [
           { label: "PENDING", value: "PENDING" },
           { label: "ACCEPTED", value: "ACCEPTED" },
@@ -272,40 +339,14 @@ useEffect(() => {
   fetchDropdownData();
 }, []);
 
-// First, filtered leads
-
-
-
-
 const selectStyles = {
   menuPortal: base => ({ ...base, zIndex: 9999 }),
   menu: base => ({ ...base, zIndex: 9999 })
 };
-const handleAddToFranchise = (lead) => {
-  // Example: check if mobile already exists in franchise
-  const isMobileTaken = true; // Replace with your actual API check
 
-  if (isMobileTaken) {
-    showPopup("⚠️ This Mobile Number Has Already Been Taken", "error");
-  } else {
-    // Proceed to add to franchise
-    showPopup("✅ Added to Franchise Successfully", "success");
-  }
-};
-const getFilters = () => {
-  return {
-    name: selectedName || undefined,
-    email: selectedEmail || undefined,
-    phone: selectedPhone || undefined,
-    city: selectedCity || undefined,
-    status: selectedStatus || undefined,
-    categories: selectedCategories.length > 0
-      ? selectedCategories.map(c => c.value)
-      : undefined,
-  };
-};
+
    const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard"); 
   };
   return (
     <Layout>
@@ -325,7 +366,7 @@ const getFilters = () => {
           </div>
         </div>
         <div className={styles.card}>
-          <h1 className={styles.heading}>Leads</h1>
+          <h2 className={styles.heading}>Leads</h2>
 
     <div className={styles.controls}>
 
@@ -352,11 +393,11 @@ onChange={opt => {
   if (selected) {
     fetchLeadsData(1, entriesPerPage, { name: selected });
   } else {
-    fetchLeadsData(1, entriesPerPage, {}); // reset filter
+    fetchLeadsData(1, entriesPerPage, {}); 
   }
 }}
   className={styles.select}
-  isClearable // ✅ this allows clearing the selection
+  isClearable 
 />
 
 <Select
@@ -401,34 +442,35 @@ onChange={opt => {
   placeholder="Select Category"
   options={dropdownData.categories}
   value={selectedCategories}
- onChange={opt => {
-  const values = (opt || []).map(c => c.value);
-  setSelectedCategories(opt || []);
-  setCurrentPage(1);
+  onChange={opt => {
+ const values = (opt || []).map(c => String(c.value));
+    setSelectedCategories(opt || []);
+    setCurrentPage(1);
 
-  if (values.length > 0) {
-    fetchLeadsData(1, entriesPerPage, { categories: values });
-  } else {
-    fetchLeadsData(1, entriesPerPage, {});
-  }
-}}
+if (values.length > 0) {
+  fetchLeadsData(1, entriesPerPage, { 
+    category_list: JSON.stringify(values.map(Number))
+  });
+} else {
+  fetchLeadsData(1, entriesPerPage, {});
+}
+  }}
   className={styles.select}
-  isClearable // ✅ clear all selected categories
+  isClearable
 />
 
 <Select
   placeholder="Select City"
-  options={dropdownData.city}
-  value={selectedCity ? { value: selectedCity, label: selectedCity } : null}
+  options={dropdownData.city} 
+  value={selectedCity}
   onChange={opt => {
-    const selected = opt?.value || null;
-    setSelectedCity(selected);
+    setSelectedCity(opt); 
     setCurrentPage(1);
 
-    if (selected) {
-      fetchLeadsData(1, entriesPerPage, { city: selected });
+    if (opt) {
+      fetchLeadsData(1, entriesPerPage, { city_id: opt.value });
     } else {
-      fetchLeadsData(1, entriesPerPage, {}); // reset filter
+      fetchLeadsData(1, entriesPerPage, {});
     }
   }}
   className={styles.select}
@@ -439,19 +481,21 @@ onChange={opt => {
   placeholder="Select Status"
   options={dropdownData.status}
   value={selectedStatus ? { value: selectedStatus, label: selectedStatus } : null}
-onChange={opt => {
-  const selected = opt?.value || null;
-  setSelectedStatus(selected);
-  setCurrentPage(1);
+  onChange={opt => {
+    const selected = opt?.value || null;
+    setSelectedStatus(selected);
+    setCurrentPage(1);
 
-  if (selected) {
-    fetchLeadsData(1, entriesPerPage, { status: selected });
-  } else {
-    fetchLeadsData(1, entriesPerPage, {});
-  }
-}}
+    if (selected) {
+      
+      const statusMap = { "PENDING": 0, "ACCEPTED": 1, "DECLINE": 2 };
+      fetchLeadsData(1, entriesPerPage, { status: statusMap[selected] });
+    } else {
+      fetchLeadsData(1, entriesPerPage, {}); // reset filter
+    }
+  }}
   className={styles.select}
-    isClearable 
+  isClearable 
 />
 
   </div>
@@ -459,13 +503,13 @@ onChange={opt => {
 
   </div>
 
-  {/* ✅ Row 2 */}
+ 
   <div className={styles.middleRow}>
     <button className={styles.buttonPrimary} onClick={handlePdfClick}>PDF</button>
     <button className={styles.buttonSecondary} onClick={handlePrintClick}>Print</button>
   </div>
 
-  {/* ✅ Row 3 */}
+
   <div className={styles.bottomRow}>
     Show{" "}
     <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
@@ -496,7 +540,7 @@ onChange={opt => {
                 </tr>
               </thead>
               <tbody>
-               {leads.map((lead, index) => (
+              {sortedLeads.map((lead, index) => (
                  <tr
   key={index}
 onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
@@ -545,7 +589,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
     {(() => {
       const list = Array.isArray(lead.categories)
         ? lead.categories
-        : (lead.categories || "").split(",").map((c) => c.trim()); // ✅ Convert string to array
+        : [];
 
       const isExpanded = expandedMessageIndex === index;
       const limited = list.slice(0, isExpanded ? list.length : 2);
@@ -583,6 +627,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   </div>
 </td>
 
+
                     <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
                     <td onClick={(e) => handleCopy(e, lead.state, "state", showPopup)}>{lead.state}</td>
                     <td onClick={(e) => handleCopy(e, lead.city, "city", showPopup)}>{lead.city}</td>
@@ -592,8 +637,8 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
       lead.status === "PENDING" ? styles.pending :
       lead.status === "ACCEPTED" ? styles.accept : styles.decline
     }`}
-    onClick={() => handleManageStatusClick(lead)} // ✅ Added click handler
-    style={{ cursor: "pointer" }} // ✅ Pointer style for clarity
+    onClick={() => handleManageStatusClick(lead)} 
+    style={{ cursor: "pointer" }} 
   >
     {lead.status}
   </span>
@@ -686,6 +731,27 @@ of {totalLeads} entries
             </div>
           </div>
         )}
+{showFranchisePopup && (
+  <div className={styles.modalOverlay}>
+    <div className={styles.modalContent}>
+      <button className={styles.closeBtn} onClick={() => setShowFranchisePopup(false)}>×</button>
+   <div className={styles.iconWrapper}>
+  <FcCancel size={80} className={styles.cancelIcon} />
+</div>
+      <h2 className={styles.h2}>Danger</h2>
+      <p className={styles.p}>{franchiseMessage}</p>
+      <div className={styles.modalActions}>
+        <button 
+          className={styles.acceptBtn}
+          onClick={() => setShowFranchisePopup(false)}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </Layout>
   );

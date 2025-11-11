@@ -48,9 +48,10 @@ const loadCategories = async () => {
     }));
     setCategories(normalized);
   } catch (err) {
-    console.error(err);
-    setCategories([]);
-  } finally {
+  const msg = err?.message || "❌ Something went wrong while fetching categories";
+  showPopup(msg, "error");
+  setCategories([]);
+} finally {
     setLoading(false);
   }
 };
@@ -162,10 +163,11 @@ try {
         </div>
 </div>
         <div className={styles.card}>
+          <div className={styles.header}>
           <h3>Categories</h3>
      
           <button className={styles.addBtn} onClick={handleAddCategory}>+ Add New</button>
-
+</div>
           <div className={styles.showEntries}>
             <label>
               Show{" "}

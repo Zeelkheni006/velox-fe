@@ -32,40 +32,22 @@ useEffect(() => {
     const res = await getServices();
     setServicesList(res?.data?.services || []);
     setLoading(false);
-  };
 
-  fetchServices();
-
-  // ✅ Check if an updated service exists in localStorage
-  const updatedService = localStorage.getItem("updatedService");
-  if (updatedService) {
-    const service = JSON.parse(updatedService);
-    setServicesList(prev =>
-      prev.map(s => (s.id === service.id ? service : s))
-    );
-    localStorage.removeItem("updatedService");
-  }
-}, []); 
-
-useEffect(() => {
-  const handleUpdatedService = () => {
-    const updatedService = localStorage.getItem('updatedService');
+    // ✅ Check for updated service after fetching
+    const updatedService = localStorage.getItem("updatedService");
     if (updatedService) {
       const service = JSON.parse(updatedService);
       setServicesList(prev =>
         prev.map(s => (s.id === service.id ? service : s))
       );
-      localStorage.removeItem('updatedService');
+      localStorage.removeItem("updatedService");
     }
   };
 
-  // Run on mount
-  handleUpdatedService();
+  fetchServices();
+}, []);
 
-  // Also run on history change (when query ?updated=1 appears)
-  const unlisten = router.events?.on('routeChangeComplete', handleUpdatedService);
-  return () => unlisten && router.events.off('routeChangeComplete', handleUpdatedService);
-}, [router]);
+
 
   // 🔹 Search filter
   const filteredServices = servicesList.filter(service =>
@@ -178,6 +160,7 @@ const handleToggleStatus = (index) => {
         </div>
 
         <div className={styles.card}>
+            <div className={styles.header}>
           <h5 className={styles.title}>Services</h5>
           <button
             className={styles.addbtn}
@@ -185,7 +168,7 @@ const handleToggleStatus = (index) => {
           >
             + Add new
           </button>
-
+</div>
           {/* Search & Show entries */}
           <div className={styles.showEntries}>
             <label>
@@ -297,11 +280,9 @@ const handleToggleStatus = (index) => {
 <li
   onClick={() => {
     localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push(
-      `/admin/edit-services?service_id=${service.id}&sub_category_id=${service.sub_category_id}`
-    );
+    router.push(`/admin/edit-services?id=${service.id}`);
   }}
->
+>  <FontAwesomeIcon icon={faEdit} />
   Edit
 </li>
 

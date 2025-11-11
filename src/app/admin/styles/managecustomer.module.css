@@ -49,10 +49,11 @@
     }
     
     .tableTitle {
-        font-size: 16px;
+        font-size: 20px;
+        font-weight: 600;
         margin-bottom: 16px;
+        color: #b9b9b9;
         text-align: left;
-        color: #888;
     }
     
     .tableControls {
