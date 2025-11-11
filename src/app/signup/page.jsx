@@ -101,11 +101,11 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
-    if (!phoneOtp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
+    if (!otp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
 
     setLoading(true);
     try {
-      await verifyPhone(Number(user_id), Number(phoneOtp.trim()));
+      await verifyPhone(Number(user_id), Number(otp.trim()));
       showPopup("✅ Phone verified! Signup complete.", "success");
       router.push("/login");
     } catch (err) {

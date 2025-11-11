@@ -154,7 +154,7 @@ export default function FranchisesPage() {
                   Id <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
-                  Sranchise Name <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
+                  Franchise Name <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Country <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />

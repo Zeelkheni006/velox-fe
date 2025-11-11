@@ -46,10 +46,11 @@ const fetchData = async () => {
       setSubCategories(normalizedData.slice(start, end));
     }
   } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
+  showPopup(err.message || " Something went wrong while fetching subcategories", "error");
+} finally {
+  setLoading(false);
+}
+
 };
 
 useEffect(() => {
@@ -213,9 +214,10 @@ useEffect(() => {
       <tr 
         key={i} 
         style={{ cursor: "pointer" }} 
-        onDoubleClick={() => router.push(
-          `/admin/edit-subcategory?id=${item.id}&title=${encodeURIComponent(item.title)}&logo=${encodeURIComponent(item.logo)}&category=${encodeURIComponent(item.category_id)}`
-        )}
+       onDoubleClick={() => {
+  localStorage.setItem("editSubCategoryData", JSON.stringify(item)); // ✅ Same as edit button
+  router.push(`/admin/edit-subcategory?id=${item.id}`); // ✅ Short URL
+}}
       >
         <td onClick={(e)=> handleCopy(e,item.title ,"title",  showPopup)}>{item.title}</td>
         <td onClick={(e)=> handleCopy(e, item.category_title,"category" , showPopup)}>{item.category_title}</td>

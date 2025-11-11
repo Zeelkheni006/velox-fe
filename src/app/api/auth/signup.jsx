@@ -70,11 +70,11 @@ export function verifyEmail(user_id, otp) {
 }
 
 // Verify Phone OTP
-export function verifyPhone(user_id, phoneOtp) {
-  console.log("verifyPhone called with:", { user_id: user_id, phoneOtp });
+export function verifyPhone(user_id, otp) {
+  console.log("verifyPhone called with:", { user_id: user_id, otp });
   return apiRequest("/api/v1/users/auth/verify/phone", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: Number(user_id), phoneOtp: Number(phoneOtp) }), // correct keys
+    body: JSON.stringify({ user_id: Number(user_id), otp: Number(otp) }), // correct keys
   });
 }
