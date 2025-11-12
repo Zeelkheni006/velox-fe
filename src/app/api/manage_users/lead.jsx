@@ -115,7 +115,6 @@ export async function updateLead(id, leadData) {
     if (!token) throw new Error("⚠️ Please login.");
 
     const formData = new FormData();
-
     for (const key in leadData) {
       if (Array.isArray(leadData[key])) {
         leadData[key].forEach(value => formData.append(`${key}`, value));
@@ -124,26 +123,27 @@ export async function updateLead(id, leadData) {
       }
     }
 
-    const res = await fetch(
-      `${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`, 
-      {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-        body: formData
-      }
-    );
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData
+    });
 
-    const data = await res.json();
-    if (!res.ok) throw data;
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || `Failed to update lead (status ${res.status})`);
+    }
 
-    return data;
+    return await res.json();
   } catch (err) {
     console.error("updateLead error:", err);
+    alert("⚠️ Could not connect to server. Check your network or backend.");
     throw err;
   }
 }
+
 
 export async function getFilterDropdownData() {
   try {
