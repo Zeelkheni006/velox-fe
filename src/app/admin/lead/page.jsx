@@ -443,14 +443,10 @@ onChange={opt => {
   options={dropdownData.categories}
   value={selectedCategories}
   onChange={opt => {
- const values = (opt || []).map(c => String(c.value));
-    setSelectedCategories(opt || []);
-    setCurrentPage(1);
-
+const values = (opt || []).map(c => Number(c.value));
+setSelectedCategories(opt || []);
 if (values.length > 0) {
-  fetchLeadsData(1, entriesPerPage, { 
-    category_list: JSON.stringify(values.map(Number))
-  });
+  fetchLeadsData(1, entriesPerPage, { category_list: values });
 } else {
   fetchLeadsData(1, entriesPerPage, {});
 }
@@ -587,9 +583,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
 <td className={styles.categoryCell}>
   <div className={styles.categoryContent}>
     {(() => {
-      const list = Array.isArray(lead.categories)
-        ? lead.categories
-        : [];
+     const list = Array.isArray(lead.categories) ? lead.categories : [];
 
       const isExpanded = expandedMessageIndex === index;
       const limited = list.slice(0, isExpanded ? list.length : 2);
