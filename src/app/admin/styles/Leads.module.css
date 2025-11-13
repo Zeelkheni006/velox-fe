@@ -143,6 +143,22 @@
     width: 100%;
 }
 
+.categoryBox {
+    display: inline-block;
+    padding: 4px 8px;
+    /* padding around text */
+    margin: 2px;
+    /* space between boxes */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    white-space: nowrap;
+    /* prevent text from wrapping inside box */
+    text-align: center;
+    /* center text */
+}
+
 .topRow {
     display: flex;
     align-items: center;

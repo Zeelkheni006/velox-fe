@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./main.css";
+import { changePassword } from "../api/user-side/dashboard/resetpassword"; // import your API helper
 
 export default function ResetForm() {
   const router = useRouter();
@@ -10,19 +11,61 @@ export default function ResetForm() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [retypePassword, setRetypePassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
-    if (!currentPassword || !newPassword || !retypePassword) {
-      alert("Please fill all fields");
-      return;
+const handleSubmit = async () => {
+  const token = localStorage.getItem("access_token");
+  const userId = localStorage.getItem("user_id");
+
+  if (!token || !userId) {
+    alert("Session expired. Please login again.");
+    router.push("/");
+    return;
+  }
+
+  if (!currentPassword || !newPassword || !retypePassword) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  if (newPassword !== retypePassword) {
+    alert("New Password and Re-type Password do not match!");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetch("/api/change-password", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        userId,
+        currentPassword,
+        newPassword,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("✅ Password reset successfully!");
+      router.push("/dashboard");
+    } else {
+      alert(`❌ ${data.message || "Password reset failed"}`);
     }
-    if (newPassword !== retypePassword) {
-      alert("New Password and Re-type Password do not match!");
-      return;
-    }
-    alert("Password reset successfully!");
-    // Add your password reset logic here
-  };
+  } catch (err) {
+    console.error("Error changing password:", err);
+    alert("❌ Something went wrong. Try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   return (
     <div className="container">
@@ -35,16 +78,14 @@ export default function ResetForm() {
           <li onClick={() => router.push("/order-track")}>Order Tracking</li>
           <li onClick={() => router.push("/user-profile")}>Edit Profile</li>
           <li className="active">Reset Password</li>
-                  <li
-  onClick={() => {
-    // 1️⃣ Clear stored login/session data
-    localStorage.removeItem("access_token"); // or your auth token key
-    // 2️⃣ Redirect to login or homepage
-    router.push("/"); // redirect to your login page
-  }}
->
-  Logout
-</li>
+          <li
+            onClick={() => {
+              localStorage.removeItem("access_token");
+              router.push("/");
+            }}
+          >
+            Logout
+          </li>
         </ul>
       </aside>
 
@@ -75,8 +116,12 @@ export default function ResetForm() {
           </div>
 
           <div className="submitBtnSection">
-            <button className="submitBtn" onClick={handleSubmit}>
-              Submit
+            <button
+              className="submitBtn"
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Submit"}
             </button>
           </div>
         </div>

@@ -194,7 +194,12 @@ const handleVerifyOtp = async () => {
               </a>
               </div>
               <div className='forgot-link'>
-              <Link href="/forgot-password" className="login-password text-sm text-blue-600 hover:underline">Forgot Password?</Link>
+           <Link 
+  href={`/admin/forgot-password?email=${encodeURIComponent(email)}`} 
+  className="login-password text-sm text-blue-600 hover:underline"
+>
+  Forgot Password?
+</Link>
             </div>
             </div>
 
