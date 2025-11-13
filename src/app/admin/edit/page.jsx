@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { updateLead } from "../../api/manage_users/lead";
@@ -37,91 +37,91 @@ export default function EditLeadPage() {
   const [countryOptions, setCountryOptions] = useState([]);
   const [stateOptions, setStateOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
-
+const [submitting, setSubmitting] = useState(false);
+const submitLock = useRef(false);
   // ==================== Load Lead Data ====================
-  useEffect(() => {
+ const initialized = useRef(false); // 🔒 prevent double API calls
+
+useEffect(() => {
+   if (initialized.current) return;
+    initialized.current = true;
+  const initData = async () => {
     const storedLead = localStorage.getItem("editLeadData");
     if (!storedLead) return;
 
     const leadData = JSON.parse(storedLead);
 
-    setLead({
-      id: leadData._id || leadData.id || "",
-      name: leadData.name || "",
-      email: leadData.email || "",
-      phone: leadData.phone || "",
-      message: leadData.message || "",
-      country_id: leadData.country?.id || leadData.country_id || null,
-      state_id: leadData.state?.id || leadData.state_id || null,
-      city_id: leadData.city?.id || leadData.city_id || null,
+    // Normalize IDs
+    const normalizedLead = {
+      ...leadData,
+      country_id: leadData.country_id
+        ? Number(leadData.country_id)
+        : leadData.country?.id
+        ? Number(leadData.country.id)
+        : null,
+      state_id: leadData.state_id
+        ? Number(leadData.state_id)
+        : leadData.state?.id
+        ? Number(leadData.state.id)
+        : null,
+      city_id: leadData.city_id
+        ? Number(leadData.city_id)
+        : leadData.city?.id
+        ? Number(leadData.city.id)
+        : null,
       categories: leadData.categories || [],
-    });
+    };
 
-    fetchCategories(leadData.categories || []);
-    fetchCountries();
-  }, []);
+    setLead(normalizedLead);
 
-  // ==================== Categories ====================
-  const fetchCategories = async (existingCategories = []) => {
-    try {
-      const list = await getCategoryList(); // [{id, title}]
-      const formattedOptions = list.map((c) => ({
-        label: c.title,
-        value: Number(c.id),
-      }));
-      setCategoryOptions(formattedOptions);
+    // Fetch categories and countries
+    const [catData, countryData] = await Promise.all([
+      getCategoryList(),
+      getCountries(),
+    ]);
 
-      // Map existing categories to Select options
-      const preSelected = (existingCategories || [])
-        .map((cat) => {
-          // If backend sends object
-          if (typeof cat === "object" && cat.id) {
-            return formattedOptions.find((opt) => opt.value === Number(cat.id));
-          }
-          // If backend sends string title
-          if (typeof cat === "string") {
-            return formattedOptions.find((opt) => opt.label === cat);
-          }
-          return null;
-        })
-        .filter(Boolean);
+    setCategoryOptions(catData.map((c) => ({ label: c.title, value: Number(c.id) })));
+    setCountryOptions(countryData.map((c) => ({ label: c.name, value: Number(c.id) })));
 
-      setSelectedCategories(preSelected);
-    } catch (err) {
-      showPopup("Failed to load categories ❌", "error");
+    // ✅ Preselect categories
+    const preSelectedCats = (normalizedLead.categories || []).map((cat) => {
+      if (typeof cat === "object" && cat.id) return { label: cat.title || cat.name, value: Number(cat.id) };
+      if (typeof cat === "string") return { label: cat, value: cat }; // fallback
+      return null;
+    }).filter(Boolean);
+
+    setSelectedCategories(preSelectedCats);
+
+    // Fetch states & cities only if IDs exist
+    if (normalizedLead.country_id) {
+      const stateData = await getStates(normalizedLead.country_id);
+      const formattedStates = stateData.map((s) => ({ label: s.name, value: Number(s.id) }));
+      setStateOptions(formattedStates);
+
+      if (normalizedLead.state_id) {
+        const cityData = await getCities(normalizedLead.state_id);
+        const formattedCities = cityData.map((c) => ({ label: c.name, value: Number(c.id) }));
+        setCityOptions(formattedCities);
+      }
     }
   };
 
-  // ==================== Countries ====================
-  const fetchCountries = async () => {
-    try {
-      const list = await getCountries();
-      const options = list.map((c) => ({ label: c.name, value: Number(c.id) }));
-      setCountryOptions(options);
+  initData();
+}, []);
 
-      // If country exists, fetch states
-      if (lead.country_id) fetchStates(lead.country_id);
-    } catch (err) {
-      showPopup("Failed to load countries ❌", "error");
-    }
-  };
 
-  // ==================== States ====================
+  // ==================== Fetch Functions ====================
   const fetchStates = async (countryId) => {
     if (!countryId) return;
     try {
       const list = await getStates(countryId);
       const options = list.map((s) => ({ label: s.name, value: Number(s.id) }));
       setStateOptions(options);
-
-      // If state exists, fetch cities
-      if (lead.state_id) fetchCities(lead.state_id);
     } catch (err) {
       showPopup("Failed to load states ❌", "error");
     }
   };
 
-  // ==================== Cities ====================
   const fetchCities = async (stateId) => {
     if (!stateId) return;
     try {
@@ -135,20 +135,34 @@ export default function EditLeadPage() {
 
   // ==================== Handlers ====================
   const handleCountryChange = (selected) => {
-    setLead({ ...lead, country_id: selected?.value || null, state_id: null, city_id: null });
+    const countryId = selected ? Number(selected.value) : null;
+    setLead((prev) => ({
+      ...prev,
+      country_id: countryId,
+      state_id: null,
+      city_id: null,
+    }));
     setStateOptions([]);
     setCityOptions([]);
-    if (selected?.value) fetchStates(selected.value);
+    if (countryId) fetchStates(countryId);
   };
 
   const handleStateChange = (selected) => {
-    setLead({ ...lead, state_id: selected?.value || null, city_id: null });
+    const stateId = selected ? Number(selected.value) : null;
+    setLead((prev) => ({
+      ...prev,
+      state_id: stateId,
+      city_id: null,
+    }));
     setCityOptions([]);
-    if (selected?.value) fetchCities(selected.value);
+    if (stateId) fetchCities(stateId);
   };
 
   const handleCityChange = (selected) => {
-    setLead({ ...lead, city_id: selected?.value || null });
+    setLead((prev) => ({
+      ...prev,
+      city_id: selected ? Number(selected.value) : null,
+    }));
   };
 
   const handleChange = (e) => {
@@ -161,36 +175,64 @@ export default function EditLeadPage() {
 
   // ==================== Submit ====================
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  if (submitting || submitLock.current) return;
+  submitLock.current = true; // lock
+  setSubmitting(true);
     try {
-      const payload = {
+      const originalLead = JSON.parse(localStorage.getItem("editLeadData") || "{}");
+
+      const updatedPayload = {
         name: lead.name,
         email: lead.email,
         phone: lead.phone,
         message: lead.message,
-        country_id: lead.country_id,
-        state_id: lead.state_id,
-        city_id: lead.city_id,
+        country_id: lead.country_id ? Number(lead.country_id) : null,
+        state_id: lead.state_id ? Number(lead.state_id) : null,
+        city_id: lead.city_id ? Number(lead.city_id) : null,
         category_list: selectedCategories.map((sel) => Number(sel.value)),
       };
 
-      console.log("✅ Payload:", payload);
+      // ✅ Only send changed fields
+      const changedData = {};
+      Object.keys(updatedPayload).forEach((key) => {
+        const newVal = updatedPayload[key];
+        const oldVal =
+          key === "category_list"
+            ? (originalLead.categories || []).map((c) => Number(c.id))
+            : originalLead[key];
 
-      const res = await updateLead(lead.id, payload);
+        const isChanged =
+          JSON.stringify(newVal) !== JSON.stringify(oldVal);
+
+        if (isChanged) changedData[key] = newVal;
+      });
+
+      console.log("🟡 Changed Data to Send:", changedData);
+
+      if (Object.keys(changedData).length === 0) {
+        showPopup("No changes detected!", "info");
+        return;
+      }
+
+      const res = await updateLead(lead.id, changedData);
+
       if (res.success) {
+        showPopup("✅ Updated Successfully!", "success");
         localStorage.setItem(
           "updatedLead",
-          JSON.stringify({ id: lead.id, ...payload })
+          JSON.stringify({ ...originalLead, ...changedData })
         );
-        showPopup("✅ Updated Successfully!", "success");
-        setTimeout(() => router.push("/admin/lead"), 500);
+        setTimeout(() => router.push("/admin/lead"), 600);
       } else {
         showPopup(res.message || "❌ Update failed!", "error");
       }
     } catch (err) {
       console.error("updateLead error:", err);
       showPopup("❌ Server error!", "error");
-    }
+    }finally {
+    setSubmitting(false); // ✅ allow new submission after finish
+  }
   };
 
   // ==================== Render ====================
@@ -290,7 +332,7 @@ export default function EditLeadPage() {
               />
             </div>
 
-            <button type="submit" className={styles.button}>
+           <button type="submit" className={styles.button} disabled={submitting}>
               Update Lead
             </button>
           </form>
@@ -299,3 +341,4 @@ export default function EditLeadPage() {
     </Layout>
   );
 }
+  

@@ -10,7 +10,6 @@ export default function SignupPage() {
     username: "",
     email: "",
     phonenumber: "",
-    city: "",
     password: "",
     confirm_password: "",
   });
@@ -19,7 +18,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [otpStep, setOtpStep] = useState(0); // 0=signup, 1=email OTP, 2=phone OTP
   const [otp, setEmailOtp] = useState("");
-  const [phoneOtp, setPhoneOtp] = useState("");
+  const [Phoneotp, setPhoneOtp] = useState("");
   const router = useRouter();
 
   // 🔹 Popup state
@@ -101,11 +100,11 @@ export default function SignupPage() {
     e.preventDefault();
 
     if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
-    if (!otp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
+    if (!Phoneotp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
 
     setLoading(true);
     try {
-      await verifyPhone(Number(user_id), Number(otp.trim()));
+      await verifyPhone(Number(user_id), Number(Phoneotp.trim()));
       showPopup("✅ Phone verified! Signup complete.", "success");
       router.push("/login");
     } catch (err) {
@@ -151,12 +150,7 @@ export default function SignupPage() {
                 <input name="username" type="text" placeholder="Your Name" onChange={handleChange} required />
                 <input name="email" type="email" placeholder="Your Email" onChange={handleChange} required />
                 <input name="phonenumber" type="tel" placeholder="Your Mobile No" onChange={handleChange} required />
-                <select name="city" onChange={handleChange} required>
-                  <option value="">Select City</option>
-                  <option value="Jamnagar">Jamnagar</option>
-                  <option value="Rajkot">Rajkot</option>
-                  <option value="Ahmedabad">Ahmedabad</option>
-                </select>
+              
                 <input name="password" type="password" placeholder="Your Password" onChange={handleChange} required />
                 <input name="confirm_password" type="password" placeholder="Confirm Password" onChange={handleChange} required />
                 <button type="submit" disabled={loading}>{loading ? "Signing Up..." : "Sign Up"}</button>
@@ -167,22 +161,26 @@ export default function SignupPage() {
           {/* Step 1: Email OTP */}
           {otpStep === 1 && (
             <>
+             <div className="modal-otp">
               <h2>Verify Email</h2>
               <form onSubmit={handleEmailOtpSubmit} className="otp-form">
                 <input type="text" maxLength="6" placeholder="Enter Email OTP" value={otp} onChange={(e) => setEmailOtp(e.target.value)} required className="otp-input" disabled={loading} />
                 <button type="submit" className="otp-btn" disabled={loading}>{loading ? "Verifying..." : "Verify Email OTP"}</button>
               </form>
+              </div>
             </>
           )}
 
           {/* Step 2: Phone OTP */}
           {otpStep === 2 && (
             <>
+             <div className="modal-otp">
               <h2>Verify Phone</h2>
               <form onSubmit={handlePhoneOtpSubmit} className="otp-form">
-                <input type="text" maxLength="6" placeholder="Enter Phone OTP" value={phoneOtp} onChange={(e) => setPhoneOtp(e.target.value)} required className="otp-input" disabled={loading} />
+                <input type="text" maxLength="6" placeholder="Enter Phone OTP"   value={Phoneotp}  onChange={(e) => setPhoneOtp(e.target.value)} required className="otp-input" disabled={loading} />
                 <button type="submit" className="otp-btn" disabled={loading}>{loading ? "Verifying..." : "Verify Phone OTP"}</button>
               </form>
+              </div>
             </>
           )}
 

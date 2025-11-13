@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo ,useRef} from "react";
 import Layout from "../pages/page"; 
 import styles from "../styles/Leads.module.css";
 import { useRouter,useSearchParams } from 'next/navigation';
@@ -43,6 +43,7 @@ const [selectedPhone, setSelectedPhone] = useState(null);
 const [selectedCity, setSelectedCity] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
+const initialized = useRef(false);
 const [franchiseMessage, setFranchiseMessage] = useState("");
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
   try {
@@ -75,9 +76,7 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
   }
 };
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
-useEffect(() => {
-  fetchLeadsData(currentPage, entriesPerPage);
-}, [currentPage, entriesPerPage]);
+
 
 const handleNextPage = () => {
   if (currentPage < totalPages) {
@@ -306,6 +305,11 @@ function formatMessage(message, wordsPerLine = 11) {
 }
 
 useEffect(() => {
+    if (initialized.current) return; // ✅ prevent double call
+  initialized.current = true;
+
+  // Fetch leads
+  fetchLeadsData(currentPage, entriesPerPage);
   const fetchDropdownData = async () => {
     try {
       const res = await getFilterDropdownData();
@@ -583,8 +587,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
 <td className={styles.categoryCell}>
   <div className={styles.categoryContent}>
     {(() => {
-     const list = Array.isArray(lead.categories) ? lead.categories : [];
-
+      const list = Array.isArray(lead.categories) ? lead.categories : [];
       const isExpanded = expandedMessageIndex === index;
       const limited = list.slice(0, isExpanded ? list.length : 2);
 
@@ -593,10 +596,8 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
           {limited.map((cat, i) => (
             <div
               key={i}
-              className={styles.categoryLine}
-              onClick={(e) =>
-                handleCopy(e, cat, "Category", showPopup)
-              }
+              className={styles.categoryBox} // each category gets its own box
+              onClick={(e) => handleCopy(e, cat, "Category", showPopup)}
             >
               {cat}
             </div>
@@ -607,9 +608,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
               className={styles.showMoreBtn}
               onClick={(e) => {
                 e.stopPropagation();
-                setExpandedMessageIndex(
-                  isExpanded ? null : index
-                );
+                setExpandedMessageIndex(isExpanded ? null : index);
               }}
             >
               {isExpanded ? "Show Less" : "Show More"}
@@ -619,7 +618,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
       );
     })()}
   </div>
-</td>
+</td> 
 
 
                     <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
@@ -640,13 +639,12 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
                     <td>
 <button
   className={styles.editBtn}
-  onClick={() => {
-    // Save lead data in localStorage
-    localStorage.setItem("editLeadData", JSON.stringify(lead));
-
-    // Navigate with only ID in URL
+ onClick={() => {
+  localStorage.setItem("editLeadData", JSON.stringify(lead));
+  setTimeout(() => {
     router.push(`/admin/edit?id=${lead._id || lead.id}`);
-  }}
+  }, 100); // small delay avoids React race condition
+}}
 >
   Edit
 </button>
