@@ -9,17 +9,24 @@ import {
   FaNewspaper, FaImage, FaExchangeAlt, FaQuoteRight, FaGlobe, FaChevronUp,
   FaCog, FaTrash
 } from 'react-icons/fa';
+
 const Sidebar = ({ isOpen, onClose }) => {
   
  const router = useRouter()
   const [openMenus, setOpenMenus] = useState({});
 
-  const toggleMenu = (menu) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [menu]: !prev[menu],
-    }));
-  };
+ const toggleMenu = (menu) => {
+  setOpenMenus((prev) => {
+    // If the clicked menu is already open, close it
+    if (prev[menu]) {
+      return {};
+    } else {
+      // Open the clicked menu, close all others
+      return { [menu]: true };
+    }
+  });
+};
+
 const [collapsed, setCollapsed] = useState(false);
 
 const toggleSidebar = () => {
@@ -36,26 +43,24 @@ const toggleSidebar = () => {
       </div>
   
 
-      <div
+  <a
+  href="/admin/dashboard"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/dashboard'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
+  onClick={onClose}  // mobile sidebar close
 >
-        <FaHome /><span>Dashboard</span>
-      </div>
+  <FaHome />
+  <span>Dashboard</span>
+</a>
 
       <div className={styles.sectionTitle}>MANAGE USERS</div>
-         <div
+<a
+  href="/admin/roles"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/roles'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
+  onClick={onClose}
 >
-        <FaUserCog /><span>Manage Roles</span> 
-      </div>
+  <FaUserCog />
+  <span>Manage Roles</span>
+</a>
   
 
       <div className={styles.menuItem} onClick={() => toggleMenu('users')}>
@@ -68,32 +73,36 @@ const toggleSidebar = () => {
       </div>
      {openMenus.users && (
   <div className={styles.subMenu}>
-    <div onClick={() => {
-      router.push('/admin/staff'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Manage Staff
-    </div>
+  <a
+  href="/admin/staff"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Manage Staff
+</a>
 
-    <div onClick={() => {
-      router.push('/admin/customer'); // 🔁 change this path to your customer page
-      onClose();
-    }}>
-      Manage Customer
-    </div>
+   <a
+  href="/admin/customer"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Manage Customer
+</a>
   </div>
 )}
 
-      <div
+      {/* <div
   className={styles.menuItem}
   onClick={() => {
-    router.push('/admin/lead'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
+    router.push('/admin/lead');
+    onClose(); 
   }}
 >
         <FaProjectDiagram /><span>Lead</span>
-      </div>
-
+      </div> */}
+<a href="/admin/lead" className={styles.menuItem} onClick={onClose}>
+  <FaProjectDiagram /><span>Lead</span>
+</a>
       <div className={styles.menuItem} onClick={() => toggleMenu('franchise')}>
         <FaStore /><span>Manage Franchise</span>{openMenus.franchise ? (
           <FaChevronDown className={styles.arrow} />  // Show up arrow when open
@@ -101,40 +110,45 @@ const toggleSidebar = () => {
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.franchise && <div className={styles.subMenu}>  <div onClick={() => {
-      router.push('/admin/franchises'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
+      {openMenus.franchise && <div className={styles.subMenu}> 
+         <a href='/admin/franchises' className={styles.subMenuItem}// 🔁 change this path to your actual staff page
+      onClick={onclick}>
       Franchise
-    </div><div onClick={() => {
-      router.push('/admin/franchises-user'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Franchise-user
-    </div></div>}
+    </a>
+<a
+  href="/admin/franchises-user"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  <span>Franchise-user</span>
+</a>
+    </div>}
 
       <div className={styles.sectionTitle}>MANAGE SERVICE</div>
-       <div
+<a
+  href="/admin/categories"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/categories'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaList /><span>Category</span></div>
-          <div
+  onClick={onClose}
+>
+  <FaList />
+  <span>Category</span>
+</a>
+<a
+  href="/admin/ambassador"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/ambassador'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaTags /><span>Our Brand Ambassador</span></div>
-       <div
+  onClick={onClose}
+>
+  <FaTags />
+  <span>Our Brand Ambassador</span>
+</a>
+   <a
+  href="/admin/sub-categories"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/sub-categories'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaProjectDiagram /><span>Sub Category</span></div>
+  onClick={onClose}
+>
+  <FaProjectDiagram />
+  <span>Sub Category</span>
+</a>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('services')}>
         <FaWrench /><span>Services</span>{openMenus.services ? (
@@ -143,26 +157,28 @@ const toggleSidebar = () => {
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.services && <div className={styles.subMenu}> <div onClick={() => {
-      router.push('/admin/services'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Services
-    </div> <div onClick={() => {
-      router.push('/admin/best-service'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-Best Services
-    </div></div>}
-
-          <div
-  className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/package'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
+      {openMenus.services && <div className={styles.subMenu}> 
+      <a
+  href="/admin/services"
+  className={styles.subMenuItem}
+  onClick={onClose}
 >
-  <FaList /><span>Package</span></div>
+  Services
+</a> <a
+  href="/admin/best-service"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Best Services
+</a></div>}
+
+     <a
+  href="/admin/package"
+  className={styles.menuItem}
+  onClick={onClose}
+>
+  <FaList /><span>Package</span>
+</a>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('orders')}>
         <FaTags /><span>Orders</span>{openMenus.orders ? (
@@ -171,17 +187,21 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.orders && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/orders'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Orders
-    </div> <div onClick={() => {
-      router.push('/admin/unallocated-order'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Unallocated Orders
-    </div></div>}
+      {openMenus.orders && <div className={styles.subMenu}>
+    <a
+  href="/admin/orders"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Orders
+</a>  
+<a
+  href="/admin/unallocated-order"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Unallocated Orders
+</a></div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('offers')}>
         <FaGift /><span>Offers</span>{openMenus.offers ? (
@@ -190,25 +210,27 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.offers && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/offer'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Offer
-    </div><div onClick={() => {
-      router.push('/admin/best-offer'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-    Best Offer
-    </div></div>}
+      {openMenus.offers && <div className={styles.subMenu}><a
+  href="/admin/offer"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Offer
+</a><a
+  href="/admin/best-offer"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Best Offer
+</a></div>}
 
-               <div
+<a
+  href="/admin/gift"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/gift'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaGift /><span>Gift</span></div>
+  onClick={onClose}
+>
+  <FaGift /><span>Gift</span>
+</a>
 
       <div className={styles.menuItem} onClick={() => toggleMenu('rating')}>
         <FaStar /><span>Rating</span>{openMenus.rating ? (
@@ -217,15 +239,22 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.rating && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/service-rating'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>
-      Service Rating
-    </div><div onClick={() => {
-      router.push('/admin/testimonial'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Testimonial</div></div>}
+      {openMenus.rating && <div className={styles.subMenu}>
+        <a
+  href="/admin/service-rating"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Service Rating
+</a>
+    <a
+  href="/admin/testimonial"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Testimonial
+</a>
+    </div>}
 
       <div className={styles.sectionTitle}>ACCOUNTS</div>
       <div className={styles.menuItem} onClick={() => toggleMenu('accounts')}>
@@ -235,25 +264,36 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.accounts && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/income'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Income</div><div onClick={() => {
-      router.push('/admin/franchise_fees'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Franchices Fees</div><div onClick={() => {
-      router.push('/admin/franchise_outstanding'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Franchise Outstanding</div></div>}
+      {openMenus.accounts && <div className={styles.subMenu}>
+     <a
+  href="/admin/income"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Income
+</a><a
+  href="/admin/franchise_fees"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Franchices Fees
+</a><a
+  href="/admin/franchise_outstanding"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Franchise Outstanding
+</a></div>}
 
       <div className={styles.sectionTitle}>PAYMENTS</div>
-      <div
+   <a
+  href="/admin/payments"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/payments'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaCreditCard /><span>Payments</span></div>
+  onClick={onClose}
+>
+  <FaCreditCard />
+  <span>Payments</span>
+</a>
       <div className={styles.menuItem} onClick={() => toggleMenu('credit')}>
         <FaCreditCard /><span>Credit</span>{openMenus.credit ? (
           <FaChevronDown className={styles.arrow} />  // Show up arrow when open
@@ -261,36 +301,46 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.credit && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/credit-plan'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Credit Plans</div><div onClick={() => {
-      router.push('/admin/custome-plan'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Custome plans</div></div>}
+      {openMenus.credit && <div className={styles.subMenu}><a
+  href="/admin/credit-plan"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Credit Plans
+</a><a
+  href="/admin/custome-plan"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Custome Plans
+</a>
+</div>}
 
       <div className={styles.sectionTitle}>MANAGE CONTENT</div>
-           <div
+    <a
+  href="/admin/news-latter"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/news-latter'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaNewspaper /><span>News Letter</span></div>
-      <div
+  onClick={onClose}
+>
+  <FaNewspaper /><span>News Letter</span>
+</a>
+
+<a
+  href="/admin/slider"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/slider'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaImage /><span>Slider</span></div>
-            <div
+  onClick={onClose}
+>
+  <FaImage /><span>Slider</span>
+</a>
+   <a
+  href="/admin/referral-program"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/referral-program'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaExchangeAlt /><span>Referral Program</span></div>
+  onClick={onClose}
+>
+  <FaExchangeAlt />
+  <span>Referral Program</span>
+</a>
+
 
       <div className={styles.menuItem} onClick={() => toggleMenu('quotes')}>
         <FaQuoteRight /><span>Request Quotes</span>{openMenus.quotes ? (
@@ -299,13 +349,20 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.quotes && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/request'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Request</div><div onClick={() => {
-      router.push('/admin/followup'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Followups</div></div>}
+      {openMenus.quotes && <div className={styles.subMenu}><a
+  href="/admin/request"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Request
+</a>
+<a
+  href="/admin/followup"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Followups
+</a></div>}
 
       <div className={styles.menuItem} onClick={() => toggleMenu('pages')}>
         <FaGlobe /><span>Manage Pages</span>{openMenus.pages ? (
@@ -314,16 +371,28 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.pages && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/admin-about'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>About Us</div><div onClick={() => {
-      router.push('/admin/admin-blog'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Blogs</div><div onClick={() => {
-      router.push('/admin/admin-contact'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Contact Us</div></div>}
+      {openMenus.pages && <div className={styles.subMenu}><a
+  href="/admin/admin-about"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  About Us
+</a>
+<a
+  href="/admin/admin-blog"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Blogs
+</a>
+<a
+  href="/admin/admin-contact"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Contact Us
+</a>
+</div>}
 
       <div className={styles.sectionTitle}>OTHERS</div>
       <div className={styles.menuItem} onClick={() => toggleMenu('settings')}>
@@ -333,18 +402,23 @@ Best Services
           <FaChevronUp className={styles.arrow} />  // Show down arrow when closed
         )}
       </div>
-      {openMenus.settings && <div className={styles.subMenu}><div onClick={() => {
-      router.push('/admin/general-settings-logo'); // 🔁 change this path to your actual staff page
-      onClose(); // optional: close sidebar on mobile
-    }}>Logo</div></div>}
-
-       <div
+      {openMenus.settings && <div className={styles.subMenu}><a
+  href="/admin/general-settings-logo"
+  className={styles.subMenuItem}
+  onClick={onClose}
+>
+  Logo
+</a>
+</div>}
+<a
+  href="/admin/dashboard"
   className={styles.menuItem}
-  onClick={() => {
-    router.push('/admin/dashboard'); // or '/dashboard' depending on your routing structure
-    onClose(); // this closes the sidebar if it's on mobile
-  }}
-><FaTrash /><span>Clear Cache</span></div>
+  onClick={onClose}
+>
+  <FaTrash />
+  <span>Clear Cache</span>
+</a>
+
       
     </div>
   );

@@ -70,7 +70,7 @@
 }
 
 .modal button {
-    background-color: #fa9601;
+    background-color: #ff9900;
     color: white;
     padding: 12px;
     border: none;
@@ -97,6 +97,16 @@
 
 .modal button.close-btn:hover {
     color: rgb(63, 63, 63);
+}
+
+
+/* OTP form - smaller inputs */
+
+.otp-form {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
 }
 
 

@@ -2,9 +2,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signupUser, verifyEmail, verifyPhone } from "../api/auth/signup";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
-import "./main.css";
-
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     username: "",
@@ -20,32 +19,15 @@ export default function SignupPage() {
   const [otp, setEmailOtp] = useState("");
   const [Phoneotp, setPhoneOtp] = useState("");
   const router = useRouter();
-
+ const { popupMessage, popupType, showPopup } = usePopup();
   // 🔹 Popup state
-  const [popupMessage, setPopupMessage] = useState("");
-  const [popupType, setPopupType] = useState(""); // "success" | "error"
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🔹 Popup auto-hide
-  useEffect(() => {
-    if (!popupMessage) return;
-    const timer = setTimeout(() => {
-      setPopupType(prev => prev + " hide");
-      setTimeout(() => {
-        setPopupMessage("");
-        setPopupType("");
-      }, 400);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
 
-  const showPopup = (message, type) => {
-    setPopupMessage(message);
-    setPopupType(type);
-  };
 
   // Step 0: Signup
   const handleSignupSubmit = async (e) => {
@@ -89,7 +71,7 @@ export default function SignupPage() {
       showPopup("✅ Email verified! Now enter OTP sent to your phone.", "success");
     } catch (err) {
       console.error(err);
-      showPopup(err?.data?.message || err.message || "Email OTP verification failed.", "error");
+     showPopup(err?.data?.message || err.message || "Email OTP verification failed.", "error");
     } finally {
       setLoading(false);
     }
@@ -119,6 +101,7 @@ export default function SignupPage() {
 
   return (
     <div className="signup-page">
+       <PopupAlert message={popupMessage} type={popupType} />
       <iframe src="/" className="iframe-bg" frameBorder="0" title="Homepage Background"></iframe>
       <div className="form-overlay">
         <div className="modal">
@@ -130,17 +113,7 @@ export default function SignupPage() {
             &times;
           </button>
 
-          {/* 🔹 Popup */}
-          {popupMessage && (
-                   <div className={`email-popup ${popupType} show flex items-center gap-2`}>
-                     {popupType==="success" ? 
-                       <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                       <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-                    <span>
-  {typeof popupMessage === "string" ? popupMessage.replace(/^✅ |^❌ /, "") : ""}
-</span>
-                   </div>
-                 )}
+    
 
           {/* Step 0: Signup Form */}
           {otpStep === 0 && (
@@ -157,7 +130,7 @@ export default function SignupPage() {
               </form>
             </>
           )}
-
+</div>
           {/* Step 1: Email OTP */}
           {otpStep === 1 && (
             <>
@@ -184,7 +157,7 @@ export default function SignupPage() {
             </>
           )}
 
-        </div>
+        
       </div>
     </div>
   );

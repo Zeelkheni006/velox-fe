@@ -11,7 +11,8 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
 import { getSliders , getFullLocation} from "./api/add-image/add-slider"; 
-
+import usePopup from './admin/components/popup';
+import PopupAlert from "./admin/components/PopupAlert";
 
 
 
@@ -155,7 +156,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
     const [query, setQuery] = useState("");
   const [fullLocation, setFullLocation] = useState("");
- 
+   const { popupMessage, popupType, showPopup } = usePopup();
  const handleSearch = async (e) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -166,32 +167,35 @@ export default function Home() {
     setLoading(false);
   };
 
-useEffect(() => {
-  const fetchSlides = async () => {
-    try {
-      setLoading(true);
-      const data = await getSliders();
-      console.log("Fetched slides:", data); // 👀 Debug
-      // 🔑 Adjust mapping according to response
-      if (Array.isArray(data)) {
-        setSlides(data);
-      } else if (Array.isArray(data.slides)) {
-        setSlides(data.slides);
-      } else if (Array.isArray(data.data)) {
-        setSlides(data.data);
-      } else {
-        setSlides([]);
-      }
-    } catch (err) {
-      console.error("Error fetching slides:", err);
-      setSlides([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+ useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        setLoading(true);
+        const data = await getSliders();
+        console.log("Fetched slides:", data);
 
-  fetchSlides();
-}, []);
+        if (Array.isArray(data)) {
+          setSlides(data);
+        } else if (Array.isArray(data.slides)) {
+          setSlides(data.slides);
+        } else if (Array.isArray(data.data)) {
+          setSlides(data.data);
+        } else {
+          setSlides([]);
+        }
+
+        showPopup("✅ Slides fetched successfully!", "success"); // ✅ Success popup
+      } catch (err) {
+        console.error("Error fetching slides:", err);
+        setSlides([]);
+        showPopup("❌ Failed to fetch slides.", "error"); // ❌ Error popup
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
 
 
   // Trigger resize for Swiper layout fix
@@ -205,8 +209,9 @@ useEffect(() => {
 
   return (
     <main>
-
+<PopupAlert message={popupMessage} type={popupType} />
       <section id="hero" className="heroSection">
+
         {loading ? (
          <div className="spinnerWrapper">
           <div className="spinner"></div>

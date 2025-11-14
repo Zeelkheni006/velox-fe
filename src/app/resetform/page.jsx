@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./main.css";
-import { changePassword } from "../api/user-side/dashboard/resetpassword"; // import your API helper
-
+import { changePassword } from "../api/user-side/dashboard/resetpassword";
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
 export default function ResetForm() {
   const router = useRouter();
 
@@ -12,64 +13,55 @@ export default function ResetForm() {
   const [newPassword, setNewPassword] = useState("");
   const [retypePassword, setRetypePassword] = useState("");
   const [loading, setLoading] = useState(false);
+ const { popupMessage, popupType, showPopup } = usePopup();
+  const handleSubmit = async () => {
+    const token = localStorage.getItem("access_token");
+    const userId = localStorage.getItem("user_id");
 
-const handleSubmit = async () => {
-  const token = localStorage.getItem("access_token");
-  const userId = localStorage.getItem("user_id");
+    if (!token || !userId) {
+      showPopup("Session expired. Please login again.");
+      router.push("/");
+      return;
+    }
 
-  if (!token || !userId) {
-    alert("Session expired. Please login again.");
-    router.push("/");
-    return;
-  }
+    if (!currentPassword || !newPassword || !retypePassword) {
+      showPopup("Please fill all fields");
+      return;
+    }
 
-  if (!currentPassword || !newPassword || !retypePassword) {
-    alert("Please fill all fields");
-    return;
-  }
+    if (newPassword !== retypePassword) {
+      showPopup("New Password and Re-type Password do not match!");
+      return;
+    }
 
-  if (newPassword !== retypePassword) {
-    alert("New Password and Re-type Password do not match!");
-    return;
-  }
+    setLoading(true);
 
-  setLoading(true);
-
-  try {
-    const response = await fetch("/api/change-password", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
+    try {
+      const result = await changePassword(
         userId,
         currentPassword,
         newPassword,
-      }),
-    });
+        retypePassword, // confirm password
+        token
+      );
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert("✅ Password reset successfully!");
-      router.push("/dashboard");
-    } else {
-      alert(`❌ ${data.message || "Password reset failed"}`);
+      if (result.success) {
+        showPopup("✅ Password reset successfully!");
+        router.push("/dashboard");
+      } else {
+        showPopup(`❌ ${result.message}`);
+      }
+    } catch (err) {
+      console.error("Error changing password:", err);
+      showPopup("❌ Something went wrong. Try again.");
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error changing password:", err);
-    alert("❌ Something went wrong. Try again.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
 
   return (
     <div className="container">
-      {/* Sidebar */}
+      <PopupAlert message={popupMessage} type={popupType} />
       <aside className="sidebar">
         <ul className="navList">
           <li onClick={() => router.push("/dashboard")}>Dashboard</li>
@@ -89,7 +81,6 @@ const handleSubmit = async () => {
         </ul>
       </aside>
 
-      {/* Main Content */}
       <main className="mainContent">
         <div className="resetBox">
           <h2 className="resetTitle">Reset Password</h2>

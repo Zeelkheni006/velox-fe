@@ -5,6 +5,8 @@ import Image from "next/image";
 import './main.css';  
 import { getCountries ,getCategoryList, getStates, getCities ,getSubcategoriesAndServices} from "../api/user-side/register-professional/location";
 import { useState, useEffect } from "react";
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
  const data = [
     {
       image: '/images/no-marketing.jpg',
@@ -64,6 +66,7 @@ const [popupCategoryTitle, setPopupCategoryTitle] = useState("");
 const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
 const [subcategories, setSubcategories] = useState([]);
 const [services, setServices] = useState([]);
+  const { popupMessage, popupType } = usePopup();
 
   // Fetch Countries & Categories on load
   useEffect(() => {
@@ -95,7 +98,7 @@ const [services, setServices] = useState([]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Form successfully submitted ✅");
+    showPopup("Form successfully submitted ✅");
     console.log({
       country: selectedCountry,
       state: selectedState,
@@ -113,6 +116,7 @@ const handleSubcategoryClick = (subcat) => {
   return (
     
     <div className="container">
+          <PopupAlert message={popupMessage} type={popupType} />
       <h2 className="title">Easy <span>Register</span> Process</h2>
       <div className="steps">
         <div className="step">
