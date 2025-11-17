@@ -7,6 +7,7 @@ import { getCountries ,getCategoryList, getStates, getCities ,getSubcategoriesAn
 import { useState, useEffect } from "react";
 import usePopup from '../admin/components/popup';
 import PopupAlert from "../admin/components/PopupAlert";
+import { IoMdCloudUpload } from "react-icons/io";
  const data = [
     {
       image: '/images/no-marketing.jpg',
@@ -67,7 +68,10 @@ const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
 const [subcategories, setSubcategories] = useState([]);
 const [services, setServices] = useState([]);
   const { popupMessage, popupType } = usePopup();
-
+  const [pancardFile, setPancardFile] = useState(null);
+  const [step, setStep] = useState(1);
+  const [aadharFront, setAadharFront] = useState(null);
+const [aadharBack, setAadharBack] = useState(null);
   // Fetch Countries & Categories on load
   useEffect(() => {
     getCountries().then(setCountries);
@@ -178,79 +182,396 @@ const handleSubcategoryClick = (subcat) => {
         />
       </div>
 
-  <div className="rightSection">
-        <div className="formBox">
-          <h2 className="heading">Register as <span>a </span>Professional</h2>
-          <p className="subheading">Join 1500+ partners across India</p>
+<div className="rightSection">
 
-          <form className="form" onSubmit={handleSubmit}>
-            <div className="row">
-              <input type="text" placeholder="Enter your name" required />
-              <input type="tel" placeholder="Enter your phone" required />
-            </div>
+  {/* 🔵 Step Indicator */}
+ 
 
-            <div className="row">
-              <input type="email" placeholder="Email" required />
+  {step === 1 && (
+    <div className="formBox">
+<div className="stepIndicator">
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(1)}
+  >
+    <span className="stepLabel">Personal Details</span>
+    <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
+  </div>
 
-              {/* ✅ Country */}
-              <select
-                value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                required
-              >
-                <option value="">Select Country</option>
-                {countries.map(c => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <div className="stepLine"></div>
 
-            <div className="row">
-              {/* ✅ State */}
-              <select
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-                disabled={!selectedCountry}
-                required
-              >
-                <option value="">Select State</option>
-                {states.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(2)}
+  >
+    <span className="stepLabel">Franchise Info</span>
+    <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
+  </div>
 
-              {/* ✅ City */}
-              <select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                disabled={!selectedState}
-                required
-              >
-                <option value="">Select City</option>
-                {cities.map(c => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
+  <div className="stepLine"></div>
 
-            {/* ✅ Category */}
- <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
-              <option value="">Select Category</option>
-              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>)}
-            </select>
-   <button type="button" className="category-info-btn" onClick={() => setShowCategoryInfoBox(prev => !prev)}>
-              Category Info
-            </button>
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(3)}
+  >
+    <span className="stepLabel">KYC Document</span>
+    <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
+  </div>
+</div>
 
+      <h2 className="heading">Personal <span>Details</span></h2>
+     
 
-            <textarea placeholder="What do you do?" rows={4}></textarea>
+      <form onSubmit={handleSubmit} className="form">
 
-            <button type="submit">Submit</button>
-          </form>
+        <div className="row">
+          <input type="text" placeholder="Enter your name" required />
+          <input type="tel" placeholder="Enter your phone" required />
         </div>
+
+        <div className="row">
+          <input type="text" placeholder="Address Line 1" required />
+        </div>
+
+        <div className="row">
+        
+            <input type="email" placeholder="Email" required />
+          <input type='text'placeholder='pincode' required/>
+        </div>
+
+        <div className="row">
+          <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} required>
+            <option value="">Select Country</option>
+            {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+
+          <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)} required disabled={!selectedCountry}>
+            <option value="">Select State</option>
+            {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </div>
+
+        <div className="row">
+          <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} required disabled={!selectedState}>
+            <option value="">Select City</option>
+            {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+
+          {/* Category */}
+          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
+            <option value="">Select Category</option>
+            {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>)}
+          </select>
+        </div>
+
+        {/* File Uploads */}
+
+        <textarea placeholder="What do you do?" rows={4}></textarea>
+
+        <button type="submit">Submit</button>
+      
+        {/* NEXT BUTTON – go to page 2 */}
+    <div className="buttonRow">
+  <button
+    type="button"
+    className="nextBtn"
+    onClick={() => setStep(2)}
+  >
+    Next →
+  </button>
+</div>
+
+      </form>
+
+      
+    </div>
+  )}
+
+  {/* STEP 2 (Franchise Info) */}
+ {step === 2 && (
+  <div className="formBox">
+    <div className="stepIndicator">
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(1)}
+  >
+    <span className="stepLabel">Personal Details</span>
+    <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(2)}
+  >
+    <span className="stepLabel">Franchise Info</span>
+    <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(3)}
+  >
+    <span className="stepLabel">KYC Document</span>
+    <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
+  </div>
+</div>
+
+    <h2 className="heading">Franchise <span>Info</span></h2>
+
+    <form onSubmit={handleSubmit} className="form">
+
+      {/* Name & Phone */}
+      <div className="row">
+        <input type="text" placeholder="Enter Name"  onChange={(e) => setFranchiseName(e.target.value)} required />
+        <input type="tel" placeholder="Enter Phone"  onChange={(e) => setFranchisePhone(e.target.value)} required />
       </div>
+
+      {/* Email */}
+      <div className="row">
+        <input type="text" placeholder="Address Line 1"  onChange={(e) => setFranchiseAddress1(e.target.value)} required />
+      </div>
+
+      {/* Address & Pincode */}
+      <div className="row">
+
+                <input type="email" placeholder="Enter Email"  onChange={(e) => setFranchiseEmail(e.target.value)} required />
+        <input type="text" placeholder="Pincode"  onChange={(e) => setFranchisePincode(e.target.value)} required />
+      </div>
+
+      {/* Country & State */}
+      <div className="row">
+        <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} required>
+          <option value="">Select Country</option>
+          {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+
+        <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)} required disabled={!selectedCountry}>
+          <option value="">Select State</option>
+          {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+        </select>
+      </div>
+
+      {/* City & Category */}
+      <div className="row">
+        <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} required disabled={!selectedState}>
+          <option value="">Select City</option>
+          {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
+
+        <select  onChange={(e) => setFranchiseCategory(e.target.value)} required>
+          <option value="">Select Category</option>
+          {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>)}
+        </select>
+      </div>
+
+      {/* Message */}
+      <div className="row">
+        <textarea placeholder="Message" rows={4} onChange={(e) => setFranchiseMessage(e.target.value)}></textarea>
+      </div>
+
+      {/* Submit & Next */}
+     
+        <button type="submit">Submit</button>
+              {/* Submit & Navigation Buttons */}
+<div className="buttonRow">
+  {/* Back button on the left */}
+  <button
+    type="button"
+    className="nextBtn"
+    onClick={() => setStep(step - 1)}
+  >
+    ← Back
+  </button>
+
+  {/* Next button on the right */}
+  <button
+    type="button"
+    className="nextBtn"
+    onClick={() => setStep(step + 1)}
+  >
+    Next →
+  </button>
+</div>
+
+    </form>
+  </div>
+)}
+
+{step === 3 && (
+  <div className="formBox">
+
+    {/* Step Indicator */}
+   <div className="stepIndicator">
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(1)}
+  >
+    <span className="stepLabel">Personal Details</span>
+    <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(2)}
+  >
+    <span className="stepLabel">Franchise Info</span>
+    <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(3)}
+  >
+    <span className="stepLabel">KYC Document</span>
+    <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
+  </div>
+</div>
+
+
+    <h2 className="heading">Documents <span>Upload</span></h2>
+
+    <form className="form">
+
+      {/* Top row: Pancard */}
+    <div className="row" style={{ marginBottom: "20px" }}>
+  {/* Pancard Upload */}
+  <div style={{ flex: 1 }}>
+    <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Pancard Upload</h4>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <label
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          minWidth: "250px"
+        }}
+      >
+        <IoMdCloudUpload style={{ fontSize: "32px", marginBottom: "8px" }} />
+        <span>Click to Upload Pancard</span>
+        <input
+          type="file"
+          accept="image/*"
+          required
+          style={{ display: "none" }}
+          onChange={(e) => e.target.files && setPancardFile(e.target.files[0])}
+        />
+
+        {/* Show uploaded file name */}
+        {pancardFile && (
+          <div style={{ marginTop: "10px" }}>Uploaded: {pancardFile.name}</div>
+        )}
+      </label>
+    </div>
+  </div>
+</div>
+
+{/* Aadhar Uploads (Front & Back) */}
+<div className="row" style={{ display: "flex", gap: "20px" }}>
+  {/* Aadhar Front */}
+  <div style={{ flex: 1 }}>
+    <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Aadhar Front Upload</h4>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <label
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          minWidth: "250px"
+        }}
+      >
+        <IoMdCloudUpload style={{ fontSize: "32px", marginBottom: "8px" }} />
+        <span>Click to Upload Aadhar Front</span>
+        <input
+          type="file"
+          accept="image/*"
+          required
+          style={{ display: "none" }}
+          onChange={(e) => e.target.files && setAadharFront(e.target.files[0])}
+        />
+
+        {/* Show uploaded file name */}
+        {aadharFront && (
+          <div style={{ marginTop: "10px" }}>Uploaded: {aadharFront.name}</div>
+        )}
+      </label>
+    </div>
+  </div>
+
+  {/* Aadhar Back */}
+  <div style={{ flex: 1 }}>
+    <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Aadhar Back Upload</h4>
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <label
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          border: "1px solid #ccc",
+          padding: "20px",
+          borderRadius: "8px",
+          cursor: "pointer",
+          minWidth: "250px"
+        }}
+      >
+        <IoMdCloudUpload style={{ fontSize: "32px", marginBottom: "8px" }} />
+        <span>Click to Upload Aadhar Back</span>
+        <input
+          type="file"
+          accept="image/*"
+          required
+          style={{ display: "none" }}
+          onChange={(e) => e.target.files && setAadharBack(e.target.files[0])}
+        />
+
+        {/* Show uploaded file name */}
+        {aadharBack && (
+          <div style={{ marginTop: "10px" }}>Uploaded: {aadharBack.name}</div>
+        )}
+      </label>
+    </div>
+  </div>
+</div>
+
+
+    
+
+      {/* Navigation buttons */}
+      <div className="buttonRow">
+        <button type="button" className="nextBtn" onClick={() => setStep(2)}>← Back</button>
+        <button type="submit" className="nextBtn">Submit</button>
+      </div>
+
+    </form>
+  </div>
+)}
+
+</div>
+
 {showCategoryInfoBox && (
   <div className="category-info-container">
     {categories.map(cat => (

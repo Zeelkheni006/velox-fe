@@ -1,27 +1,34 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-// Function to refresh access token
-async function refreshAccessToken() {
+export const refreshToken = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/auth/refresh`, {
-      method: "POST",
-      credentials: "include", // send cookie
-    });
+    const token = localStorage.getItem("refresh_token");
+    if (!token) return null;
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/auth/refresh`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: token }),
+          credentials: "include" // if backend uses cookies
+      }
+    );
 
     const data = await res.json();
-    if (!res.ok || !data.success) {
-      throw new Error(data.message || "Failed to refresh token");
-    }
+    console.log("REFRESH TOKEN RESPONSE:", data); // ✅ Must log the backend response
 
-    const newToken = data.data?.access_token;
-    if (newToken) {
-      localStorage.setItem("access_token", newToken);
-      return newToken;
-    } else {
-      throw new Error("No access token returned by refresh API");
-    }
+    if (!data.success) return null;
+
+    const newAccessToken = data?.data?.access_token;
+    if (!newAccessToken) return null;
+
+    localStorage.setItem("access_token", newAccessToken);
+
+    return newAccessToken;
   } catch (err) {
-    console.error("Refresh token failed:", err);
-    throw err; // Let caller handle logout if needed
+    console.error("Error refreshing token:", err);
+    return null;
   }
-}
+};
+

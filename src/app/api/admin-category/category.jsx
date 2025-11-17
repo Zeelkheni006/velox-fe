@@ -37,35 +37,89 @@ export async function createCategory({ title, logo, description }) {
 }
 
 // get category
-// ✅ This function must be called from a client component
+import { refreshToken } from "../auth/admin-refresh-tocken";
+
 export const fetchCategories = async () => {
   try {
-    // Get token from localStorage (browser only)
-    const accessToken = localStorage.getItem("access_token");
+    if (typeof window === "undefined") return [];
 
-    if (!accessToken) {
-      console.error("Access token not found — make sure it's stored after login!");
+    let accessToken = localStorage.getItem("access_token");
+    if (!accessToken) return [];
+
+    // -------------------------------
+    // API call helper with token
+    // -------------------------------
+    const fetchWithToken = async (token) => {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/get`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      console.log("CATEGORY API RESPONSE:", data);
+
+      const msg = (data?.message || "").toLowerCase();
+
+      if (msg.includes("access token expired")) return "EXPIRED";
+      if (msg.includes("login required")) return "LOGIN_REQUIRED";
+      if (data.success && Array.isArray(data.data)) return data.data;
+
       return [];
+    };
+
+    // -------------------------------
+    // FIRST ATTEMPT
+    // -------------------------------
+    let categories = await fetchWithToken(accessToken);
+
+    // -------------------------------
+    // IF ACCESS TOKEN EXPIRED → CALL REFRESH TOKEN
+    // -------------------------------
+    if (categories === "EXPIRED") {
+      console.log("Access token expired → calling refresh token API");
+
+      const newToken = await refreshToken(); // call refresh API
+
+      // ❌ If refresh fails or backend says login required → clear tokens & stop
+      if (!newToken || newToken === "LOGIN_REQUIRED") {
+        console.log("Refresh token failed or login required");
+
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+
+        // Optionally, show a UI message here instead of redirecting
+        return [];
+      }
+
+      // ✅ Retry API with new access token
+      categories = await fetchWithToken(newToken);
+
+      // ❌ If backend still says login required → clear tokens & stop
+      if (categories === "LOGIN_REQUIRED") {
+        console.log("Login required even after refresh");
+
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+
+        return [];
+      }
     }
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/get`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`, // ✅ Must include 'Bearer ' prefix
-      },
-    });
+    return categories || [];
 
-    if (!res.ok) throw new Error("Failed to fetch categories");
-
-    const data = await res.json();
-    if (data.success && Array.isArray(data.data)) return data.data;
-    return [];
   } catch (err) {
     console.error("Error fetching categories:", err);
     return [];
   }
 };
+
+
 
 
 export async function getSubCategories(page = 1, per_page = 10) {
