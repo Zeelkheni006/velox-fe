@@ -46,9 +46,7 @@ export const fetchCategories = async () => {
     let accessToken = localStorage.getItem("access_token");
     if (!accessToken) return [];
 
-    // -------------------------------
-    // API call helper with token
-    // -------------------------------
+   
     const fetchWithToken = async (token) => {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/get`,
@@ -66,47 +64,63 @@ export const fetchCategories = async () => {
 
       const msg = (data?.message || "").toLowerCase();
 
-      if (msg.includes("access token expired")) return "EXPIRED";
-      if (msg.includes("login required")) return "LOGIN_REQUIRED";
+      //  Detect ALL possible expired token messages
+      if (
+        msg.includes("access token expired") ||
+        msg.includes("access_token_expired") ||
+        msg.includes("token expired") ||
+        msg.includes("token is expired") ||
+        msg.includes("token has expired") ||
+        msg.includes("jwt expired") ||
+        msg.includes("invalid token") ||
+        msg.includes("invalid or expired") ||
+        msg.includes("unauthorized")
+      ) {
+        return "EXPIRED";
+      }
+
+      //  Login required patterns
+      if (
+        msg.includes("login required") ||
+        msg.includes("please login") ||
+        msg.includes("no auth") ||
+        msg.includes("unauthorized user")
+      ) {
+        return "LOGIN_REQUIRED";
+      }
+
+      // Success
       if (data.success && Array.isArray(data.data)) return data.data;
 
       return [];
     };
 
-    // -------------------------------
-    // FIRST ATTEMPT
-    // -------------------------------
+   
     let categories = await fetchWithToken(accessToken);
 
-    // -------------------------------
-    // IF ACCESS TOKEN EXPIRED → CALL REFRESH TOKEN
-    // -------------------------------
+ 
     if (categories === "EXPIRED") {
       console.log("Access token expired → calling refresh token API");
 
-      const newToken = await refreshToken(); // call refresh API
+      const newToken = await refreshToken(); // refresh token API
 
-      // ❌ If refresh fails or backend says login required → clear tokens & stop
-      if (!newToken || newToken === "LOGIN_REQUIRED") {
-        console.log("Refresh token failed or login required");
-
+      if (!newToken) {
+        console.log("❌ Refresh token failed");
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-
-        // Optionally, show a UI message here instead of redirecting
         return [];
       }
 
-      // ✅ Retry API with new access token
+      // Save new token
+      localStorage.setItem("access_token", newToken);
+
+      // Retry API
       categories = await fetchWithToken(newToken);
 
-      // ❌ If backend still says login required → clear tokens & stop
       if (categories === "LOGIN_REQUIRED") {
-        console.log("Login required even after refresh");
-
+        console.log("❌ Login required even after refresh");
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-
         return [];
       }
     }
@@ -118,7 +132,6 @@ export const fetchCategories = async () => {
     return [];
   }
 };
-
 
 
 
