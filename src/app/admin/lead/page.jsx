@@ -77,6 +77,28 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
 };
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
 
+useEffect(() => {
+  if (!initialized.current) return; // skip before mount
+
+  // Fetch leads only when user changes filters or pagination
+  fetchLeadsData(currentPage, entriesPerPage, {
+    name: selectedName,
+    email: selectedEmail,
+    phone: selectedPhone,
+    city_id: selectedCity?.value,
+    status: selectedStatus,
+    category_list: selectedCategories.map(c => Number(c.value))
+  });
+}, [
+  currentPage,
+  entriesPerPage,
+  selectedName,
+  selectedEmail,
+  selectedPhone,
+  selectedCity,
+  selectedStatus,
+  selectedCategories
+]);
 
 const handleNextPage = () => {
   if (currentPage < totalPages) {

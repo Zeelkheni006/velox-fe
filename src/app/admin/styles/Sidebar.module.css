@@ -138,11 +138,27 @@
     transition: background 0.2s;
     font-size: 14px;
     color: #5099f8;
+    text-decoration: none !important;
 }
 
 .menuItem:hover {
     background-color: #1e293b;
     border-radius: 6px;
+}
+
+.subMenuItem {
+    text-decoration: none !important;
+    color: inherit;
+    display: block;
+    padding: 8px 20px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.subMenuItem:hover {
+    text-decoration: none !important;
+    background: #34495e;
+    color: white
 }
 
 .arrow {

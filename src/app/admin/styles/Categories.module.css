@@ -168,12 +168,20 @@
     background-color: #337ab7;
 }
 
+.deleteBtn:hover {
+    background-color: #216fd4;
+}
+
 .inactiveBtn {
     background-color: #d9534f;
 }
 
 .activeBtn {
     background-color: #5cb85c;
+}
+
+.activeBtn:hover {
+    background-color: #6bc96b;
 }
 
 .pagination {

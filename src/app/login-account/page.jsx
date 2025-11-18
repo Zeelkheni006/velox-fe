@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import "./main.css"; 
 import ForgotPasswordModal from '../../components/ForgotPasswordModal';
 import { loginInitiate, loginWithPassword, sendOtp } from '../api/auth/user-login';
-
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
 export default function CustomerLogin() {
   const [loginValue, setLoginValue] = useState('');
   const [password, setPassword] = useState('');
@@ -14,6 +15,7 @@ export default function CustomerLogin() {
   const [userId, setUserId] = useState(null);
   const [showResetModal, setShowResetModal] = useState(false);
   const router = useRouter();
+  const { popupMessage, popupType, showPopup } = usePopup();
 
   const handleClose = () => router.push('/');
 
@@ -22,7 +24,7 @@ export default function CustomerLogin() {
 
   // Step 1: Initiate login
   const handleContinue = async () => {
-    if (!loginValue.trim()) return alert("Enter phone or email.");
+    if (!loginValue.trim()) return showPopup("Enter phone or email.");
     try {
       const res = await loginInitiate(loginValue.trim());
       if (res.success) {
@@ -30,10 +32,10 @@ export default function CustomerLogin() {
         setLoginType(res.data.login_type);
         setUserId(res.data.user_id);
       } else {
-        alert(res.message || "Login failed.");
+        showPopup(res.message || "Login failed.");
       }
     } catch (err) {
-      alert(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.");
     }
   };
 
@@ -45,7 +47,7 @@ export default function CustomerLogin() {
       const res = await sendOtp(loginValue.trim()); // Call OTP API
 
       if (res.success) {
-        alert(res.message?.message || "OTP sent successfully!");
+        showPopup(res.message?.message || "OTP sent successfully!");
 
         // Redirect to OTP page with correct query param
         if (isEmail(loginValue.trim())) {
@@ -54,11 +56,11 @@ export default function CustomerLogin() {
           router.push(`/otp?mobile=${loginValue.trim()}`);
         }
       } else {
-        alert(res.message || "Failed to send OTP.");
+        showPopup(res.message || "Failed to send OTP.");
       }
     } catch (err) {
       console.error(err);
-      alert(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.");
     }
   };
 
@@ -71,18 +73,20 @@ export default function CustomerLogin() {
 
       if (res.success) {
         localStorage.setItem("access_token", res.data.access_token);
-        alert(res.message || "Logged in successfully!");
+        showPopup(res.message || "Logged in successfully!");
         router.push("/dashboard");
       } else {
-        alert(res.message || "Password login failed.");
+        showPopup(res.message || "Password login failed.");
       }
     } catch (err) {
-      alert(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.");
     }
   };
 
   return (
+     
     <div className="login-account-page">
+       <PopupAlert message={popupMessage} type={popupType} />
       <iframe src="/" className="iframe-bg" frameBorder="0" title="Homepage Background"></iframe>
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 modal-overlay ">
         <div className="bg-white rounded-lg shadow-lg p-6 relative modal-box">

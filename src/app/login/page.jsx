@@ -2,11 +2,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./main.css"; 
-
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
 export default function LoginTypeModal() {
   const [loginType, setLoginType] = useState("");
   const router = useRouter(); // ✅ Create router instance
-
+ const { popupMessage, popupType, showPopup } = usePopup();
   const handleClose = () => {
     router.push("/"); // ✅ Redirect to home page
   };
@@ -17,7 +18,7 @@ export default function LoginTypeModal() {
   } else if (loginType === 'professional') {
     router.push('/professionallogin'); // (Optional: for other login types)
   } else {
-    alert("Please select a login type");
+    showPopup("Please select a login type");
   }
 };
 
@@ -25,6 +26,7 @@ export default function LoginTypeModal() {
   return (
 
       <div className="login-page">
+         <PopupAlert message={popupMessage} type={popupType} />
       <iframe
         src="/"
         className="iframe-bg"

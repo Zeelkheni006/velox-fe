@@ -168,6 +168,54 @@
     /* Ensures the line stretches across the full width */
 }
 
+.stepIndicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.stepItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stepLabel {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.stepCircle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.stepCircle.active {
+    background-color: #007bff;
+    /* blue for active step */
+}
+
+.stepCircle.active {
+    background-color: #007bff;
+    /* active step color */
+}
+
+.stepLine {
+    flex: 1;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 10px;
+}
+
 .query {
     font-size: 1rem;
     color: #555;
@@ -204,6 +252,7 @@
     justify-content: center;
     margin-top: -600px;
     margin-right: -500px;
+    margin-bottom: 100px;
 }
 
 .formBox {
@@ -211,9 +260,24 @@
     padding: 40px;
     border-radius: 8px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    width: 300%;
-    max-width: 700px;
-    height: 600px;
+    width: 400%;
+    max-width: 800px;
+    height: 800px;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: space-between;
+    /* Back left, Next right */
+    margin-top: 20px;
+    gap: 540px;
+}
+
+.backBtn {
+    background-color: #ccc;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
 }
 
 .heading {
@@ -239,6 +303,45 @@
 .row {
     display: flex;
     gap: 20px;
+    /* space between the two upload boxes */
+}
+
+.fileUpload {
+    flex: 1;
+    /* both fields take equal width */
+    display: flex;
+    flex-direction: column;
+}
+
+.fileUpload input[type="file"] {
+    padding: 10px;
+    border: 1px dashed #ccc;
+    cursor: pointer;
+}
+
+.uploadBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #aaa;
+    border-radius: 8px;
+    padding: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    width: 250px;
+}
+
+.uploadBox:hover {
+    border-color: #007bff;
+    background-color: #f9f9f9;
+}
+
+.uploadBox span {
+    margin-top: 5px;
+    font-size: 16px;
+    color: #555;
 }
 
 input,
@@ -269,6 +372,26 @@ button {
 
 button:hover {
     background-color: #1a252f;
+}
+
+.buttonRow {
+    display: flex;
+    justify-content: flex-end;
+    /* aligns button to the right */
+    margin-top: 20px;
+    /* optional spacing from above fields */
+}
+
+.nextBtn {
+    background-color: #2c3e50;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100px;
 }
 
 .container-benefits {
