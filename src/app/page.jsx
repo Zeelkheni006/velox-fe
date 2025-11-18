@@ -152,20 +152,60 @@ const reviews = [
   ];
 
 export default function Home() {
-  const [slides, setSlides] = useState([]);
-  const [loading, setLoading] = useState(true);
-    const [query, setQuery] = useState("");
-  const [fullLocation, setFullLocation] = useState("");
-   const { popupMessage, popupType, showPopup } = usePopup();
- const handleSearch = async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+    const [slides, setSlides] = useState([]);
+    const [loading, setLoading] = useState(true);
+      const [query, setQuery] = useState("");
+    const [fullLocation, setFullLocation] = useState("");
+    const { popupMessage, popupType, showPopup } = usePopup();
+    const [suggestions, setSuggestions] = useState([]);
+const fetchSuggestions = async (value) => {
+  if (!value) {
+    setSuggestions([]);
+    return;
+  }
 
-    setLoading(true);
-    const location = await getFullLocation(query);
-    setFullLocation(location);
-    setLoading(false);
-  };
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=8&q=${value}`,
+      {
+        headers: {
+          "User-Agent": "YourApp/1.0", // 🔥 Important for Nominatim
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    // Convert raw data into city list
+    const cities = data.map((item) => {
+      const city =
+        item.address.city ||
+        item.address.town ||
+        item.address.village ||
+        item.address.hamlet ||
+        "";
+
+      const state = item.address.state || "";
+      const country = item.address.country || "";
+
+      return {
+        display: `${city}, ${state}, ${country}`,
+        city,
+        state,
+        country,
+        lat: item.lat,
+        lon: item.lon,
+      };
+    });
+
+    setSuggestions(cities);
+  } catch (err) {
+    console.error("Nominatim Error:", err);
+  }
+};
+
+
+
 
  useEffect(() => {
     const fetchSlides = async () => {
@@ -204,7 +244,6 @@ export default function Home() {
       window.dispatchEvent(new Event("resize"));
     }, 100);
   }, []);
-  // Auto Slide
 
 
   return (
@@ -251,39 +290,68 @@ export default function Home() {
       )}
 
       {/* 🔥 Static Search Box */}
-       <div className="searchBox">
-        <form className="searchForm" onSubmit={handleSearch}>
-          <div className="searchInputWrapper">
-            <span className="searchIcon"><FaSearch /></span>
-            <input
-              type="text"
-              placeholder="Enter a location"
-              className="searchInput"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <span className="locationIcon"><FaMapMarkerAlt /></span>
-            {query && (
-              <span
-                className="clearIcon"
-                onClick={() => {
-                  setQuery("");
-                  setFullLocation("");
-                }}
-              >
-                <FaTimesCircle />
-              </span>
-            )}
-          </div>
-          <button type="submit" className="searchButton">
-            {loading ? "Loading..." : "Go"}
-          </button>
-        </form>
+      <div className="searchBox">
+  <form className="searchForm" onSubmit={fetchSuggestions}>
+    <div className="searchInputWrapper">
+      
+      <span className="searchIcon"><FaSearch /></span>
 
-        {fullLocation && (
-          <p className="searchResult">📍 {fullLocation}</p>
-        )}
-      </div>
+      <input
+        type="text"
+        placeholder="Enter a location"
+        className="searchInput"
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          fetchSuggestions(e.target.value);
+        }}
+      />
+
+      {/* 🔥 AUTOCOMPLETE DROPDOWN */}
+      {suggestions.length > 0 && (
+        <ul className="suggestionList">
+          {suggestions.map((item, index) => (
+            <li
+              key={index}
+              className="suggestionItem"
+              onClick={() => {
+                setQuery(item.display);
+                setSuggestions([]);
+              }}
+            >
+              {item.display}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <span className="locationIcon"><FaMapMarkerAlt /></span>
+
+      {query && (
+        <span
+          className="clearIcon"
+          onClick={() => {
+            setQuery("");
+            setFullLocation("");
+            setSuggestions([]);
+          }}
+        >
+          <FaTimesCircle />
+        </span>
+      )}
+
+    </div>
+
+    <button type="submit" className="searchButton">
+      {loading ? "Loading..." : "Go"}
+    </button>
+  </form>
+
+  {fullLocation && (
+    <p className="searchResult">📍 {fullLocation}</p>
+  )}
+</div>
+
     </section>
 
        <section className="services-section">

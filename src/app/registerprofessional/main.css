@@ -273,6 +273,14 @@
     gap: 540px;
 }
 
+.btnRow {
+    display: flex;
+    justify-content: space-between;
+    /* Back left, Next right */
+    margin-top: 210px;
+    gap: 540px;
+}
+
 .backBtn {
     background-color: #ccc;
     padding: 10px 20px;
@@ -317,31 +325,6 @@
     padding: 10px;
     border: 1px dashed #ccc;
     cursor: pointer;
-}
-
-.uploadBox {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #aaa;
-    border-radius: 8px;
-    padding: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-    text-align: center;
-    width: 250px;
-}
-
-.uploadBox:hover {
-    border-color: #007bff;
-    background-color: #f9f9f9;
-}
-
-.uploadBox span {
-    margin-top: 5px;
-    font-size: 16px;
-    color: #555;
 }
 
 input,

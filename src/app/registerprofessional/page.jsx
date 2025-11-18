@@ -248,10 +248,7 @@ const handleSubcategoryClick = (subcat) => {
             {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
 
-          <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)} required disabled={!selectedCountry}>
-            <option value="">Select State</option>
-            {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+        
         </div>
 
         <div className="row">
@@ -259,12 +256,12 @@ const handleSubcategoryClick = (subcat) => {
             <option value="">Select City</option>
             {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-
-          {/* Category */}
-          <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} required>
-            <option value="">Select Category</option>
-            {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>)}
+  <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)} required disabled={!selectedCountry}>
+            <option value="">Select State</option>
+            {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
+          {/* Category */}
+         
         </div>
 
         {/* File Uploads */}
@@ -561,7 +558,7 @@ const handleSubcategoryClick = (subcat) => {
     
 
       {/* Navigation buttons */}
-      <div className="buttonRow">
+      <div className="btnRow">
         <button type="button" className="nextBtn" onClick={() => setStep(2)}>← Back</button>
         <button type="submit" className="nextBtn">Submit</button>
       </div>

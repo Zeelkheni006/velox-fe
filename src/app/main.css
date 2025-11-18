@@ -390,6 +390,42 @@
     }
     /* ✅ Search Bar */
     
+    .suggestionList {
+        background: #fff;
+        border: 1px solid #ddd;
+        width: 100%;
+        margin-top: 4px;
+        list-style: none;
+        padding: 5px 0;
+        border-radius: 6px;
+        max-height: 200px;
+        overflow-y: auto;
+        position: absolute;
+        z-index: 999;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .suggestionItem {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .suggestionItem:last-child {
+        border-bottom: none;
+        /* last ma line remove */
+    }
+    
+    .suggestionItem:hover {
+        background: #f5f5f5;
+    }
+    
+    .suggestionItem:hover {
+        background: #f2f2f2;
+    }
+    
     .search-container {
         margin-top: 1rem;
     }
@@ -742,6 +778,7 @@
     .about-section {
         padding: 5rem 1.5rem;
         background: #fff;
+        position: relative;
     }
     
     .about-container {
@@ -905,15 +942,19 @@
     .easy-process-section {
         background-color: #f9f9f9;
         padding: -90px -50px;
+        position: relative;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .steps-container {
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        gap: 60px;
+        /* better alignment */
+        gap: 2rem;
+        /* space between steps */
         flex-wrap: wrap;
-        margin-top: 40px;
     }
     /* Step Wrapper - now horizontal layout */
     
