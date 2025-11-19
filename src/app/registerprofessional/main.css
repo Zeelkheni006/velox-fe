@@ -262,22 +262,28 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
     width: 400%;
     max-width: 800px;
-    height: 800px;
+    height: 700px;
 }
 
 .buttonRow {
     display: flex;
     justify-content: space-between;
-    /* Back left, Next right */
-    margin-top: 20px;
+    justify-content: flex-end;
     gap: 540px;
+}
+
+.buttonrow {
+    display: flex;
+    justify-content: space-between;
+    justify-content: flex-end;
+    gap: 540px;
+    margin-top: 120px;
 }
 
 .btnRow {
     display: flex;
     justify-content: space-between;
-    /* Back left, Next right */
-    margin-top: 210px;
+    margin-top: 95px;
     gap: 540px;
 }
 
@@ -312,6 +318,10 @@
     display: flex;
     gap: 20px;
     /* space between the two upload boxes */
+}
+
+.row1 {
+    display: flex;
 }
 
 .fileUpload {
@@ -355,14 +365,6 @@ button {
 
 button:hover {
     background-color: #1a252f;
-}
-
-.buttonRow {
-    display: flex;
-    justify-content: flex-end;
-    /* aligns button to the right */
-    margin-top: 20px;
-    /* optional spacing from above fields */
 }
 
 .nextBtn {

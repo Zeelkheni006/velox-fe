@@ -82,3 +82,39 @@ export async function loginWithOtp(email, id, otp) {
     return { ok: false, message: "Network/API error" };
   }
 }
+
+export const changePassword = async ({ userId, oldPassword, newPassword, confirmPassword, token = "" }) => {
+  if (!userId) throw new Error("User ID is required");
+
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/auth/change-password/${userId}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify({
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_password: confirmPassword,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(JSON.stringify(errorData.message) || "Failed to change password");
+    }
+
+    return await response.json();
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
