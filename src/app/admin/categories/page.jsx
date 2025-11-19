@@ -9,6 +9,8 @@ import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
 
+
+import { refreshToken } from '../../api/auth/admin-refresh-tocken';
 function SortArrow({ direction }) {
   return (
     <span style={{ marginLeft: '5px', fontSize: '12px' }}>
@@ -20,7 +22,6 @@ function SortArrow({ direction }) {
 export default function Categories() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,6 +145,24 @@ try {
      const goToDashboard = () => {
     router.push("/admin/dashboard"); // Replace with your dashboard route
   };
+
+   
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    try {
+      const newToken = await refreshToken();
+      if (newToken) {
+        console.log("✅ Refresh token successful:", newToken);
+      } else {
+        console.error("❌ Refresh token failed");
+      }
+    } catch (err) {
+      console.error("Error calling refresh token API:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Layout>
        <PopupAlert message={popupMessage} type={popupType} />
@@ -167,6 +186,9 @@ try {
           <h3>Categories</h3>
      
           <button className={styles.addBtn} onClick={handleAddCategory}>+ Add New</button>
+        <button onClick={handleRefresh} disabled={loading} className="addBtn">
+      {loading ? "Refreshing..." : "+ Refresh Token"}
+    </button>
 </div>
           <div className={styles.showEntries}>
             <label>

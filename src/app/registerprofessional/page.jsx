@@ -264,14 +264,8 @@ const handleSubcategoryClick = (subcat) => {
          
         </div>
 
-        {/* File Uploads */}
-
-        <textarea placeholder="What do you do?" rows={4}></textarea>
-
-        <button type="submit">Submit</button>
-      
         {/* NEXT BUTTON – go to page 2 */}
-    <div className="buttonRow">
+    <div className="buttonrow">
   <button
     type="button"
     className="nextBtn"
@@ -376,10 +370,7 @@ const handleSubcategoryClick = (subcat) => {
         <textarea placeholder="Message" rows={4} onChange={(e) => setFranchiseMessage(e.target.value)}></textarea>
       </div>
 
-      {/* Submit & Next */}
      
-        <button type="submit">Submit</button>
-              {/* Submit & Navigation Buttons */}
 <div className="buttonRow">
   {/* Back button on the left */}
   <button
@@ -447,7 +438,7 @@ const handleSubcategoryClick = (subcat) => {
     <form className="form">
 
       {/* Top row: Pancard */}
-    <div className="row" style={{ marginBottom: "20px" }}>
+    <div className="row" style={{ marginBottom: " 50px" }}>
   {/* Pancard Upload */}
   <div style={{ flex: 1 }}>
     <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Pancard Upload</h4>
@@ -484,7 +475,7 @@ const handleSubcategoryClick = (subcat) => {
 </div>
 
 {/* Aadhar Uploads (Front & Back) */}
-<div className="row" style={{ display: "flex", gap: "20px" }}>
+<div className="row1">
   {/* Aadhar Front */}
   <div style={{ flex: 1 }}>
     <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Aadhar Front Upload</h4>
@@ -522,7 +513,7 @@ const handleSubcategoryClick = (subcat) => {
   {/* Aadhar Back */}
   <div style={{ flex: 1 }}>
     <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Aadhar Back Upload</h4>
-    <div style={{ display: "flex", justifyContent: "center" }}>
+    <div style={{ display: "flex", justifyContent: "center" , }}>
       <label
         style={{
           display: "flex",

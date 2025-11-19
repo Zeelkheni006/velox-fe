@@ -50,3 +50,48 @@ export async function verifyOtp(credential, otp) {
 
   return await res.json();
 }
+
+export const initiateForgotPassword = async (email) => {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/users/auth/forgot-password/initiate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }
+    );
+
+    const data = await res.json();
+    return data;
+
+  } catch (err) {
+    console.error("Forgot Password API Error:", err);
+
+    return {
+      success: false,
+      message: "Server error, please try again later.",
+      data: {},
+    };
+  }
+};
+export const verifyResetPassword = async (token, password) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/auth/reset-password/verify`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token, password }),
+      }
+    );
+
+    return await res.json();
+  } catch {
+    return { success: false, message: "Server error" };
+  }
+};
+
+

@@ -10,7 +10,7 @@ import "./main.css";
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
-import { getSliders , getFullLocation} from "./api/add-image/add-slider"; 
+import { getSliders , getFullLocation , getCategories} from "./api/add-image/add-slider"; 
 import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
 
@@ -18,20 +18,7 @@ import PopupAlert from "./admin/components/PopupAlert";
 
 // Array with image + text
 
-const services = [
-  { img: "/icon/ac-service.png", label: "AC Service" },
-  { img: "/icon/spa.png", label: "Spa for Women" },
-  { img: "/icon/cleaning.png", label: "Cleaning & Disinfection" },
-  { img: "/icon/grooming.png", label: "Men Grooming" },
-  { img: "/icon/sofa.png", label: "Sofa Cleaning" },
-  { img: "/icon/car-wash.png", label: "Car Washing" },
-  { img: "/icon/solar.png", label: "Solar Panel" },
-  { img: "/icon/beauty.png", label: "Women Beauty Care" },
-  { img: "/icon/pest.png", label: "Pest Control" },
-  { img: "/icon/skin.png", label: "Skin Treatment" },
-  { img: "/icon/nail.png", label: "NAIL Studio" },
-  { img: "/icon/other.png", label: "Other" },
-];
+
 
 const bestServices = [
   {
@@ -245,7 +232,15 @@ const fetchSuggestions = async (value) => {
     }, 100);
   }, []);
 
+  const [services, setServices] = useState([]);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await getCategories();
+      setServices(data); // Assuming data is an array of categories
+    };
+    fetchCategories();
+  }, []);
   return (
     <main>
 <PopupAlert message={popupMessage} type={popupType} />
@@ -354,18 +349,24 @@ const fetchSuggestions = async (value) => {
 
     </section>
 
-       <section className="services-section">
-  <div className="services-grid">
-    {services.map((service, index) => (
-      <div key={index} className="service-card">
-        <div className="service-image">   
-          <Image src={service.img} alt={service.label} fill className="service-img" />
-        </div>
-        <p className="service-label">{service.label}</p>
+ <section className="services-section">
+      <div className="services-grid">
+        {services.map((service) => (
+          <div key={service.id} className="service-card">
+            <div className="service-image">
+              <Image
+                src={service.logo} // backend provides the image path
+                alt={service.title}
+                width={100}
+                height={100}
+                className="service-img"
+              />
+            </div>
+            <p className="service-label">{service.title}</p>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-</section>
+    </section>
       <section className="py-10 px-4  ">
         <div className="best-service">
           <h2 className="text-center text-2xl font-bold mb-2">Best Services</h2>
@@ -649,5 +650,6 @@ const fetchSuggestions = async (value) => {
       </form>
     </section>
     </main>
+   
   );
 }
