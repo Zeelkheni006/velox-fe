@@ -14,7 +14,7 @@ export default function LayoutWrapper({ children }) {
     '/admin/admin-add/add-about','/admin/edit-about','/admin/admin-blog','/admin/admin-add/add-blog','/admin/edit-blog',"/admin/admin-contact","/admin/general-settings-logo",'/admin/edit-slider','/admin/admin-add/add-gift','/admin/edit-role','/admin/select-city','/admin/delete_accounts','/admin/local_page','/admin/forgot-password','/admin/change-password'
    ]; 
 
-  const hideLayout = hideLayoutRoutes.includes(pathname);
+   const hideLayout = hideLayoutRoutes.some(route => pathname.startsWith(route));
 
   return (
     <>

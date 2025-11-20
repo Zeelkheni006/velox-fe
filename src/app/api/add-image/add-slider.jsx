@@ -86,7 +86,7 @@ const res = await fetch(
 export const getCategories = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home-page-body/categories/get`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home_page_body/categories/get`,
       {
         method: "GET",
         headers: {
