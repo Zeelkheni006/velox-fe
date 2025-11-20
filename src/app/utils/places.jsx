@@ -10,3 +10,5 @@ export async function fetchNearbyPlaces(query, lat, lng) {
     return [];
   }
 }
+
+

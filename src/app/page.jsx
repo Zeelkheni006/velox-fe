@@ -13,7 +13,7 @@ import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
 import { getSliders , getFullLocation , getCategories} from "./api/add-image/add-slider"; 
 import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
-
+import {getStats} from "./api/user-side/home_api";
 
 
 // Array with image + text
@@ -241,6 +241,50 @@ const fetchSuggestions = async (value) => {
     };
     fetchCategories();
   }, []);
+
+    const [stats, setStats] = useState([]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      const data = await getStats();
+      console.log("📌 Final Stats Data:", data);
+
+      if (!data) return;
+
+      const formatted = [
+        {
+          id: 1,
+          label: "City",
+          value: data.City,
+          icon: "/icon/icon-1.png",
+        },
+        {
+          id: 2,
+          label: "Franchises",
+          value: data.Franchises,
+          icon: "/icon/icon-3.png",
+        },
+        {
+          id: 3,
+          label: "Happy Customer",
+          value: data["Happy Customer"],
+          icon: "/icon/icon-2.png",
+        },
+        {
+          id: 4,
+          label: "Services",
+          value: data.Services,
+          icon: "/icon/icon-4.png",
+        },
+      ];
+
+      console.log("📌 FORMATTED STATS:", formatted);
+      setStats(formatted);
+    }
+
+    fetchStats();
+  }, []);
+
   return (
     <main>
 <PopupAlert message={popupMessage} type={popupType} />
@@ -349,24 +393,28 @@ const fetchSuggestions = async (value) => {
 
     </section>
 
- <section className="services-section">
-      <div className="services-grid">
-        {services.map((service) => (
-          <div key={service.id} className="service-card">
-            <div className="service-image">
-              <Image
-                src={service.logo} // backend provides the image path
-                alt={service.title}
-                width={100}
-                height={100}
-                className="service-img"
-              />
-            </div>
-            <p className="service-label">{service.title}</p>
-          </div>
-        ))}
-      </div>
-    </section>
+<section className="services-section">
+  <div className="services-grid">
+    {services.map((service) => (
+      <Link
+        key={service.id}
+        href={`/services-list/${service.slug}`}   // 👈 OPEN DETAILS PAGE
+        className="service-card"
+      >
+        <div className="service-image">
+          <Image
+            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
+            alt={service.title}
+            width={50}
+            height={50}
+            className="service-img"
+          />
+        </div>
+        <p className="service-label">{service.title}</p>
+      </Link>
+    ))}
+  </div>
+</section>
       <section className="py-10 px-4  ">
         <div className="best-service">
           <h2 className="text-center text-2xl font-bold mb-2">Best Services</h2>
@@ -411,25 +459,30 @@ const fetchSuggestions = async (value) => {
           </Swiper>
           </div>
         </section>
-         <section className=" stats-section py-12 px-6 bg-gray-50">
+       <section className="stats-section py-12 px-6 bg-gray-50">
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid">
         {stats.map((stat) => (
           <div
             key={stat.id}
             className="relative bg-white rounded-2xl shadow-md text-center p-6 transition transform hover:-translate-y-1 hover:shadow-lg"
           >
-            {/* Orange Corner Border */}
             <div className="absolute bottom-0 left-0 w-full h-full rounded-2xl border-2 border-transparent">
               <div className="absolute bottom-0 left-0 w-1/3 h-1 border-b-4 border-orange-500 rounded-bl-xl"></div>
               <div className="absolute bottom-0 left-0 h-1/3 w-1 border-l-4 border-orange-500 rounded-bl-xl"></div>
             </div>
+
             <div className="stat-card">
-                <div className="corner-border"></div>
-            <div className="flex justify-center mb-3 stat-icon">
-              <Image src={stat.icon} alt={stat.label} width={50} height={50} />
-            </div>
-            <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
-            <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
+              <div className="flex justify-center mb-3 stat-icon">
+                <Image
+                  src={stat.icon}
+                  alt={stat.label}
+                  width={50}
+                  height={50}
+                  unoptimized
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
+              <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
             </div>
           </div>
         ))}
