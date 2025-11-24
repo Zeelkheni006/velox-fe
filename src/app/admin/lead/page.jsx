@@ -549,8 +549,8 @@ if (values.length > 0) {
               <thead>
                 <tr>
               {[
- "name","email","phone","message",
- "categories","country","state","city",
+ "owner name","franchise email","franchise phone","message",
+ "categories","franchise state","franchise city",
  "status"
 ].map((key) => (
 <th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
@@ -569,22 +569,22 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   style={{ cursor: "pointer" }}
 >
                     <td
-  onClick={(e) => handleCopy(e, lead.name, "Name", showPopup)}
+  onClick={(e) => handleCopy(e, lead.owner_name, "Owner Name", showPopup)}
   className={styles.copyCell}
 >
-  {lead.name}
+  {lead.owner_name}
 </td>
                     <td
- onClick={(e) => handleCopy(e, lead.email, "Email", showPopup)}
+ onClick={(e) => handleCopy(e, lead.franchise_email, "Franchise Email", showPopup)}
   className={styles.copyCell}
 >
-  {lead.email}
+  {lead.franchise_email}
 </td>
                     <td
-  onClick={(e) => handleCopy(e, lead.phone, "Phone",showPopup )}
+  onClick={(e) => handleCopy(e, lead.franchise_phone , "Franchise Phone",showPopup )}
   className={styles.copyCell}
 >
-  {lead.phone}
+  {lead.franchise_phone}
 </td>
 <td className={styles.messageCell}onClick={(e) => handleCopy(e, lead.message, "message", showPopup)}>
   <div className={styles.messageContent}>
@@ -643,14 +643,14 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
 </td> 
 
 
-                    <td onClick={(e) => handleCopy(e, lead.country, "country", showPopup)}>{lead.country}</td>
-                    <td onClick={(e) => handleCopy(e, lead.state, "state", showPopup)}>{lead.state}</td>
-                    <td onClick={(e) => handleCopy(e, lead.city, "city", showPopup)}>{lead.city}</td>
+                 
+                    <td onClick={(e) => handleCopy(e, lead.state, "Franchise state", showPopup)}>{lead.franchise_state?.name}</td>
+                    <td onClick={(e) => handleCopy(e, lead.city, "Franchise city", showPopup)}>{lead.franchise_city?.name}</td>
                   <td>
   <span
     className={`${styles.badge} ${
       lead.status === "PENDING" ? styles.pending :
-      lead.status === "ACCEPTED" ? styles.accept : styles.decline
+      lead.status === "ACCEPTED" ? styles.accept : styles.decline 
     }`}
     onClick={() => handleManageStatusClick(lead)} 
     style={{ cursor: "pointer" }} 
@@ -672,7 +672,7 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
 </button>
 
                       <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>Manage Status</button>
-
+        <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>view all detais</button>
 {lead.status?.toUpperCase() === "ACCEPTED" && (
   <button 
     className={styles.franchiseBtn}
