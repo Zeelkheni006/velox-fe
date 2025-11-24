@@ -64,7 +64,7 @@ const Header = ({ toggleMenu }) => {
             {/* EDIT PROFILE */}
             <div
               className={styles.dropdownItem}
-              onClick={() => router.push("/edit-profile")}
+              onClick={() => router.push("/admin/edit-profile")}
             >
               <AiOutlineUser className={styles.dropdownIcon} />
               <span>EDIT PROFILE</span>
@@ -82,7 +82,7 @@ const Header = ({ toggleMenu }) => {
             {/* LOGOUT */}
             <div
               className={styles.dropdownItem}
-              onClick={() => router.push("/logout")}
+              onClick={() => router.push("/admin")}
             >
               <SlPower className={styles.dropdownIcon} />
               <span>LOGOUT</span>

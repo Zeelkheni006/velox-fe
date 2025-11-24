@@ -4,9 +4,12 @@ import Image from "next/image";
 import { AiFillClockCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useState } from "react";
- 
+
+
 export default function ServiceDetails({ params }) {
    const [modalImage, setModalImage] = useState(null);
+   const [openDetail, setOpenDetail] = useState(false);
+     const [count, setCount] = useState(0);
   const service = {
     title: "Split AC Regular Water Jet Service",
     banner_image: "/images/image1.jpg",
@@ -53,7 +56,17 @@ export default function ServiceDetails({ params }) {
 
         <div className="service-title-row">
   <h1 className="service-title">{service.title}</h1>
-  <button className="btn-add">Add</button>
+  {count === 0 ? (
+        <button className="btn-add" onClick={() => setCount(1)}>
+          Add
+        </button>
+      ) : (
+        <div className="qty-box">
+          <button onClick={() => setCount(count - 1)}>-</button>
+          <span>{count}</span>
+          <button onClick={() => setCount(count + 1)}>+</button>
+        </div>
+      )}
 </div>
           <div className="service-rating">
             ⭐ {service.rating} ({service.rating_count} ratings)
@@ -67,7 +80,7 @@ export default function ServiceDetails({ params }) {
             ))}
           </ul>
           <div className="service-actions">
-            <button className="btn-outline">View Detail</button>
+            <button className="btn-outline" onClick={() => setOpenDetail(true)}>View Detail</button>
             <button className="btn-filled">Proceed to Pay</button>
           </div>
         </div>
@@ -99,7 +112,7 @@ export default function ServiceDetails({ params }) {
             ))}
           </ul>
           <div className="service-actions">
-            <button className="btn-outline">View Detail</button>
+           <button className="btn-outline" onClick={() => setOpenDetail(true)}>View Detail</button>
             <button className="btn-filled">Proceed to Pay</button>
           </div>
         </div>
@@ -130,7 +143,7 @@ export default function ServiceDetails({ params }) {
             ))}
           </ul>
           <div className="service-actions">
-            <button className="btn-outline">View Detail</button>
+           <button className="btn-outline" onClick={() => setOpenDetail(true)}>View Detail</button>
             <button className="btn-filled">Proceed to Pay</button>
           </div>
         </div>
@@ -160,17 +173,188 @@ export default function ServiceDetails({ params }) {
             ))}
           </ul>
           <div className="service-actions">
-            <button className="btn-outline">View Detail</button>
+           <button className="btn-outline" onClick={() => setOpenDetail(true)}>View Detail</button>
             <button className="btn-filled">Proceed to Pay</button>
           </div>
         </div>
         
       </div>
-      {modalImage && (
+{modalImage && (
   <div className="image-modal" onClick={() => setModalImage(null)}>
+    
+    {/* 🔹 Top Right Icons */}
+    <div className="modal-controls" onClick={(e) => e.stopPropagation()}>
+      <button className="modal-btn" onClick={() => setModalImage(null)}>✖</button>
+ 
+    </div>
+
     <img src={modalImage} alt="Service Image" />
   </div>
 )}
+
+{openDetail && (
+  <div className="side-modal-overlay" onClick={() => setOpenDetail(false)}>
+    <div className="side-modal" onClick={(e) => e.stopPropagation()}>
+
+      {/* top bar */}
+      <div className="side-modal-header">
+        <h2>{service.title}</h2>
+        <button className="close-btn" onClick={() => setOpenDetail(false)}>✖</button>
+      </div>
+
+  
+
+      {/* image */}
+      <div className="side-modal-img-box">
+        <img src={service.banner_image} className="side-modal-img" />
+      </div>
+
+      {/* Title + Price Row */}
+      <div className="details-row">
+        <h3 className="title-left">{service.title}</h3>
+        <h3 className="price-right">₹{service.price}</h3>
+      </div>
+
+      {/* Ratings */}
+      <p className="rating-left">⭐ {service.rating} Ratings</p>
+
+      <div className="time">
+      <p className="time-left"><AiFillClockCircle /> Estimated Time: {service.time} min</p>
+</div>
+      <ul className="side-modal-points">
+        {service.points.map((point, index) => (
+          <li key={index}><FcApproval /> {point}</li>
+        ))}
+      </ul>
+
+      {/* Specifications Section */}
+      <h3 className="spec-title">Specifications</h3>
+
+   <div className="spec-card">   {/* <-- added wrapper */}
+  <div className="spec-box">
+    <img
+      src="/images/image2.jpg"
+      className="spec-small-img"
+    />
+
+    <div className="spec-text">
+      <h4 className="spec-heading">High Pressure Power Jets</h4>
+      <p className="spec-desc">
+        Our Professional Team Cleans Units with High Pressure Power Jets during AC Service.
+      </p>
+    </div>
+  </div>
+</div>
+   <div className="spec-card">   {/* <-- added wrapper */}
+  <div className="spec-box">
+ 
+
+    <div className="spec-text">
+      <h4 className="spec-heading">High Pressure Power Jets</h4>
+      <p className="spec-desc">
+        Our Professional Team Cleans Units with High Pressure Power Jets during AC Service.
+      </p>
+    </div>
+       <img
+      src="/images/image1.jpg"
+      className="spec-small-img"
+    />
+  </div>
+</div>
+  <div className="spec-card">   {/* <-- added wrapper */}
+  <div className="spec-box">
+    <img
+      src="/images/image2.jpg"
+      className="spec-small-img"
+    />
+
+    <div className="spec-text">
+      <h4 className="spec-heading">High Pressure Power Jets</h4>
+      <p className="spec-desc">
+        Our Professional Team Cleans Units with High Pressure Power Jets during AC Service.
+      </p>
+    </div>
+  </div>
+</div>
+<div className="spec-bottom-img-box">
+  <img
+    src="/images/download.png"   // change your second image here
+    className="spec-bottom-img"
+  />
+</div> 
+<div className="spec-bottom-img-box1"> 
+  <img
+    src="/images/download1.png"   // change your second image here
+    className="spec-bottom-img1"
+  />
+  </div> 
+  <div className="spec-bottom-img-box1"> 
+  <img
+    src="/images/download3.jpg"   // change your second image here
+    className="spec-bottom-img1"
+  />
+  </div> 
+  <h3 className="review-title">Most Helpful Reviews</h3>
+
+<div className="review-box">
+  {/* left image */}
+  <img
+    src="/images/profile.png"  // your small reviewer image
+    className="review-user-img"
+  />
+
+  {/* middle part */}
+  <div className="review-user-info">
+    <h4 className="review-name">Manan Bhadresha</h4>
+    <p className="review-location">Jamnagar, 09 March, 2022</p>
+  </div>
+
+  {/* right rating */}
+  <div className="review-rating">
+    ⭐ 5.0
+  </div>
+</div>
+<div className="review-box">
+  {/* left image */}
+  <img
+    src="/images/profile.png"  // your small reviewer image
+    className="review-user-img"
+  />
+
+  {/* middle part */}
+  <div className="review-user-info">
+    <h4 className="review-name">Manan Bhadresha</h4>
+    <p className="review-location">Jamnagar, 09 March, 2022</p>
+  </div>
+
+  {/* right rating */}
+  <div className="review-rating">
+    ⭐ 5.0
+  </div>
+</div>
+<div className="review-box">
+  {/* left image */}
+  <img
+    src="/images/profile.png"  // your small reviewer image
+    className="review-user-img"
+  />
+
+  {/* middle part */}
+  <div className="review-user-info">
+    <h4 className="review-name">Manan Bhadresha</h4>
+    <p className="review-location">Jamnagar, 09 March, 2022</p>
+  </div>
+
+  {/* right rating */}
+  <div className="review-rating">
+    ⭐ 5.0
+  </div>
+</div>
+    </div>
+  </div>
+)}
+
+
     </div>
     
   );
