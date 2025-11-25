@@ -1,344 +1,283 @@
 "use client";
-
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import Layout from "../pages/page";
+import dynamic from "next/dynamic";
 import styles from "../styles/Leads.module.css";
-import { updateLead } from "../../api/manage_users/lead";
-import Select from "react-select";
-import usePopup from "../components/popup";
-import PopupAlert from "../components/PopupAlert";
-import {
-  getCategoryList,
-  getCountries,
-  getStates,
-  getCities,
-} from "../../api/user-side/register-professional/location";
+import Layout from "../pages/page";
+import React, { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SlHome } from "react-icons/sl";
+import { getStates, getCities, getCategoryList } from "../../api/user-side/register-professional/location";
+import { getLeadDetails } from "../../api/manage_users/lead";
 
-export default function EditLeadPage() {
-  const router = useRouter();
-  const { popupMessage, popupType, showPopup } = usePopup();
+export default function EditFranchise() {
 
-  const [lead, setLead] = useState({
-    id: "",
-    name: "",
-    email: "",
-    phone: "",
+    const router = useRouter();
+  const searchParams = useSearchParams();
+  const leadId = searchParams.get("id");
+
+  const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
+  const [states, setStates] = useState([]);
+  const [ownerCities, setOwnerCities] = useState([]);
+  const [franchiseCities, setFranchiseCities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+ 
+  const [kycFiles, setKycFiles] = useState({
+    aadharFront: "",
+    aadharBack: "",
+    panCard: ""
+  });
+  const [form, setForm] = useState({
+    owner_name: "",
+    owner_email: "",
+    owner_phone: "",
+    owner_pincode: "",
+    owner_address: "",
+    owner_state_id: "",
+    owner_city_id: "",
+    franchise_name: "",
+    franchise_email: "",
+    franchise_phone: "",
+    franchise_pincode: "",
+    franchise_address: "",
+    franchise_state_id: "",
+    franchise_city_id: "",
     message: "",
-    country_id: null,
-    state_id: null,
-    city_id: null,
-    categories: [],
   });
 
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [countryOptions, setCountryOptions] = useState([]);
-  const [stateOptions, setStateOptions] = useState([]);
-  const [cityOptions, setCityOptions] = useState([]);
-const [submitting, setSubmitting] = useState(false);
-const submitLock = useRef(false);
-  // ==================== Load Lead Data ====================
- const initialized = useRef(false); // 🔒 prevent double API calls
+ 
 
-useEffect(() => {
-   if (initialized.current) return;
-    initialized.current = true;
-  const initData = async () => {
-    const storedLead = localStorage.getItem("editLeadData");
-    if (!storedLead) return;
+  // Fetch lead data
+   useEffect(() => {
+    async function loadInitialData() {
+      const stateData = await getStates(1);
+      const categoryData = await getCategoryList();
+      setStates(stateData || []);
+      setCategories(categoryData || []);
+    }
+    loadInitialData();
+  }, []);
 
-    const leadData = JSON.parse(storedLead);
+  // Fetch lead details
+  useEffect(() => {
+    if (!leadId) return;
 
-    // Normalize IDs
-    const normalizedLead = {
-      ...leadData,
-      country_id: leadData.country_id
-        ? Number(leadData.country_id)
-        : leadData.country?.id
-        ? Number(leadData.country.id)
-        : null,
-      state_id: leadData.state_id
-        ? Number(leadData.state_id)
-        : leadData.state?.id
-        ? Number(leadData.state.id)
-        : null,
-      city_id: leadData.city_id
-        ? Number(leadData.city_id)
-        : leadData.city?.id
-        ? Number(leadData.city.id)
-        : null,
-      categories: leadData.categories || [],
-    };
+    async function fetchLead() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-    setLead(normalizedLead);
+        const res = await getLeadDetails(leadId, token); // <-- API call
+        if (!res?.success) return;
 
-    // Fetch categories and countries
-    const [catData, countryData] = await Promise.all([
-      getCategoryList(),
-      getCountries(),
-    ]);
+        const { data } = res;
+        const { owner_data = {}, franchise_data = {}, kyc_documents = {} } = data;
 
-    setCategoryOptions(catData.map((c) => ({ label: c.title, value: Number(c.id) })));
-    setCountryOptions(countryData.map((c) => ({ label: c.name, value: Number(c.id) })));
+        // Populate form
+        setForm({
+          owner_name: owner_data.owner_name || "",
+          owner_email: owner_data.owner_email || "",
+          owner_phone: owner_data.owner_phone || "",
+          owner_pincode: owner_data.owner_pincode || "",
+          owner_address: owner_data.owner_address || "",
+          owner_state_id: owner_data.owner_state_id || "",
+          owner_city_id: owner_data.owner_city_id || "",
+          franchise_name: franchise_data.franchise_name || "",
+          franchise_email: franchise_data.franchise_email || "",
+          franchise_phone: franchise_data.franchise_phone || "",
+          franchise_pincode: franchise_data.franchise_pincode || "",
+          franchise_address: franchise_data.franchise_address || "",
+          franchise_state_id: franchise_data.franchise_state_id || "",
+          franchise_city_id: franchise_data.franchise_city_id || "",
+          message: franchise_data.message || "",
+        });
 
-    // ✅ Preselect categories
-    const preSelectedCats = (normalizedLead.categories || []).map((cat) => {
-      if (typeof cat === "object" && cat.id) return { label: cat.title || cat.name, value: Number(cat.id) };
-      if (typeof cat === "string") return { label: cat, value: cat }; // fallback
-      return null;
-    }).filter(Boolean);
+        // Categories
+        setSelectedCategories((franchise_data.category_list || []).map(c => ({
+          value: c.id,
+          label: c.title
+        })));
 
-    setSelectedCategories(preSelectedCats);
+        // Cities
+        if (owner_data.owner_state_id) {
+          const ownerCitiesData = await getCities(owner_data.owner_state_id);
+          setOwnerCities(ownerCitiesData || []);
+        }
+        if (franchise_data.franchise_state_id) {
+          const franchiseCitiesData = await getCities(franchise_data.franchise_state_id);
+          setFranchiseCities(franchiseCitiesData || []);
+        }
 
-    // Fetch states & cities only if IDs exist
-    if (normalizedLead.country_id) {
-      const stateData = await getStates(normalizedLead.country_id);
-      const formattedStates = stateData.map((s) => ({ label: s.name, value: Number(s.id) }));
-      setStateOptions(formattedStates);
+        // KYC
+        setKycFiles({
+          aadharFront: kyc_documents.adhar_card_front_image || "",
+          aadharBack: kyc_documents.adhar_card_back_image || "",
+          panCard: kyc_documents.pan_card_image || ""
+        });
 
-      if (normalizedLead.state_id) {
-        const cityData = await getCities(normalizedLead.state_id);
-        const formattedCities = cityData.map((c) => ({ label: c.name, value: Number(c.id) }));
-        setCityOptions(formattedCities);
+      } catch (err) {
+        console.error(err);
       }
+    }
+
+    fetchLead();
+  }, [leadId]);
+
+
+  // Handle state changes separately for owner and franchise
+  const handleOwnerStateChange = async (e) => {
+    const stateId = e.target.value;
+    setForm({ ...form, owner_state_id: stateId, owner_city_id: "" });
+    if (stateId) {
+      const citiesData = await getCities(stateId);
+      setOwnerCities(citiesData || []);
+    } else {
+      setOwnerCities([]);
     }
   };
 
-  initData();
-}, []);
-
-
-  // ==================== Fetch Functions ====================
-  const fetchStates = async (countryId) => {
-    if (!countryId) return;
-    try {
-      const list = await getStates(countryId);
-      const options = list.map((s) => ({ label: s.name, value: Number(s.id) }));
-      setStateOptions(options);
-    } catch (err) {
-      showPopup("Failed to load states ❌", "error");
+  const handleFranchiseStateChange = async (e) => {
+    const stateId = e.target.value;
+    setForm({ ...form, franchise_state_id: stateId, franchise_city_id: "" });
+    if (stateId) {
+      const citiesData = await getCities(stateId);
+      setFranchiseCities(citiesData || []);
+    } else {
+      setFranchiseCities([]);
     }
   };
 
-  const fetchCities = async (stateId) => {
-    if (!stateId) return;
-    try {
-      const list = await getCities(stateId);
-      const options = list.map((c) => ({ label: c.name, value: Number(c.id) }));
-      setCityOptions(options);
-    } catch (err) {
-      showPopup("Failed to load cities ❌", "error");
-    }
-  };
+  const handleOwnerCityChange = (e) => setForm({ ...form, owner_city_id: e.target.value });
+  const handleFranchiseCityChange = (e) => setForm({ ...form, franchise_city_id: e.target.value });
 
-  // ==================== Handlers ====================
-  const handleCountryChange = (selected) => {
-    const countryId = selected ? Number(selected.value) : null;
-    setLead((prev) => ({
-      ...prev,
-      country_id: countryId,
-      state_id: null,
-      city_id: null,
-    }));
-    setStateOptions([]);
-    setCityOptions([]);
-    if (countryId) fetchStates(countryId);
-  };
+  const categoryOptions = categories.map(cat => ({ value: cat.id, label: cat.title }));
+  const goToDashboard = () => router.push("/admin/dashboard");
 
-  const handleStateChange = (selected) => {
-    const stateId = selected ? Number(selected.value) : null;
-    setLead((prev) => ({
-      ...prev,
-      state_id: stateId,
-      city_id: null,
-    }));
-    setCityOptions([]);
-    if (stateId) fetchCities(stateId);
-  };
-
-  const handleCityChange = (selected) => {
-    setLead((prev) => ({
-      ...prev,
-      city_id: selected ? Number(selected.value) : null,
-    }));
-  };
-
-  const handleChange = (e) => {
-    setLead({ ...lead, [e.target.name]: e.target.value });
-  };
-
-  const goToDashboard = () => {
-    router.push("/admin/dashboard");
-  };
-
-  // ==================== Submit ====================
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (submitting || submitLock.current) return;
-  submitLock.current = true; // lock
-  setSubmitting(true);
-    try {
-      const originalLead = JSON.parse(localStorage.getItem("editLeadData") || "{}");
-
-      const updatedPayload = {
-        name: lead.name,
-        email: lead.email,
-        phone: lead.phone,
-        message: lead.message,
-        country_id: lead.country_id ? Number(lead.country_id) : null,
-        state_id: lead.state_id ? Number(lead.state_id) : null,
-        city_id: lead.city_id ? Number(lead.city_id) : null,
-        category_list: selectedCategories.map((sel) => Number(sel.value)),
-      };
-
-      // ✅ Only send changed fields
-      const changedData = {};
-      Object.keys(updatedPayload).forEach((key) => {
-        const newVal = updatedPayload[key];
-        const oldVal =
-          key === "category_list"
-            ? (originalLead.categories || []).map((c) => Number(c.id))
-            : originalLead[key];
-
-        const isChanged =
-          JSON.stringify(newVal) !== JSON.stringify(oldVal);
-
-        if (isChanged) changedData[key] = newVal;
-      });
-
-      console.log("🟡 Changed Data to Send:", changedData);
-
-      if (Object.keys(changedData).length === 0) {
-        showPopup("No changes detected!", "info");
-        return;
-      }
-
-      const res = await updateLead(lead.id, changedData);
-
-      if (res.success) {
-        showPopup("✅ Updated Successfully!", "success");
-        localStorage.setItem(
-          "updatedLead",
-          JSON.stringify({ ...originalLead, ...changedData })
-        );
-        setTimeout(() => router.push("/admin/lead"), 600);
-      } else {
-        showPopup(res.message || "❌ Update failed!", "error");
-      }
-    } catch (err) {
-      console.error("updateLead error:", err);
-      showPopup("❌ Server error!", "error");
-    }finally {
-    setSubmitting(false); // ✅ allow new submission after finish
-  }
-  };
-
-  // ==================== Render ====================
   return (
     <Layout>
-      <PopupAlert message={popupMessage} type={popupType} />
-      <div className={styles.editcontainer}>
+      <div className={styles.container}>
+        {/* Breadcrumb */}
         <div className={styles.headerContainer}>
           <div>
-            <span
-              className={styles.breadcrumb}
-              onClick={() => router.push("/admin/lead")}
-              style={{ cursor: "pointer" }}
-            >
-              Lead
-            </span>
+            <span className={styles.breadcrumb} onClick={() => router.push("/admin/lead")} style={{ cursor: "pointer" }}>Lead</span>
             <span className={styles.separator}> | </span>
-            <SlHome
-              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
-              onClick={goToDashboard}
-              title="Go to Dashboard"
-            />
+            <SlHome style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }} onClick={goToDashboard} title="Go to Dashboard" />
             <span> &gt; </span>
-            <span className={styles.breadcrumbActive}> Edit Lead</span>
+            <span className={styles.breadcrumbActive}>Edit Lead</span>
           </div>
         </div>
 
+        {/* Owner & Franchise Info */}
+        <div className={styles.twoColWrap}>
+          {/* Owner Details */}
+          <div className={styles.editcard}>
+            <h2 className={styles.sectiontitle}>Owner Details</h2>
+            <div className={styles.gridbox}>
+              <div>
+                <label className={styles.label}>Owner Name</label>
+                <input type="text" className={styles.input} value={form.owner_name} onChange={e => setForm({ ...form, owner_name: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Owner Email</label>
+                <input type="email" className={styles.input} value={form.owner_email} onChange={e => setForm({ ...form, owner_email: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Owner Phone</label>
+                <input type="text" className={styles.input} value={form.owner_phone} onChange={e => setForm({ ...form, owner_phone: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Owner Pincode</label>
+                <input type="text" className={styles.input} value={form.owner_pincode} onChange={e => setForm({ ...form, owner_pincode: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Owner State</label>
+                <select className={styles.input} value={form.owner_state_id} onChange={handleOwnerStateChange}>
+                  <option value="">Select State</option>
+                  {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={styles.label}>Owner City</label>
+                <select className={styles.input} value={form.owner_city_id} onChange={handleOwnerCityChange}>
+                  <option value="">Select City</option>
+                  {ownerCities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <label className={styles.label}>Owner Address</label>
+            <textarea className={`${styles.input} ${styles.full}`} rows={3} value={form.owner_address} onChange={e => setForm({ ...form, owner_address: e.target.value })} />
+          </div>
+
+          {/* Franchise Info */}
+          <div className={styles.editcard}>
+            <h2 className={styles.sectiontitle}>Franchise Info</h2>
+            <div className={styles.gridbox}>
+              <div>
+                <label className={styles.label}>Franchise Name</label>
+                <input type="text" className={styles.input} value={form.franchise_name} onChange={e => setForm({ ...form, franchise_name: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Franchise Email</label>
+                <input type="email" className={styles.input} value={form.franchise_email} onChange={e => setForm({ ...form, franchise_email: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Franchise Phone</label>
+                <input type="text" className={styles.input} value={form.franchise_phone} onChange={e => setForm({ ...form, franchise_phone: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Franchise Pincode</label>
+                <input type="text" className={styles.input} value={form.franchise_pincode} onChange={e => setForm({ ...form, franchise_pincode: e.target.value })} />
+              </div>
+              <div>
+                <label className={styles.label}>Franchise State</label>
+                <select className={styles.input} value={form.franchise_state_id} onChange={handleFranchiseStateChange}>
+                  <option value="">Select State</option>
+                  {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={styles.label}>Franchise City</label>
+                <select className={styles.input} value={form.franchise_city_id} onChange={handleFranchiseCityChange}>
+                  <option value="">Select City</option>
+                  {franchiseCities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <label className={styles.label}>Franchise Address</label>
+            <textarea className={`${styles.input} ${styles.full}`} rows={3} value={form.franchise_address} onChange={e => setForm({ ...form, franchise_address: e.target.value })} />
+
+            <label className={styles.label}>Franchise Category</label>
+           <ReactSelect
+  isMulti
+  placeholder="Select Categories"
+  options={categoryOptions}
+  value={selectedCategories}
+  onChange={setSelectedCategories}
+/>
+
+            <label className={styles.label}>Franchise Message</label>
+            <textarea className={`${styles.input} ${styles.full}`} rows={3} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
+          </div>
+        </div>
+
+        {/* KYC Section */}
         <div className={styles.editcard}>
-          <h2 className={styles.title}>Edit Lead</h2>
-
-          <form onSubmit={handleSubmit} className={styles.form}>
-            {/* Country */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Country</label>
-              <Select
-                placeholder="Select Country"
-                options={countryOptions}
-                value={countryOptions.find((c) => c.value === lead.country_id) || null}
-                onChange={handleCountryChange}
-                isClearable
-              />
-            </div>
-
-            {/* State */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>State</label>
-              <Select
-                placeholder="Select State"
-                options={stateOptions}
-                value={stateOptions.find((s) => s.value === lead.state_id) || null}
-                onChange={handleStateChange}
-                isClearable
-                isDisabled={!lead.country_id}
-              />
-            </div>
-
-            {/* City */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>City</label>
-              <Select
-                placeholder="Select City"
-                options={cityOptions}
-                value={cityOptions.find((c) => c.value === lead.city_id) || null}
-                onChange={handleCityChange}
-                isClearable
-                isDisabled={!lead.state_id}
-              />
-            </div>
-
-            {/* Other Inputs */}
-            {["name", "email", "phone", "message"].map((field) => (
-              <div key={field} className={styles.formGroup}>
-                <label className={styles.label}>
-                  {field.charAt(0).toUpperCase() + field.slice(1)}
-                </label>
-                <input
-                  type="text"
-                  name={field}
-                  value={lead[field]}
-                  onChange={handleChange}
-                  className={styles.input}
-                  required
-                />
+          <h2 className={styles.sectiontitle}>KYC Documents</h2>
+          <div className={styles.kycRow}>
+            {["aadharFront","aadharBack","panCard"].map((key) => (
+              <div className={styles.kycBox} key={key}>
+                <label className={styles.label}>{key.replace(/([A-Z])/g, ' $1')}</label>
+                <div className={styles.previewBox}>
+                  {kycFiles[key] && <img src={kycFiles[key]} alt={key} className={styles.previewImg} />}
+                </div>
+                <input type="file" id={key} className={styles.fileInput} />
+                <label htmlFor={key} className={styles.chooseBtn}>Change File</label>
               </div>
             ))}
-
-            {/* Categories */}
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Categories</label>
-              <Select
-                isMulti
-                placeholder="Select Categories"
-                options={categoryOptions}
-                value={selectedCategories}
-                onChange={(selected) => setSelectedCategories(selected || [])}
-                isClearable
-              />
-            </div>
-
-           <button type="submit" className={styles.button} disabled={submitting}>
-              Update Lead
-            </button>
-          </form>
+          </div>
+          <button className={styles.btnupdate}>Update</button>
         </div>
       </div>
     </Layout>
   );
 }
-  
