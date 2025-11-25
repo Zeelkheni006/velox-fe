@@ -64,13 +64,13 @@ import Select from "react-select";
     const [selectedState, setSelectedState] = useState("");
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
-  const [showPopup, setShowPopup] = useState(false);
+  
   const [popupCategoryTitle, setPopupCategoryTitle] = useState("");
     const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
   const [subcategories, setSubcategories] = useState([]);
   const [services, setServices] = useState([]);
-    const { popupMessage, popupType } = usePopup();
+
     const [pancardFile, setPancardFile] = useState(null);
     const [step, setStep] = useState(1);
     const [aadharFront, setAadharFront] = useState(null);
@@ -81,7 +81,7 @@ const [address, setAddress] = useState("");
 const [email, setEmail] = useState("");
 const [pincode, setPincode] = useState("");
 const [selectedCategories, setSelectedCategories] = useState([]);
-
+const { popupMessage, popupType, showPopup } = usePopup();
 const [franchiseCategory, setFranchiseCategory] = useState("");
 const [franchiseMessage, setFranchiseMessage] = useState("");
     // Fetch Countries & Categories on load
@@ -177,6 +177,104 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
   }
 };
 
+const validateStep1 = () => {
+  if (!ownerName.trim()) {
+    showPopup("Please enter your name","error");
+    return false;
+  }
+  if (!phone.trim()) {
+    alert("Please enter phone number","error");
+    return false;
+  }
+  if (!address.trim()) {
+    alert("Please enter address","error");
+    return false;
+  }
+  if (!email.trim()) {
+    alert("Please enter email","error");
+    return false;
+  }
+  if (!pincode.trim()) {
+    alert("Please enter pincode","error");
+    return false;
+  }
+  if (!selectedCountry) {
+    alert("Please select country","error");
+    return false;
+  }
+  if (!selectedState) {
+    alert("Please select state","error");
+    return false;
+  }
+  if (!selectedCity) {
+    alert("Please select city","error");
+    return false;
+  }
+
+  return true;
+};
+const validateStep2 = () => {
+  if (!ownerName.trim()) {
+    alert("Please enter Name","error");
+    return false;
+  }
+  if (!phone.trim()) {
+    alert("Please enter Phone","error");
+    return false;
+  }
+  if (!address.trim()) {
+    alert("Please enter Address","error");
+    return false;
+  }
+  if (!email.trim()) {
+    alert("Please enter Email","error");
+    return false;
+  }
+  if (!pincode.trim()) {
+    alert("Please enter Pincode","error");
+    return false;
+  }
+  if (!selectedCountry) {
+    alert("Please select Country","error");
+    return false;
+  }
+  if (!selectedState) {
+    alert("Please select State","error");
+    return false;
+  }
+  if (!selectedCity) {
+    alert("Please select City","error");
+    return false;
+  }
+  if (selectedCategories.length === 0) {
+    alert("Please select at least one Category","error");
+    return false;
+  }
+  if (!franchiseMessage.trim()) {
+    alert("Please enter Message","error");
+    return false;
+  }
+
+  return true;
+};
+const validateStep3 = () => {
+  if (!pancardFile) {
+    alert("Please upload Pancard");
+    return false;
+  }
+
+  if (!aadharFront) {
+    alert("Please upload Aadhar Front");
+    return false;
+  }
+
+  if (!aadharBack) {
+    alert("Please upload Aadhar Back");
+    return false;
+  }
+
+  return true;
+};
 
     return (
       
@@ -250,38 +348,43 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
 
     {step === 1 && (
       <div className="formBox">
-  <div className="stepIndicator">
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(1)}
-    >
-      <span className="stepLabel">Personal Details</span>
-      <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
-    </div>
-
-    <div className="stepLine"></div>
-
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(2)}
-    >
-      <span className="stepLabel">Franchise Info</span>
-      <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
-    </div>
-
-    <div className="stepLine"></div>
-
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(3)}
-    >
-      <span className="stepLabel">KYC Document</span>
-      <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
-    </div>
+<div className="stepIndicator">
+  <div 
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(1)}
+  >
+    <span className="stepLabel">Personal Details</span>
+    <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
   </div>
+
+  <div className="stepLine"></div>
+
+  <div
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => {
+      if (validateStep1()) setStep(2);
+    }}
+  >
+    <span className="stepLabel">Franchise Info</span>
+    <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  <div
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => {
+      if (validateStep1() && validateStep2()) setStep(3);
+    }}
+  >
+    <span className="stepLabel">KYC Document</span>
+    <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
+  </div>
+</div>
+
 
         <h2 className="heading">Personal <span>Details</span></h2>
       
@@ -307,13 +410,32 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
           </div>
 
           <div className="row">
-            <input type="text" placeholder="Address Line 1" required />
+           <input
+  type="text"
+  placeholder="Address Line 1"
+  required
+  value={address}
+  onChange={(e) => setAddress(e.target.value)}
+/>
           </div>
 
           <div className="row">
           
-              <input type="email" placeholder="Email" required />
-            <input type='text'placeholder='pincode' required/>
+             <input
+  type="email"
+  placeholder="Email"
+  required
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+/>
+
+<input
+  type='text'
+  placeholder='Pincode'
+  required
+  value={pincode}
+  onChange={(e) => setPincode(e.target.value)}
+/>
           </div>
 
           <div className="row">
@@ -340,13 +462,15 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
 
           {/* NEXT BUTTON – go to page 2 */}
       <div className="buttonrow">
-    <button
-      type="button"
-      className="nextBtn"
-      onClick={() => setStep(step + 1)}
-    >
-      Next →
-    </button>
+<button
+  type="button"
+  className="nextBtn"
+  onClick={() => {
+    if (validateStep1()) setStep(step + 1);
+  }}
+>
+  Next →
+</button>
   </div>  
 
         </form>
@@ -358,38 +482,46 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
     {/* STEP 2 (Franchise Info) */}
   {step === 2 && (
     <div className="formBox">
-      <div className="stepIndicator">
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(1)}
-    >
-      <span className="stepLabel">Personal Details</span>
-      <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
-    </div>
-
-    <div className="stepLine"></div>
-
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(2)}
-    >
-      <span className="stepLabel">Franchise Info</span>
-      <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
-    </div>
-
-    <div className="stepLine"></div>
-
-    <div 
-      className="stepItem"
-      style={{ cursor: "pointer" }}
-      onClick={() => setStep(3)}
-    >
-      <span className="stepLabel">KYC Document</span>
-      <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
-    </div>
+ <div className="stepIndicator">
+  {/* STEP 1 */}
+  <div
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => setStep(1)}
+  >
+    <span className="stepLabel">Personal Details</span>
+    <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
   </div>
+
+  <div className="stepLine"></div>
+
+  {/* STEP 2 */}
+  <div
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => {
+      if (validateStep1()) setStep(2);
+    }}
+  >
+    <span className="stepLabel">Franchise Info</span>
+    <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
+  </div>
+
+  <div className="stepLine"></div>
+
+  {/* STEP 3 */}
+  <div
+    className="stepItem"
+    style={{ cursor: "pointer" }}
+    onClick={() => {
+      if (validateStep1() && validateStep2()) setStep(3);
+    }}
+  >
+    <span className="stepLabel">KYC Document</span>
+    <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
+  </div>
+</div>
+
 
       <h2 className="heading">Franchise <span>Info</span></h2>
 
@@ -436,16 +568,16 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
 
  </div>
 
-  <div style={{ width: "100%" }}>
-    <Select
-      isMulti
-      placeholder="Select Categories"
-      options={categoryOptions}
-      value={selectedCategories}
-      onChange={(selected) => setSelectedCategories(selected || [])}
-    />
- 
-</div>
+    <div style={{ width: "100%" }}>
+      <Select
+        isMulti
+        placeholder="Select Categories"
+        options={categoryOptions}
+        value={selectedCategories}
+        onChange={(selected) => setSelectedCategories(selected || [])}
+      />
+  
+  </div>
 
 
 
@@ -471,7 +603,9 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
     <button
       type="button"
       className="nextBtn"
-      onClick={() => setStep(step + 1)}
+      onClick={() =>{
+        if (validateStep2())
+       setStep(step + 1);}}
     >
       Next →
     </button>
@@ -633,7 +767,15 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
         {/* Navigation buttons */}
         <div className="btnRow">
           <button type="button" className="nextBtn" onClick={() => setStep(2)}>← Back</button>
-         <button type="button" className="nextBtn" onClick={handleFinalSubmit}>
+     <button
+  type="button"
+  className="nextBtn"
+  onClick={() => {
+    if (validateStep3()) {
+      handleFinalSubmit();
+    }
+  }}
+>
   Submit
 </button>
         </div>

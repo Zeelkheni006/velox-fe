@@ -661,12 +661,9 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
                     <td>
 <button
   className={styles.editBtn}
- onClick={() => {
-  localStorage.setItem("editLeadData", JSON.stringify(lead));
-  setTimeout(() => {
+  onClick={() => {
     router.push(`/admin/edit?id=${lead._id || lead.id}`);
-  }, 100); // small delay avoids React race condition
-}}
+  }}
 >
   Edit
 </button>

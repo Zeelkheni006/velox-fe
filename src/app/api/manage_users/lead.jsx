@@ -188,3 +188,35 @@ export async function getFilterDropdownData() {
   }
 }
 
+// src/api/admin/leads.js
+export const getLeadDetails = async (id, token) => {
+  if (!token) {
+    console.error("No token provided to getLeadDetails");
+    return { success: false, data: null };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get/one-lead-data/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("API returned error:", res.status, text);
+      return { success: false, data: null };
+    }
+
+    const json = await res.json();
+    return json; // json already has { success, data, message }
+  } catch (err) {
+    console.error("API ERROR → getLeadDetails:", err);
+    return { success: false, data: null };
+  }
+};
+
+
+
