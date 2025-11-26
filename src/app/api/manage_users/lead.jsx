@@ -117,52 +117,72 @@ export async function updateLeadStatus(id, status) {
   }
 }
 
-export async function updateLead(id, leadData) {
+// export async function updateLead(id, leadData) {
+//   try {
+//     const token = localStorage.getItem("access_token");
+//     if (!token) throw new Error("⚠️ Please login.");
+
+//     const formData = new FormData();
+
+//     for (const key in leadData) {
+//       const value = leadData[key];
+//       if (value === null || value === undefined || value === "") continue;
+
+//       // ✅ Special case: send category_list as JSON
+//       if (key === "category_list" && Array.isArray(value)) {
+//         formData.append(key, JSON.stringify(value.map(Number)));
+//       }
+//       // ✅ Normal array handling (other arrays if any)
+//       else if (Array.isArray(value)) {
+//         value.forEach((v) => formData.append(key, v));
+//       } else {
+//         formData.append(key, value);
+//       }
+//     }
+
+//     // Debugging: log full formData
+//     for (let [k, v] of formData.entries()) console.log("📦", k, v);
+
+//     const res = await fetch(
+//       `${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`,
+//       {
+//         method: "PATCH",
+//         headers: { Authorization: `Bearer ${token}` },
+//         body: formData,
+//       }
+//     );
+
+//     const data = await res.json();
+//     if (!res.ok) throw new Error(data.message || `Failed to update lead (${res.status})`);
+
+//     return data;
+//   } catch (err) {
+//     console.error("updateLead error:", err);
+//     alert("⚠️ Could not connect to server. Check your network or backend.");
+//     throw err;
+//   }
+// }
+
+export const updateLead = async (leadId, token, formData) => {
   try {
-    const token = localStorage.getItem("access_token");
-    if (!token) throw new Error("⚠️ Please login.");
-
-    const formData = new FormData();
-
-    for (const key in leadData) {
-      const value = leadData[key];
-      if (value === null || value === undefined || value === "") continue;
-
-      // ✅ Special case: send category_list as JSON
-      if (key === "category_list" && Array.isArray(value)) {
-        formData.append(key, JSON.stringify(value.map(Number)));
-      }
-      // ✅ Normal array handling (other arrays if any)
-      else if (Array.isArray(value)) {
-        value.forEach((v) => formData.append(key, v));
-      } else {
-        formData.append(key, value);
-      }
-    }
-
-    // Debugging: log full formData
-    for (let [k, v] of formData.entries()) console.log("📦", k, v);
-
     const res = await fetch(
-      `${API_BASE_URL}/api/v1/admin/manage-users/leads/update/${id}`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/update/${leadId}`,
       {
         method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       }
     );
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.message || `Failed to update lead (${res.status})`);
-
     return data;
-  } catch (err) {
-    console.error("updateLead error:", err);
-    alert("⚠️ Could not connect to server. Check your network or backend.");
-    throw err;
+  } catch (error) {
+    console.error("UPDATE LEAD API ERROR:", error);
+    return { success: false, message: "API error" };
   }
-}
-
+};
 
 
 
@@ -190,33 +210,39 @@ export async function getFilterDropdownData() {
 
 // src/api/admin/leads.js
 export const getLeadDetails = async (id, token) => {
-  if (!token) {
-    console.error("No token provided to getLeadDetails");
-    return { success: false, data: null };
-  }
+  if (!token) return { success: false, data: null, message: "Token missing" };
 
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get/one-lead-data/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/get/one-lead-data/${id}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("API returned error:", res.status, text);
-      return { success: false, data: null };
+    const data = await res.json();
+
+    // Handle API returning success: false
+    if (!data.success) {
+      console.warn("Lead fetch failed:", data.message);
+      return { success: false, data: null, message: data.message };
     }
 
-    const json = await res.json();
-    return json; // json already has { success, data, message }
+    return { success: true, data: data.data };
+
   } catch (err) {
-    console.error("API ERROR → getLeadDetails:", err);
-    return { success: false, data: null };
+    console.error("Lead fetch error", err);
+    return { success: false, data: null, message: err.message || "Network error" };
   }
 };
+
+
+
 
 
 
