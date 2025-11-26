@@ -83,6 +83,15 @@ const [pincode, setPincode] = useState("");
 const [selectedCategories, setSelectedCategories] = useState([]);
 const { popupMessage, popupType, showPopup } = usePopup();
 const [franchiseCategory, setFranchiseCategory] = useState("");
+const [franchiseName, setFranchiseName] = useState("");
+const [franchisePhone, setFranchisePhone] = useState("");
+const [franchiseEmail, setFranchiseEmail] = useState("");
+const [franchiseAddress, setFranchiseAddress] = useState("");
+const [franchisePincode, setFranchisePincode] = useState("");
+const [franchiseCountry, setFranchiseCountry] = useState("");
+const [franchiseState, setFranchiseState] = useState("");
+const [franchiseCity, setFranchiseCity] = useState("");
+const [franchiseCategories, setFranchiseCategories] = useState([]);
 const [franchiseMessage, setFranchiseMessage] = useState("");
     // Fetch Countries & Categories on load
     const categoryOptions = categories?.map((cat) => ({
@@ -183,31 +192,31 @@ const validateStep1 = () => {
     return false;
   }
   if (!phone.trim()) {
-    alert("Please enter phone number","error");
+    showPopup("Please enter phone number","error");
     return false;
   }
   if (!address.trim()) {
-    alert("Please enter address","error");
+    showPopup("Please enter address","error");
     return false;
   }
   if (!email.trim()) {
-    alert("Please enter email","error");
+    showPopup("Please enter email","error");
     return false;
   }
   if (!pincode.trim()) {
-    alert("Please enter pincode","error");
+    showPopup("Please enter pincode","error");
     return false;
   }
   if (!selectedCountry) {
-    alert("Please select country","error");
+    showPopup("Please select country","error");
     return false;
   }
   if (!selectedState) {
-    alert("Please select state","error");
+    showPopup("Please select state","error");
     return false;
   }
   if (!selectedCity) {
-    alert("Please select city","error");
+    showPopup("Please select city","error");
     return false;
   }
 
@@ -215,43 +224,43 @@ const validateStep1 = () => {
 };
 const validateStep2 = () => {
   if (!ownerName.trim()) {
-    alert("Please enter Name","error");
+    showPopup("Please enter Name","error");
     return false;
   }
   if (!phone.trim()) {
-    alert("Please enter Phone","error");
+    showPopup("Please enter Phone","error");
     return false;
   }
   if (!address.trim()) {
-    alert("Please enter Address","error");
+    showPopup("Please enter Address","error");
     return false;
   }
   if (!email.trim()) {
-    alert("Please enter Email","error");
+    showPopup("Please enter Email","error");
     return false;
   }
   if (!pincode.trim()) {
-    alert("Please enter Pincode","error");
+    showPopup("Please enter Pincode","error");
     return false;
   }
   if (!selectedCountry) {
-    alert("Please select Country","error");
+    showPopup("Please select Country","error");
     return false;
   }
   if (!selectedState) {
-    alert("Please select State","error");
+    showPopup("Please select State","error");
     return false;
   }
   if (!selectedCity) {
-    alert("Please select City","error");
+    showPopup("Please select City","error");
     return false;
   }
   if (selectedCategories.length === 0) {
-    alert("Please select at least one Category","error");
+    showPopup("Please select at least one Category","error");
     return false;
   }
   if (!franchiseMessage.trim()) {
-    alert("Please enter Message","error");
+    showPopup("Please enter Message","error");
     return false;
   }
 
@@ -529,30 +538,30 @@ const validateStep3 = () => {
 
         {/* Name & Phone */}
         <div className="row">
-        <input type="text" placeholder="Enter Name" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} required />
-<input type="tel" placeholder="Enter Phone" value={phone} onChange={(e) => setPhone(e.target.value)} required />
+        <input type="text" placeholder="Enter Name" value={franchiseName} onChange={(e) => setFranchiseName(e.target.value)} required />
+<input type="tel" placeholder="Enter Phone" value={franchisePhone} onChange={(e) => setFranchisePhone(e.target.value)} required />
         </div>
 
         {/* Email */}
         <div className="row">
-         <input type="text" placeholder="Address Line 1" value={address} onChange={(e) => setAddress(e.target.value)} required />
+         <input type="text" placeholder="Address Line 1" value={franchiseAddress} onChange={(e) => setAddress(e.target.value)} required />
         </div>
 
         {/* Address & Pincode */}
         <div className="row">
 
-                 <input type="email" placeholder="Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-         <input type="text" placeholder="Pincode" value={pincode} onChange={(e) => setPincode(e.target.value)} required />
+                 <input type="email" placeholder="Enter Email" value={franchiseEmail} onChange={(e) => setFranchiseAddress(e.target.value)} required />
+         <input type="text" placeholder="Pincode" value={franchisePincode} onChange={(e) => setFranchisePincode(e.target.value)} required />
         </div>
 
         {/* Country & State */}
         <div className="row">
-          <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} required>
+          <select value={franchiseCountry} onChange={(e) => setFranchiseCountry(e.target.value)} required>
             <option value="">Select Country</option>
             {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
 
-          <select value={selectedState} onChange={(e) => setSelectedState(e.target.value)} required disabled={!selectedCountry}>
+          <select value={franchiseState} onChange={(e) => setFranchiseState(e.target.value)} required disabled={!selectedCountry}>
             <option value="">Select State</option>
             {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
@@ -560,7 +569,7 @@ const validateStep3 = () => {
 
         {/* City & Category */}
         <div className="row">
-          <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} required disabled={!selectedState}>
+          <select value={franchiseCity} onChange={(e) => setFranchiseCity(e.target.value)} required disabled={!selectedState}>
             <option value="">Select City</option>
             {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>

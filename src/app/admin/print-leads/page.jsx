@@ -47,7 +47,7 @@ useEffect(() => {
             <th>Email</th>
             <th>Mobile</th>
             <th>Message</th>
-            <th>Country</th>
+            <th>categories</th>
             <th>State</th>
             <th>City</th>
           </tr>
@@ -55,13 +55,14 @@ useEffect(() => {
         <tbody>
           {leads.map((lead, i) => (
             <tr key={i}>
-              <td>{lead.name}</td>
-              <td>{lead.email}</td>
-              <td>{lead.phone}</td>
+              <td>{lead.owner_name}</td>
+              <td>  {lead.franchise_email}</td>
+              <td>{lead.franchise_phone}</td>
               <td>{lead.message}</td>
-              <td>{lead.country}</td>
-              <td>{lead.state}</td>
-              <td>{lead.city}</td>
+             
+              <td>{lead.categories}</td>
+              <td>{lead.franchise_state?.name}</td>
+              <td>{lead.franchise_city?.name }</td>
             </tr>
           ))}
         </tbody>

@@ -1,29 +1,50 @@
 "use client";
 import dynamic from "next/dynamic";
-import styles from "../styles/Leads.module.css";
-import Layout from "../pages/page";
+import styles from "../../styles/Leads.module.css";
+import Layout from "../../pages/page";
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams ,useParams } from 'next/navigation';
 import { SlHome } from "react-icons/sl";
-import { getStates, getCities, getCategoryList } from "../../api/user-side/register-professional/location";
-import { getLeadDetails } from "../../api/manage_users/lead";
-
+import { getStates, getCities, getCategoryList } from "../../../api/user-side/register-professional/location";
+import { getLeadDetails ,updateLead } from "../../../api/manage_users/lead";
+import { useRef } from "react"; 
+import usePopup from "../../components/popup"
+import PopupAlert from "../../components/PopupAlert";
+const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
 export default function EditFranchise() {
-
+  const hasLoadedInitialData = useRef(false);
     const router = useRouter();
-  const searchParams = useSearchParams();
-  const leadId = searchParams.get("id");
+const searchParams = useSearchParams();
+// const leadId = searchParams.get("id");
 
-  const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
+const [token, setToken] = useState(null);
+const { popupMessage, popupType, showPopup } = usePopup();
+const [leadId, setLeadId] = useState(null);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    console.log("LEAD ID =", id);
+    setLeadId(id);
+  }
+}, []);
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const savedToken = localStorage.getItem("access_token"); // ✅ FIXED KEY
+    console.log("TOKEN LOADED =", savedToken);
+    setToken(savedToken);
+  }
+}, []);
+
   const [states, setStates] = useState([]);
   const [ownerCities, setOwnerCities] = useState([]);
   const [franchiseCities, setFranchiseCities] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
- 
+ const [loading, setLoading] = useState(true);
   const [kycFiles, setKycFiles] = useState({
-    aadharFront: "",
-    aadharBack: "",
+    adharFront: "",
+    adharBack: "",
     panCard: ""
   });
   const [form, setForm] = useState({
@@ -44,83 +65,96 @@ export default function EditFranchise() {
     message: "",
   });
 
- 
-
   // Fetch lead data
-   useEffect(() => {
-    async function loadInitialData() {
-      const stateData = await getStates(1);
-      const categoryData = await getCategoryList();
-      setStates(stateData || []);
-      setCategories(categoryData || []);
+useEffect(() => {
+  async function loadInitialData() {
+    try {
+      const savedStates = JSON.parse(localStorage.getItem("states"));
+      const savedCategories = JSON.parse(localStorage.getItem("categories"));
+
+      if (savedStates && savedCategories) {
+        setStates(savedStates);
+        setCategories(savedCategories);
+      } else {
+        const [stateData, categoryData] = await Promise.all([
+          getStates(1),
+          getCategoryList()
+        ]);
+
+        setStates(stateData || []);
+        setCategories(categoryData || []);
+
+        localStorage.setItem("states", JSON.stringify(stateData));
+        localStorage.setItem("categories", JSON.stringify(categoryData));
+      }
+    } catch (err) {
+      console.error("Error loading initial data:", err);
     }
-    loadInitialData();
-  }, []);
+  }
+
+  loadInitialData();
+}, []);
+
+
 
   // Fetch lead details
-  useEffect(() => {
-    if (!leadId) return;
+useEffect(() => {
+  if (!leadId || !token) return;
 
-    async function fetchLead() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
+  async function fetchLead() {
+    try {
+      const res = await getLeadDetails(leadId, token);
+      console.log("API RESPONSE =", res);
 
-        const res = await getLeadDetails(leadId, token); // <-- API call
-        if (!res?.success) return;
+      if (!res.success) {
+        console.warn("API Error:", res.message);
+        return;
+      }
 
-        const { data } = res;
-        const { owner_data = {}, franchise_data = {}, kyc_documents = {} } = data;
+      const { owner_data = {}, franchise_data = {}, kyc_documents = {} } = res.data;
 
-        // Populate form
-        setForm({
-          owner_name: owner_data.owner_name || "",
-          owner_email: owner_data.owner_email || "",
-          owner_phone: owner_data.owner_phone || "",
-          owner_pincode: owner_data.owner_pincode || "",
-          owner_address: owner_data.owner_address || "",
-          owner_state_id: owner_data.owner_state_id || "",
-          owner_city_id: owner_data.owner_city_id || "",
-          franchise_name: franchise_data.franchise_name || "",
-          franchise_email: franchise_data.franchise_email || "",
-          franchise_phone: franchise_data.franchise_phone || "",
-          franchise_pincode: franchise_data.franchise_pincode || "",
-          franchise_address: franchise_data.franchise_address || "",
-          franchise_state_id: franchise_data.franchise_state_id || "",
-          franchise_city_id: franchise_data.franchise_city_id || "",
-          message: franchise_data.message || "",
-        });
+      setForm({
+        owner_name: owner_data?.owner_name || "",
+        owner_email: owner_data?.owner_email || "",
+        owner_phone: owner_data?.owner_phone || "",
+        owner_pincode: owner_data?.owner_pincode || "",
+        owner_address: owner_data?.owner_address || "",
+        owner_state_id: owner_data?.owner_state_id || "",
+        owner_city_id: owner_data?.owner_city_id || "",
+        franchise_name: franchise_data?.franchise_name || "",
+        franchise_email: franchise_data?.franchise_email || "",
+        franchise_phone: franchise_data?.franchise_phone || "",
+        franchise_pincode: franchise_data?.franchise_pincode || "",
+        franchise_address: franchise_data?.franchise_address || "",
+        franchise_state_id: franchise_data?.franchise_state_id || "",
+        franchise_city_id: franchise_data?.franchise_city_id || "",
+        message: franchise_data?.message || "",
+      });
 
-        // Categories
-        setSelectedCategories((franchise_data.category_list || []).map(c => ({
+      setSelectedCategories(
+        (franchise_data?.category_list || []).map(c => ({
           value: c.id,
           label: c.title
-        })));
+        }))
+      );
 
-        // Cities
-        if (owner_data.owner_state_id) {
-          const ownerCitiesData = await getCities(owner_data.owner_state_id);
-          setOwnerCities(ownerCitiesData || []);
-        }
-        if (franchise_data.franchise_state_id) {
-          const franchiseCitiesData = await getCities(franchise_data.franchise_state_id);
-          setFranchiseCities(franchiseCitiesData || []);
-        }
+      const BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-        // KYC
-        setKycFiles({
-          aadharFront: kyc_documents.adhar_card_front_image || "",
-          aadharBack: kyc_documents.adhar_card_back_image || "",
-          panCard: kyc_documents.pan_card_image || ""
-        });
+      setKycFiles({
+        adharFront: kyc_documents?.adhar_card_front_image ? BASE + kyc_documents.adhar_card_front_image : "",
+        adharBack: kyc_documents?.adhar_card_back_image ? BASE + kyc_documents.adhar_card_back_image : "",
+        panCard: kyc_documents?.pan_card_image ? BASE + kyc_documents.pan_card_image : ""
+      });
 
-      } catch (err) {
-        console.error(err);
-      }
+    } catch (err) {
+      console.error("Lead fetch error:", err);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchLead();
-  }, [leadId]);
+  fetchLead();
+}, [leadId, token]);
 
 
   // Handle state changes separately for owner and franchise
@@ -152,10 +186,68 @@ export default function EditFranchise() {
   const categoryOptions = categories.map(cat => ({ value: cat.id, label: cat.title }));
   const goToDashboard = () => router.push("/admin/dashboard");
 
+  const handleUpdateLead = async () => {
+  try {
+    if (!leadId || !token) {
+      showPopup("Lead ID or Token missing!","error");
+      return;
+    }
+
+    const formData = new FormData();
+
+    // Owner fields
+    formData.append("owner_name", form.owner_name);
+    formData.append("owner_email", form.owner_email);
+    formData.append("owner_phone", form.owner_phone);
+    formData.append("owner_pincode", form.owner_pincode);
+    formData.append("owner_address", form.owner_address);
+    formData.append("owner_state_id", form.owner_state_id);
+    formData.append("owner_city_id", form.owner_city_id);
+
+    // Franchise fields
+    formData.append("franchise_name", form.franchise_name);
+    formData.append("franchise_email", form.franchise_email);
+    formData.append("franchise_phone", form.franchise_phone);
+    formData.append("franchise_pincode", form.franchise_pincode);
+    formData.append("franchise_address", form.franchise_address);
+    formData.append("franchise_state_id", form.franchise_state_id);
+    formData.append("franchise_city_id", form.franchise_city_id);
+    formData.append("message", form.message);
+
+    // Categories
+    const categoryIds = selectedCategories.map((c) => c.value);
+    formData.append("category_list", JSON.stringify(categoryIds));
+
+    // Files
+    const front = document.getElementById("adharFront")?.files[0];
+    const back = document.getElementById("adharBack")?.files[0];
+    const pan = document.getElementById("panCard")?.files[0];
+
+    if (front) formData.append("adhar_card_front_image", front);
+    if (back) formData.append("adhar_card_back_image", back);
+    if (pan) formData.append("pan_card_image", pan);
+
+    // CALL API
+    const data = await updateLead(leadId, token, formData);
+    console.log("UPDATE RESPONSE =", data);
+
+    if (data.success) {
+      showPopup("Lead Updated Successfully!");
+      router.push("/admin/lead");
+    } else {
+      showPopup(data.message || "Update failed","error");
+    }
+
+  } catch (err) {
+    console.error("Update error:", err);
+    showPopup("Error updating lead!","error");
+  }
+};
+
   return (
     <Layout>
       <div className={styles.container}>
-        {/* Breadcrumb */}
+         <PopupAlert message={popupMessage} type={popupType} />
         <div className={styles.headerContainer}>
           <div>
             <span className={styles.breadcrumb} onClick={() => router.push("/admin/lead")} style={{ cursor: "pointer" }}>Lead</span>
@@ -264,7 +356,7 @@ export default function EditFranchise() {
         <div className={styles.editcard}>
           <h2 className={styles.sectiontitle}>KYC Documents</h2>
           <div className={styles.kycRow}>
-            {["aadharFront","aadharBack","panCard"].map((key) => (
+            {["adharFront","adharBack","panCard"].map((key) => (
               <div className={styles.kycBox} key={key}>
                 <label className={styles.label}>{key.replace(/([A-Z])/g, ' $1')}</label>
                 <div className={styles.previewBox}>
@@ -275,7 +367,14 @@ export default function EditFranchise() {
               </div>
             ))}
           </div>
-          <button className={styles.btnupdate}>Update</button>
+         <button 
+  type="button"
+  className={styles.btnupdate}
+  onClick={handleUpdateLead}
+>
+  Update
+</button>
+
         </div>
       </div>
     </Layout>

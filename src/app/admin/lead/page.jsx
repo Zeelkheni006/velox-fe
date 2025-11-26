@@ -4,7 +4,7 @@ import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { useRouter,useSearchParams } from 'next/navigation';
 import dynamic from "next/dynamic";
-import { getLeads, updateLeadStatus,getFilterDropdownData} from "../../api/manage_users/lead";
+import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails} from "../../api/manage_users/lead";
 import Select from "react-select";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
@@ -36,11 +36,15 @@ const [dropdownData, setDropdownData] = useState({
   city: [],
   status: [],
 });
+const [showLeadDetailsPopup, setShowLeadDetailsPopup] = useState(false);
+const [leadDetails, setLeadDetails] = useState(null);
+const [leadDetailsLoading, setLeadDetailsLoading] = useState(false);
 const [selectedCategories, setSelectedCategories] = useState([]);
 const [selectedName, setSelectedName] = useState(null);
 const [selectedEmail, setSelectedEmail] = useState(null);
 const [selectedPhone, setSelectedPhone] = useState(null);
 const [selectedCity, setSelectedCity] = useState(null);
+const [kycFiles, setKycFiles] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
 const initialized = useRef(false);
@@ -78,9 +82,7 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
 
 useEffect(() => {
-  if (!initialized.current) return; // skip before mount
-
-  // Fetch leads only when user changes filters or pagination
+  if (!initialized.current) return;
   fetchLeadsData(currentPage, entriesPerPage, {
     name: selectedName,
     email: selectedEmail,
@@ -89,16 +91,8 @@ useEffect(() => {
     status: selectedStatus,
     category_list: selectedCategories.map(c => Number(c.value))
   });
-}, [
-  currentPage,
-  entriesPerPage,
-  selectedName,
-  selectedEmail,
-  selectedPhone,
-  selectedCity,
-  selectedStatus,
-  selectedCategories
-]);
+}, [currentPage, entriesPerPage, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
+  
 
 const handleNextPage = () => {
   if (currentPage < totalPages) {
@@ -263,23 +257,22 @@ const handlePdfClick = async () => {
     "Phone",
     "Message",
     "category",
-    "Country",
+ 
     "State",
     "City",
     "Status"
   ];
 
-  const tableBody = currentLeads.map(l => [
-    l.name || "",
-    l.email || "",
-    l.phone || "",
-    l.message || "",
-    l.category|| "",
-    l.country || "",
-    l.state || "",
-    l.city || "",
-    l.status || "",
-  ]);
+const tableBody = currentLeads.map(l => [
+  l.owner_name || "",
+  l.franchise_email || "",
+  l.franchise_phone || "",
+  l.message || "",
+  Array.isArray(l.categories) ? l.categories.join(", ") : "", // convert array to string
+  l.franchise_state?.name || "", // access the name property
+  l.franchise_city?.name || "",  // access the name property
+  l.status || "",
+]);
 
   doc.autoTable({
     head: [tableColumn],
@@ -370,10 +363,44 @@ const selectStyles = {
   menu: base => ({ ...base, zIndex: 9999 })
 };
 
-
+const columnKeyMap = {
+  "owner name": "owner_name",
+  "franchise email": "franchise_email",
+  "franchise phone": "franchise_phone",
+  "message": "message",
+  "categories": "categories",
+  "franchise state": "franchise_state",
+  "franchise city": "franchise_city",
+  "status": "status",
+};
    const goToDashboard = () => {
     router.push("/admin/dashboard"); 
   };
+  const fetchLeadDetails = async (leadId) => {
+  if (!leadId) return;
+  const token = localStorage.getItem("access_token"); // get token
+  if (!token) return alert("Token missing!");
+
+  setLeadDetailsLoading(true);
+  setShowLeadDetailsPopup(true);
+
+  try {
+    const res = await getLeadDetails(leadId, token);
+
+    if (res.success) {
+      setLeadDetails(res.data);
+    } else {
+      setLeadDetails(null);
+      alert(res.message || "Failed to fetch lead details");
+    }
+  } catch (err) {
+    console.error(err);
+    setLeadDetails(null);
+    alert("Error fetching lead details");
+  } finally {
+    setLeadDetailsLoading(false);
+  }
+};
   return (
     <Layout>
       <PopupAlert message={popupMessage} type={popupType} />
@@ -546,26 +573,29 @@ if (values.length > 0) {
 
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
-              <thead>
-                <tr>
-              {[
- "owner name","franchise email","franchise phone","message",
- "categories","franchise state","franchise city",
- "status"
-].map((key) => (
-<th key={key} onClick={() => handleSort(key)} style={{ cursor: "pointer" }}>
-  {key.charAt(0).toUpperCase() + key.slice(1)}
-  <SortArrow direction={sortConfig.key === key ? sortConfig.direction : null} />
-</th>
-))}
-                  <th>Action</th>
-                </tr>
-              </thead>
+            <thead>
+  <tr>
+    {[
+      "owner name","franchise email","franchise phone","message",
+      "categories","franchise state","franchise city","status"
+    ].map((displayName) => (
+      <th
+        key={displayName}
+        onClick={() => handleSort(columnKeyMap[displayName])} // use mapped key
+        style={{ cursor: "pointer" }}
+      >
+        {displayName.charAt(0).toUpperCase() + displayName.slice(1)}
+        <SortArrow direction={sortConfig.key === columnKeyMap[displayName] ? sortConfig.direction : null} />
+      </th>
+    ))}
+    <th>Action</th>
+  </tr>
+</thead>
               <tbody>
               {sortedLeads.map((lead, index) => (
                  <tr
   key={index}
-onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
+onDoubleClick={() => router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)}
   style={{ cursor: "pointer" }}
 >
                     <td
@@ -642,8 +672,6 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   </div>
 </td> 
 
-
-                 
                     <td onClick={(e) => handleCopy(e, lead.state, "Franchise state", showPopup)}>{lead.franchise_state?.name}</td>
                     <td onClick={(e) => handleCopy(e, lead.city, "Franchise city", showPopup)}>{lead.franchise_city?.name}</td>
                   <td>
@@ -659,17 +687,22 @@ onDoubleClick={() => router.push(`/admin/edit?id=${lead._id || lead.id}`)}
   </span>
 </td>
                     <td>
-<button
-  className={styles.editBtn}
-  onClick={() => {
-    router.push(`/admin/edit?id=${lead._id || lead.id}`);
-  }}
->
-  Edit
-</button>
+  <button
+    className={styles.editBtn}
+    onClick={() => {
+    router.push(`/admin/lead/edit?id=${lead._id || lead.id}`);
+    }}
+  >
+    Edit
+  </button>
 
                       <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>Manage Status</button>
-        <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>view all detais</button>
+       <button
+  className={styles.statusBtn}
+  onClick={() => fetchLeadDetails(lead._id || lead.id)}
+>
+  View All Details
+</button>
 {lead.status?.toUpperCase() === "ACCEPTED" && (
   <button 
     className={styles.franchiseBtn}
@@ -762,6 +795,107 @@ of {totalLeads} entries
     </div>
   </div>
 )}
+{showLeadDetailsPopup && (
+  <div className={styles.leadModalOverlay}>
+    <div className={styles.leadModalContent}>
+      <button
+        className={styles.leadCloseBtn}
+        onClick={() => setShowLeadDetailsPopup(false)}
+      >
+        ×
+      </button>
+
+      {leadDetailsLoading ? (
+        <p>Loading...</p>
+      ) : !leadDetails ? (
+        <p>No details available</p>
+      ) : (
+        <div className={styles.leadPopupWrapper}>
+
+          {/* Owner + Franchise */}
+          <div className={styles.leadTwoCol}>
+            
+            {/* Owner */}
+            <div className={styles.leadCardSmall}>
+              <h2 className={styles.leadTitle}>Owner Details</h2>
+
+              <div className={styles.leadGridSmall}>
+                <p><strong>Name:</strong> {leadDetails.owner_data?.owner_name}</p>
+                <p><strong>Email:</strong> {leadDetails.owner_data?.owner_email}</p>
+                <p><strong>Phone:</strong> {leadDetails.owner_data?.owner_phone}</p>
+                <p><strong>Pincode:</strong> {leadDetails.owner_data?.owner_pincode}</p>
+                <p><strong>State:</strong> {leadDetails.owner_data?.owner_state_id}</p>
+                <p><strong>City:</strong> {leadDetails.owner_data?.owner_city_id}</p>
+              </div>
+
+              <p className={styles.leadFull}><strong>Address:</strong> {leadDetails.owner_data?.owner_address}</p>
+            </div>
+
+            {/* Franchise */}
+            <div className={styles.leadCardSmall}>
+              <h2 className={styles.leadTitle}>Franchise Details</h2>
+
+              <div className={styles.leadGridSmall}>
+                <p><strong>Name:</strong> {leadDetails.franchise_data?.franchise_name}</p>
+                <p><strong>Email:</strong> {leadDetails.franchise_data?.franchise_email}</p>
+                <p><strong>Phone:</strong> {leadDetails.franchise_data?.franchise_phone}</p>
+                <p><strong>Pincode:</strong> {leadDetails.franchise_data?.franchise_pincode}</p>
+                <p><strong>State:</strong> {leadDetails.franchise_data?.franchise_state_id}</p>
+                <p><strong>City:</strong> {leadDetails.franchise_data?.franchise_city_id}</p>
+              </div>
+
+              <p className={styles.leadFull}><strong>Address:</strong> {leadDetails.franchise_data?.franchise_address}</p>
+              <p className={styles.leadFull}><strong>Message:</strong> {leadDetails.franchise_data?.message}</p>
+
+           <div className={styles.categoriesBox}>
+  <p className={styles.catTitle}>Categories:</p>
+
+  <ul className={styles.categoriesList}>
+    {(leadDetails.franchise_data?.category_list || []).map((c) => (
+      <li key={c.id} className={styles.categoryItem}>
+        {c.title}
+      </li>
+    ))}
+  </ul>
+</div>
+            </div>
+          </div>
+
+          {/* KYC */}
+          <div className={styles.leadCardSmall}>
+            <h2 className={styles.leadTitle}>KYC Documents</h2>
+
+            <div className={styles.leadKycRowSmall}>
+              {["adhar_card_front_image", "adhar_card_back_image", "pan_card_image"].map((key) => (
+                <div className={styles.leadKycBoxSmall} key={key}>
+                  <label className={styles.leadLabel}>
+                    {key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  </label>
+
+                  <div className={styles.leadPreviewBoxSmall}>
+                    {leadDetails.kyc_documents?.[key] ? (
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${leadDetails.kyc_documents[key]}`}
+                        alt={key}
+                        className={styles.leadPreviewImgSmall}
+                      />
+                    ) : (
+                      <p>No File</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
+
+
 
       </div>
     </Layout>
