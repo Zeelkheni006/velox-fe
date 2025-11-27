@@ -4,7 +4,7 @@ import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { useRouter,useSearchParams } from 'next/navigation';
 import dynamic from "next/dynamic";
-import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails} from "../../api/manage_users/lead";
+import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails,fetchKycDocuments} from "../../api/manage_users/lead";
 import Select from "react-select";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
@@ -28,6 +28,8 @@ const [showFilter, setShowFilter] = useState(false);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 const [expandedMessageIndex, setExpandedMessageIndex] = useState(null);
 const { popupMessage, popupType, showPopup } = usePopup();
+const [showKycPopup, setShowKycPopup] = useState(false);
+const [kycData, setKycData] = useState(null);
 const [dropdownData, setDropdownData] = useState({
   name: [],
   email: [],
@@ -49,6 +51,8 @@ const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
 const initialized = useRef(false);
 const [franchiseMessage, setFranchiseMessage] = useState("");
+
+  const [loadingKyc, setLoadingKyc] = useState(false);
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
   try {
     const { leads, total } = await getLeads(page, perPage, filters);
@@ -68,7 +72,6 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
         state: l.state || l.state_id || "",
         country: l.country || l.country_id || "",
 
-      
         categories: categoryNames,
       };
     });
@@ -187,7 +190,7 @@ useEffect(() => {
   };
 
 const handleAccept = async () => {
-  if (!activeLead?.id) return alert("Lead ID is missing!");
+  if (!activeLead?.id) return showPopup("Lead ID is missing!","error");
 
   try {
     const res = await updateLeadStatus(activeLead.id, 1); 
@@ -206,11 +209,11 @@ const handleAccept = async () => {
       showPopup(" Status updated to ACCEPT", "success");
 
     } else {
-      alert(res.message || "Failed to update status");
+      showPopup(res.message || "Failed to update status","error");
     }
 
   } catch (err) {
-    alert(err.message);
+    showPopup(err.message,"error");
   }
 };
 
@@ -234,11 +237,11 @@ const handleDecline = async () => {
       showPopup(" Status updated to DECLINE", "error");
 
     } else {
-      alert(res.message || "Failed to update status");
+      showPopup(res.message || "Failed to update status","error");
     }
 
   } catch (err) {
-    alert(err.message);
+    showPopup(err.message);
   }
 };
 
@@ -257,7 +260,6 @@ const handlePdfClick = async () => {
     "Phone",
     "Message",
     "category",
- 
     "State",
     "City",
     "Status"
@@ -379,7 +381,7 @@ const columnKeyMap = {
   const fetchLeadDetails = async (leadId) => {
   if (!leadId) return;
   const token = localStorage.getItem("access_token"); // get token
-  if (!token) return alert("Token missing!");
+  if (!token) return showPopup("Token missing!","error");
 
   setLeadDetailsLoading(true);
   setShowLeadDetailsPopup(true);
@@ -391,16 +393,36 @@ const columnKeyMap = {
       setLeadDetails(res.data);
     } else {
       setLeadDetails(null);
-      alert(res.message || "Failed to fetch lead details");
+      showPopup(res.message || "Failed to fetch lead details","error");
     }
   } catch (err) {
     console.error(err);
     setLeadDetails(null);
-    alert("Error fetching lead details");
+    showPopup("Error fetching lead details","error");
   } finally {
     setLeadDetailsLoading(false);
   }
 };
+
+const handleViewKyc = async (lead) => {
+  setShowKycPopup(true);
+  setLoadingKyc(true);
+
+  const id = lead.id;  // FIXED ID
+
+  const data = await fetchKycDocuments(id);
+
+  if (data) {
+    setKycData(data);
+  } else {
+    setKycData(null);
+    showPopup("Failed to fetch KYC documents", "error");
+  }
+
+  setLoadingKyc(false);
+};
+
+
   return (
     <Layout>
       <PopupAlert message={popupMessage} type={popupType} />
@@ -695,6 +717,7 @@ onDoubleClick={() => router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)}
   >
     Edit
   </button>
+  
 
                       <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>Manage Status</button>
        <button
@@ -703,6 +726,12 @@ onDoubleClick={() => router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)}
 >
   View All Details
 </button>
+  <button 
+    className={styles.kycBtn}
+    onClick={() => handleViewKyc(lead)}
+  >
+    KYC Documents
+  </button>
 {lead.status?.toUpperCase() === "ACCEPTED" && (
   <button 
     className={styles.franchiseBtn}
@@ -805,9 +834,7 @@ of {totalLeads} entries
         ×
       </button>
 
-      {leadDetailsLoading ? (
-        <p>Loading...</p>
-      ) : !leadDetails ? (
+      {leadDetailsLoading ?  (
         <p>No details available</p>
       ) : (
         <div className={styles.leadPopupWrapper}>
@@ -824,8 +851,8 @@ of {totalLeads} entries
                 <p><strong>Email:</strong> {leadDetails.owner_data?.owner_email}</p>
                 <p><strong>Phone:</strong> {leadDetails.owner_data?.owner_phone}</p>
                 <p><strong>Pincode:</strong> {leadDetails.owner_data?.owner_pincode}</p>
-                <p><strong>State:</strong> {leadDetails.owner_data?.owner_state_id}</p>
-                <p><strong>City:</strong> {leadDetails.owner_data?.owner_city_id}</p>
+                <p><strong>State:</strong> {leadDetails.owner_data?.owner_state_id?.name}</p>
+                <p><strong>City:</strong> {leadDetails.owner_data?.owner_city_id?.name}</p>
               </div>
 
               <p className={styles.leadFull}><strong>Address:</strong> {leadDetails.owner_data?.owner_address}</p>
@@ -840,8 +867,8 @@ of {totalLeads} entries
                 <p><strong>Email:</strong> {leadDetails.franchise_data?.franchise_email}</p>
                 <p><strong>Phone:</strong> {leadDetails.franchise_data?.franchise_phone}</p>
                 <p><strong>Pincode:</strong> {leadDetails.franchise_data?.franchise_pincode}</p>
-                <p><strong>State:</strong> {leadDetails.franchise_data?.franchise_state_id}</p>
-                <p><strong>City:</strong> {leadDetails.franchise_data?.franchise_city_id}</p>
+                <p><strong>State:</strong> {leadDetails.franchise_data?.franchise_state?.name}</p>
+                <p><strong>City:</strong> {leadDetails.franchise_data?.franchise_city_id?.name}</p>
               </div>
 
               <p className={styles.leadFull}><strong>Address:</strong> {leadDetails.franchise_data?.franchise_address}</p>
@@ -862,7 +889,7 @@ of {totalLeads} entries
           </div>
 
           {/* KYC */}
-          <div className={styles.leadCardSmall}>
+          {/* <div className={styles.leadCardSmall}>
             <h2 className={styles.leadTitle}>KYC Documents</h2>
 
             <div className={styles.leadKycRowSmall}>
@@ -886,7 +913,7 @@ of {totalLeads} entries
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
         </div>
       )}
@@ -894,6 +921,44 @@ of {totalLeads} entries
   </div>
 )}
 
+{showKycPopup && (
+  <div className={styles.leadModalOverlay}>
+    <div className={styles.leadModalContent}>
+
+      <button 
+        className={styles.leadCloseBtn}
+        onClick={() => setShowKycPopup(false)}
+      >
+        ×
+      </button>
+
+      <h2 className={styles.leadTitle}>KYC Documents</h2>
+
+      <div className={styles.leadKycRowSmall}>
+        {["adhar_card_front_image", "adhar_card_back_image", "pan_card_image"].map((key) => (
+          <div className={styles.leadKycBoxSmall} key={key}>
+            <label className={styles.leadLabel}>
+              {key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+            </label>
+
+            <div className={styles.leadPreviewBoxSmall}>
+              {kycData?.[key] ? (
+                <img
+                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${kycData[key]}`}
+                  alt={key}
+                  className={styles.leadPreviewImgSmall}
+                />
+              ) : (
+                <p>No File</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+)}
 
 
 

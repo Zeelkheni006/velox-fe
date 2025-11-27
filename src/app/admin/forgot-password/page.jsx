@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import styles from '../styles/ForgotPassword.module.css';
+import usePopup from '../components/popup';
+  import PopupAlert from "../components/PopupAlert";
 
 export default function ForgotPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const prefilledEmail = searchParams.get('email') || '';
-
+const { popupMessage, popupType, showPopup } = usePopup();
   const [email, setEmail] = useState(prefilledEmail);
   const [loading, setLoading] = useState(false);
 
@@ -17,17 +19,17 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async () => {
     if (!email) {
-      alert("Please enter your email");
+      showPopup("Please enter your email","error");
       return;
     }
 
     setLoading(true);
     try {
-      alert(`Password reset link will be sent to ${email}`);
+      showPopup(`Password reset link will be sent to ${email}`);
       // Call your forgot password API here
     } catch (err) {
       console.error(err);
-      alert("Failed to send reset link. Try again.");
+      showPopup("Failed to send reset link. Try again.","error");
     } finally {
       setLoading(false);
     }
@@ -37,6 +39,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className={styles.wrapper}>
+       <PopupAlert message={popupMessage} type={popupType} />
            {[...Array(6)].map((_, i) => (
      <div key={i} className={`${styles.pillShape} ${styles[`pill${i + 1}`]}`}></div>
 
