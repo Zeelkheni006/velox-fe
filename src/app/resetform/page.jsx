@@ -19,18 +19,18 @@ export default function ResetForm() {
     const userId = localStorage.getItem("user_id");
 
     if (!token || !userId) {
-      showPopup("Session expired. Please login again.");
+      showPopup("Session expired. Please login again.","error");
       router.push("/");
       return;
     }
 
     if (!currentPassword || !newPassword || !retypePassword) {
-      showPopup("Please fill all fields");
+      showPopup("Please fill all fields","error");
       return;
     }
 
     if (newPassword !== retypePassword) {
-      showPopup("New Password and Re-type Password do not match!");
+      showPopup("New Password and Re-type Password do not match!","error");
       return;
     }
 
@@ -53,7 +53,7 @@ export default function ResetForm() {
       }
     } catch (err) {
       console.error("Error changing password:", err);
-      showPopup("❌ Something went wrong. Try again.");
+      showPopup("❌ Something went wrong. Try again.","error");
     } finally {
       setLoading(false);
     }

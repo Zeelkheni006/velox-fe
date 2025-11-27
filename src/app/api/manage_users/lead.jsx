@@ -241,6 +241,38 @@ export const getLeadDetails = async (id, token) => {
   }
 };
 
+// services/kyc.js
+
+export const fetchKycDocuments = async (leadId) => {
+  try {
+    const token = localStorage.getItem("access_token");
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/get/kyc-documents/${leadId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+
+    return data?.data || null;
+
+  } catch (error) {
+    console.error("KYC ERROR:", error);
+    return null;
+  }
+};
+
+
+
+
+
 
 
 

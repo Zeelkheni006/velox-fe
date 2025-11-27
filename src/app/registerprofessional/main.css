@@ -1424,3 +1424,101 @@ button:hover {
         z-index: -1;
     }
 }
+
+.row {
+    position: relative;
+    margin: 5px 0;
+}
+
+.row input {
+    width: 100%;
+    padding: 14px 13px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+
+/* LABEL INSIDE INPUT BOX */
+
+.row label {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    top: 14px;
+    font-size: 16px;
+    display: flex;
+    justify-content: space-between;
+    /* LEFT + RIGHT */
+    color: #888;
+    pointer-events: none;
+    transition: 0.2s ease;
+}
+
+
+/* RIGHT SIDE PLACEHOLDER */
+
+.right-ph {
+    color: #bbb;
+    font-size: 16px;
+}
+
+
+/* FLOAT LABEL UP WHEN TYPING */
+
+.row input:focus+label,
+.row input:not([value=""])+label {
+    top: -16px;
+    font-size: 12px;
+    color: #555;
+}
+
+.phone-row {
+    position: relative;
+    margin: 15px 0;
+}
+
+.phone-row label {
+    font-size: 16px;
+    color: #888;
+    display: block;
+    margin-bottom: 6px;
+    right: 12px;
+}
+
+.phone-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.phone-input-wrapper .prefix {
+    position: absolute;
+    left: 12px;
+    color: #555;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.phone-input-wrapper input {
+    width: 100%;
+    padding: 12px 95px 12px 60px;
+    /* left padding to avoid overlapping with prefix */
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+}
+
+.phone-input-wrapper label {
+    position: absolute;
+    margin-left: 40px;
+    /* 👈 MOVE LABEL TO RIGHT */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #999;
+    transition: 0.2s ease;
+    pointer-events: none;
+}

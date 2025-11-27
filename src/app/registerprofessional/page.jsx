@@ -3,7 +3,7 @@
   import React from 'react';
   import Image from "next/image";
   import './main.css';  
-  import { getCountries ,getCategoryList, getStates, getCities ,getSubcategoriesAndServices} from "../api/user-side/register-professional/location";
+  import { getAllCountries ,getCategoryList, getallStates, getallCities ,getSubcategoriesAndServices} from "../api/user-side/register-professional/location";
   import { useState, useEffect } from "react";
   import usePopup from '../admin/components/popup';
   import PopupAlert from "../admin/components/PopupAlert";
@@ -60,7 +60,7 @@ import Select from "react-select";
     const [cities, setCities] = useState([]);
     const [categories, setCategories] = useState([]);
  
-    const [selectedCountry, setSelectedCountry] = useState("");
+ 
     const [selectedState, setSelectedState] = useState("");
     const [selectedCity, setSelectedCity] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -71,38 +71,80 @@ import Select from "react-select";
   const [subcategories, setSubcategories] = useState([]);
   const [services, setServices] = useState([]);
 
+
     const [pancardFile, setPancardFile] = useState(null);
     const [step, setStep] = useState(1);
     const [aadharFront, setAadharFront] = useState(null);
   const [aadharBack, setAadharBack] = useState(null);
   const [ownerName, setOwnerName] = useState("");
-const [phone, setPhone] = useState("");
+
 const [address, setAddress] = useState("");
 const [email, setEmail] = useState("");
 const [pincode, setPincode] = useState("");
 const [selectedCategories, setSelectedCategories] = useState([]);
 const { popupMessage, popupType, showPopup } = usePopup();
-const [franchiseCategory, setFranchiseCategory] = useState("");
 const [franchiseName, setFranchiseName] = useState("");
 const [franchisePhone, setFranchisePhone] = useState("");
 const [franchiseEmail, setFranchiseEmail] = useState("");
 const [franchiseAddress, setFranchiseAddress] = useState("");
 const [franchisePincode, setFranchisePincode] = useState("");
-const [franchiseCountry, setFranchiseCountry] = useState("");
 const [franchiseState, setFranchiseState] = useState("");
 const [franchiseCity, setFranchiseCity] = useState("");
-const [franchiseCategories, setFranchiseCategories] = useState([]);
 const [franchiseMessage, setFranchiseMessage] = useState("");
+const [selectedCountry, setSelectedCountry] = useState(
+  countries.length ? countries[0].id : ""
+);
+const [countryCode, setCountryCode] = useState(
+  countries.length ? countries[0].phonecode : ""
+);
+const [phone, setPhone] = useState(countries.length ? countries[0].phonecode : "");
+
+
     // Fetch Countries & Categories on load
     const categoryOptions = categories?.map((cat) => ({
   value: cat.id,
   label: cat.title
 })) || [];
 
-    useEffect(() => {
-      getCountries().then(setCountries);
-      getCategoryList().then(setCategories);
-    }, []);
+   useEffect(() => {
+  loadCountries();
+}, []);
+
+const loadCountries = async () => {
+  const data = await getAllCountries();
+  setCountries(data);
+};
+const handleCountryChange = (e) => {
+  const countryId = e.target.value;
+  setSelectedCountry(countryId);
+
+  const country = countries.find(c => c.id === parseInt(countryId));
+  if (country) {
+    setCountryCode(country.phonecode);
+
+    // Prepend code if phone doesn't start with it
+    if (!phone.startsWith(country.phonecode)) {
+      setPhone(country.phonecode);
+    }
+  } else {
+    setCountryCode("");
+  }
+};
+
+useEffect(() => {
+  if (countries.length > 0) {
+    // If a country is already selected, use it; otherwise default to first
+    const initialCountry = selectedCountry || countries[0].id;
+    setSelectedCountry(initialCountry);
+
+    const country = countries.find(c => c.id === parseInt(initialCountry));
+    if (country) {
+      setCountryCode(country.phonecode);
+      setPhone(country.phonecode); // Pre-fill phone input with country code
+    }
+  }
+}, [countries]);
+
 
     // Fetch States when Country changes
     useEffect(() => {
@@ -113,7 +155,7 @@ const [franchiseMessage, setFranchiseMessage] = useState("");
         setSelectedCity("");
         return;
       }
-      getStates(selectedCountry).then(setStates);
+      getallStates(selectedCountry).then(setStates);
     }, [selectedCountry]);
 
     // Fetch Cities when State changes
@@ -123,7 +165,7 @@ const [franchiseMessage, setFranchiseMessage] = useState("");
         setSelectedCity("");
         return;
       }
-      getCities(selectedState).then(setCities);
+      getallCities(selectedState).then(setCities);
     }, [selectedState]);
 
     const handleSubmit = (e) => {
@@ -137,12 +179,28 @@ const [franchiseMessage, setFranchiseMessage] = useState("");
       });
     };
 
-  const handleCategoryClick = async (cat) => { setPopupCategoryTitle(cat.title); setShowPopup(true); setSelectedCategoryId(cat.id); const response = await getSubcategoriesAndServices(cat.id); console.log("Popup Response:", response); setSubcategories(response || []); setServices([]); setSelectedSubcategoryId(null); };
 
-  const handleSubcategoryClick = (subcat) => {
-    setSelectedSubcategoryId(subcat.subcategory);
-    setServices(subcat.services || []);
-  };
+useEffect(() => {
+  async function loadCategories() {
+    try {
+      const categoryData = await getCategoryList(); // API call
+      console.log("Categories from API:", categoryData);
+
+      if (Array.isArray(categoryData)) {
+        setCategories(categoryData); // Save API data
+      } else {
+        console.error("API returned something invalid for categories");
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  }
+
+  loadCategories();
+}, []);
+
+
+  
 const handleFinalSubmit = async () => {
   const formData = new FormData();
 
@@ -179,8 +237,8 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
   try {
     const data = await submitFranchiseRequest(formData);
     console.log("FINAL RESPONSE:", data);
-    if (data.success) alert("Request submitted successfully 🎉");
-    else alert(data.message || "Something went wrong ❌");
+    if (data.success) showPopup("Request submitted successfully 🎉");
+    else showPopup(data.message || "Something went wrong ❌","error");
   } catch (error) {
     console.log(error);
   }
@@ -409,14 +467,37 @@ const validateStep3 = () => {
   onChange={(e) => setOwnerName(e.target.value)}
 />
 
-<input
-  type="tel"
-  placeholder="Enter your phone"
-  required
-  value={phone}
-  onChange={(e) => setPhone(e.target.value)}
-/>
-          </div>
+
+<div className="phone-field">
+  <div className="phone-input-wrapper">
+    <span className="prefix">{countryCode} |</span>
+
+    <input
+      type="text"
+      id="phone"
+      maxLength={10}  // ✅ allow only 10 digits
+      value={phone.replace(countryCode, "")} // show only digits, not +91
+      onChange={(e) => {
+        let numberPart = e.target.value.replace(/\D/g, ""); // only digits
+
+        numberPart = numberPart.slice(0, 10); // ✅ restrict to 10 digits
+
+        setPhone(countryCode + numberPart); // store full number +91XXXXXXXXXX
+      }}
+      required
+    />
+
+    <label htmlFor="phone">Phonenumber (will be use admin login)</label>
+  </div>
+</div>
+
+
+
+</div>
+
+
+
+          
 
           <div className="row">
            <input
@@ -428,15 +509,19 @@ const validateStep3 = () => {
 />
           </div>
 
-          <div className="row">
           
-             <input
-  type="email"
-  placeholder="Email"
-  required
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-/>
+       <div className="row">   
+
+
+  <input
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    required
+  />
+  <label>Email (will be use admin login)</label>
+
+
 
 <input
   type='text'
@@ -448,10 +533,14 @@ const validateStep3 = () => {
           </div>
 
           <div className="row">
-            <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} required>
-              <option value="">Select Country</option>
-              {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+<select value={selectedCountry} onChange={handleCountryChange} required>
+  {countries.map(c => (
+    <option key={c.id} value={c.id}>
+      {c.name}
+    </option>
+  ))}
+</select>
+
 
           
           </div>
@@ -543,23 +632,30 @@ const validateStep3 = () => {
         </div>
 
         {/* Email */}
-        <div className="row">
-         <input type="text" placeholder="Address Line 1" value={franchiseAddress} onChange={(e) => setAddress(e.target.value)} required />
-        </div>
+       <div className="row">
+  <input
+    type="text"
+    placeholder="Address Line 1"
+    value={franchiseAddress}
+    onChange={(e) => setFranchiseAddress(e.target.value)}
+    required
+  />
+</div>
+
 
         {/* Address & Pincode */}
         <div className="row">
 
-                 <input type="email" placeholder="Enter Email" value={franchiseEmail} onChange={(e) => setFranchiseAddress(e.target.value)} required />
+                 <input type="email" placeholder="Enter Email" value={franchiseEmail} onChange={(e) => setFranchiseEmail(e.target.value)} required />
          <input type="text" placeholder="Pincode" value={franchisePincode} onChange={(e) => setFranchisePincode(e.target.value)} required />
         </div>
 
         {/* Country & State */}
         <div className="row">
-          <select value={franchiseCountry} onChange={(e) => setFranchiseCountry(e.target.value)} required>
-            <option value="">Select Country</option>
-            {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
+        <select value={selectedCountry} onChange={handleCountryChange} required>
+  <option value="">Select Country</option>
+  {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+</select>
 
           <select value={franchiseState} onChange={(e) => setFranchiseState(e.target.value)} required disabled={!selectedCountry}>
             <option value="">Select State</option>
@@ -577,24 +673,31 @@ const validateStep3 = () => {
 
  </div>
 
-    <div style={{ width: "100%" }}>
-      <Select
-        isMulti
-        placeholder="Select Categories"
-        options={categoryOptions}
-        value={selectedCategories}
-        onChange={(selected) => setSelectedCategories(selected || [])}
-      />
-  
-  </div>
+  <div style={{ width: "100%" }}>
+<Select
+  isMulti
+  placeholder="Select Categories"
+  options={categoryOptions}
+  value={selectedCategories}
+  onChange={setSelectedCategories}
+/>
 
+</div>
 
-
-        
 
         {/* Message */}
         <div className="row">
-          <textarea placeholder="Message" rows={4} onChange={(e) => setFranchiseMessage(e.target.value)}></textarea>
+       <textarea
+  placeholder="Message"
+  rows={4}
+  maxLength={300}                 // ⭐ CHARACTER LIMIT
+  value={franchiseMessage}
+  onChange={(e) => setFranchiseMessage(e.target.value)}
+></textarea>
+
+<p style={{ fontSize: "12px", color: "#666", textAlign: "right" }}>
+  {franchiseMessage.length}/300 characters
+</p>
         </div>
 
       
@@ -667,7 +770,7 @@ const validateStep3 = () => {
       <form className="form">
 
         {/* Top row: Pancard */}
-      <div className="row" style={{ marginBottom: " 50px" }}>
+      <div className="row1" style={{ marginBottom: " 50px" }}>
     {/* Pancard Upload */}
     <div style={{ flex: 1 }}>
       <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Pancard Upload</h4>

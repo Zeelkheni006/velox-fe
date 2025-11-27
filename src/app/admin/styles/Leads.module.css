@@ -840,7 +840,7 @@
 
 .leadModalContent {
     background: #fff;
-    width: 70%;
+    width: 60%;
     max-height: auto;
     overflow-y: auto;
     padding: 20px;
@@ -894,41 +894,43 @@
 
 .leadGridSmall p {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    align-items: center;
+    gap: 6px;
+    /* ONLY this gap controls spacing */
     padding: 4px 0;
     border-bottom: 1px solid #e6e6e6;
     font-size: 14px;
 }
 
 .leadGridSmall p strong {
-    min-width: 110px;
-    /* Label width set */
-    display: inline-block;
+    width: 90px;
+    /* 👈 label width */
     font-weight: 600;
     color: #444;
+    display: inline-block;
+    text-align: left;
 }
 
 .leadGridSmall {
     display: block !important;
-    /* remove 2-col grid */
-}
-
-.leadFull strong {
-    min-width: 110px;
-    /* Label width set */
-    display: inline-block;
-    font-weight: 600;
-    color: #444;
 }
 
 .leadFull {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 6px;
+    /* SAME clean spacing */
     padding: 4px 0;
     border-bottom: 1px solid #e6e6e6;
     font-size: 14px;
+}
+
+.leadFull strong {
+    width: 90px;
+    font-weight: 600;
+    color: #444;
+    display: inline-block;
+    text-align: left;
 }
 
 
@@ -975,35 +977,8 @@
     font-size: 14px;
 }
 
-
-/* KYC Row Small */
-
-.leadKycRowSmall {
-    display: flex;
-    gap: 18px;
-}
-
-
-/* Each KYC Box Small */
-
 .leadKycBoxSmall {
     width: 150px;
-    /* 💥 smaller box */
-}
-
-
-/* Preview Container */
-
-.leadPreviewBoxSmall {
-    width: 100%;
-    height: 120px;
-    /* 💥 smaller height */
-    background: #eee;
-    border-radius: 6px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
 }
 
 
@@ -1022,6 +997,7 @@
     font-size: 13px;
     margin-bottom: 6px;
     display: block;
+    text-align: center;
 }
 
 .catStrong {
@@ -1036,18 +1012,26 @@
 .leadKycRowSmall {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 200px;
     flex-wrap: wrap;
+    margin-right: 150px;
 }
 
 .leadPreviewBoxSmall {
+    width: 320px;
+    height: 200px;
+    border: 0.5px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: #f8f8f8;
+    padding: 4px;
 }
 
 .leadPreviewImgSmall {
-    width: 120px;
+    width: 300px;
     height: auto;
     border-radius: 8px;
     display: block;
@@ -1069,16 +1053,44 @@
 }
 
 .categoriesList {
-    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    /* ⭐ line break allowed */
+    gap: 10px;
+    /* space between items */
     padding: 0;
     margin: 0;
+    list-style: none;
 }
 
 .categoryItem {
-    background: white;
-    padding: 6px 10px;
-    margin-bottom: 6px;
+    background: #ebebeb;
+    /* box background (optional) */
+    padding: 6px 12px;
     border-radius: 6px;
-    border: 1px solid #e3e3e3;
+    display: inline-block;
+    /* ⭐ width = only text size */
+    white-space: nowrap;
+    /* ⭐ no breaking inside text */
     font-size: 14px;
 }
+
+.kycBtn {
+    background: #334155;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    margin-top: 6px;
+    display: block;
+    width: 40%;
+    font-size: 12px;
+}
+
+.kycBtn:hover {
+    background: #334155;
+}
+
+
+/* (will be use admin login) */

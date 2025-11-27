@@ -119,15 +119,15 @@ useEffect(() => {
         owner_phone: owner_data?.owner_phone || "",
         owner_pincode: owner_data?.owner_pincode || "",
         owner_address: owner_data?.owner_address || "",
-        owner_state_id: owner_data?.owner_state_id || "",
-        owner_city_id: owner_data?.owner_city_id || "",
+        owner_state_id: owner_data?.owner_state_id?.id || "",
+        owner_city_id: owner_data?.owner_city_id?.id || "",
         franchise_name: franchise_data?.franchise_name || "",
         franchise_email: franchise_data?.franchise_email || "",
         franchise_phone: franchise_data?.franchise_phone || "",
         franchise_pincode: franchise_data?.franchise_pincode || "",
         franchise_address: franchise_data?.franchise_address || "",
-        franchise_state_id: franchise_data?.franchise_state_id || "",
-        franchise_city_id: franchise_data?.franchise_city_id || "",
+        franchise_state_id: franchise_data?.franchise_state?.id || "",
+        franchise_city_id: franchise_data?.franchise_city_id?.id || "",
         message: franchise_data?.message || "",
       });
 
@@ -201,8 +201,8 @@ useEffect(() => {
     formData.append("owner_phone", form.owner_phone);
     formData.append("owner_pincode", form.owner_pincode);
     formData.append("owner_address", form.owner_address);
-    formData.append("owner_state_id", form.owner_state_id);
-    formData.append("owner_city_id", form.owner_city_id);
+    formData.append("owner_state_id", form.owner_state_id?.id);
+    formData.append("owner_city_id", form.owner_city_id?.id);
 
     // Franchise fields
     formData.append("franchise_name", form.franchise_name);
@@ -210,8 +210,8 @@ useEffect(() => {
     formData.append("franchise_phone", form.franchise_phone);
     formData.append("franchise_pincode", form.franchise_pincode);
     formData.append("franchise_address", form.franchise_address);
-    formData.append("franchise_state_id", form.franchise_state_id);
-    formData.append("franchise_city_id", form.franchise_city_id);
+    formData.append("franchise_state_id", form.franchise_state_id?.id);
+    formData.append("franchise_city_id", form.franchise_city_id?.id);
     formData.append("message", form.message);
 
     // Categories
