@@ -56,26 +56,19 @@ const [franchiseMessage, setFranchiseMessage] = useState("");
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
   try {
     const { leads, total } = await getLeads(page, perPage, filters);
-
     const normalizedLeads = leads.map(l => {
-   
       const categoryObj = l.categories || l.category_list || {};
-
       const categoryNames = Array.isArray(categoryObj)
         ? categoryObj
         : Object.values(categoryObj);
-
       return {
         ...l,
-      
         city: l.city || l.city_id || "",
         state: l.state || l.state_id || "",
         country: l.country || l.country_id || "",
-
         categories: categoryNames,
       };
     });
-
     setLeads(normalizedLeads);
     setTotalLeads(total);
   } catch (err) {
@@ -83,7 +76,6 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
   }
 };
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
-
 useEffect(() => {
   if (!initialized.current) return;
   fetchLeadsData(currentPage, entriesPerPage, {
@@ -96,7 +88,6 @@ useEffect(() => {
   });
 }, [currentPage, entriesPerPage, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
   
-
 const handleNextPage = () => {
   if (currentPage < totalPages) {
     setCurrentPage(prev => prev + 1);
@@ -134,27 +125,18 @@ const handleSort = (key) => {
   );
 const sortedLeads = useMemo(() => {
   if (!sortConfig.key) return leads;
-
   const sorted = [...leads].sort((a, b) => {
     let aValue = a[sortConfig.key];
     let bValue = b[sortConfig.key];
-
-    // Handle null/undefined
     aValue = aValue ?? "";
     bValue = bValue ?? "";
-
-    // If array (categories), join to string for comparison
     if (Array.isArray(aValue)) aValue = aValue.join(", ");
     if (Array.isArray(bValue)) bValue = bValue.join(", ");
-
-    // If number, compare as numbers
     if (!isNaN(aValue) && !isNaN(bValue)) {
       return sortConfig.direction === "asc"
         ? Number(aValue) - Number(bValue)
         : Number(bValue) - Number(aValue);
     }
-
-    // Compare strings case-insensitively
     return sortConfig.direction === "asc"
       ? String(aValue).toLowerCase().localeCompare(String(bValue).toLowerCase())
       : String(bValue).toLowerCase().localeCompare(String(aValue).toLowerCase());
@@ -163,27 +145,20 @@ const sortedLeads = useMemo(() => {
   return sorted;
 }, [leads, sortConfig]);
 
-
-const handleAddToFranchise = (lead) => {
- 
+const handleAddToFranchise = (lead) => { 
   const isTaken = false; 
-
   if (isTaken) {
     setFranchiseMessage("⚠️ This Mobile Number Has Already Been Taken");
   } else {
     setFranchiseMessage(" This Mobile Number Has Already Been Taken");
   }
-
   setShowFranchisePopup(true);
 };
  
-
 useEffect(() => {
   setCurrentPage(1);
 }, [search]);
 
-
- 
   const handleManageStatusClick = (lead) => {
     setActiveLead({ ...lead, id: lead._id || lead.id });
     setShowModal(true);
@@ -191,7 +166,6 @@ useEffect(() => {
 
 const handleAccept = async () => {
   if (!activeLead?.id) return showPopup("Lead ID is missing!","error");
-
   try {
     const res = await updateLeadStatus(activeLead.id, 1); 
 
@@ -203,11 +177,8 @@ const handleAccept = async () => {
             : l
         )
       );
-
       setShowModal(false);
-
       showPopup(" Status updated to ACCEPT", "success");
-
     } else {
       showPopup(res.message || "Failed to update status","error");
     }
@@ -270,9 +241,9 @@ const tableBody = currentLeads.map(l => [
   l.franchise_email || "",
   l.franchise_phone || "",
   l.message || "",
-  Array.isArray(l.categories) ? l.categories.join(", ") : "", // convert array to string
-  l.franchise_state?.name || "", // access the name property
-  l.franchise_city?.name || "",  // access the name property
+  Array.isArray(l.categories) ? l.categories.join(", ") : "",
+  l.franchise_state?.name || "", 
+  l.franchise_city?.name || "",  
   l.status || "",
 ]);
 
@@ -322,7 +293,7 @@ function formatMessage(message, wordsPerLine = 11) {
 }
 
 useEffect(() => {
-    if (initialized.current) return; // ✅ prevent double call
+    if (initialized.current) return; 
   initialized.current = true;
 
   // Fetch leads

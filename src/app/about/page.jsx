@@ -1,32 +1,9 @@
+"use client";
 import React from 'react';
 import Image from "next/image";
 import './main.css';  
-const stats = [
-  {
-    id: 1,
-    icon: "/icon/icon-1.png", 
-    value: "187",
-    label: "Services",
-  },
-  {
-    id: 2,
-    icon: "/icon/icon-3.png",
-    value: "15",
-    label: "City",
-  },
-  {
-    id: 3,
-    icon: "/icon/icon-2.png",
-    value: "22",
-    label: "Franchises",
-  },
-  {
-    id: 4,
-    icon: "/icon/icon-4.png",
-    value: "2113",
-    label: "Happy Customer",
-  },
-];
+import { useEffect ,useState} from 'react';
+import {getStats} from "../api/user-side/home_api";
 const teamMembers = [
   {
     name: 'MAYANK RATHOD',
@@ -39,7 +16,50 @@ const teamMembers = [
     image: '/images/jalpa.jpg',
   },
 ];
+ 
 export default function aboutpage() {
+   const [stats, setStats] = useState([]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      const data = await getStats();
+      console.log("📌 Final Stats Data:", data);
+
+      if (!data) return;
+
+      const formatted = [
+        {
+          id: 1,
+          label: "City",
+          value: data.City,
+          icon: "/icon/icon-1.png",
+        },
+        {
+          id: 2,
+          label: "Franchises",
+          value: data.Franchises,
+          icon: "/icon/icon-3.png",
+        },
+        {
+          id: 3,
+          label: "Happy Customer",
+          value: data["Happy Customer"],
+          icon: "/icon/icon-2.png",
+        },
+        {
+          id: 4,
+          label: "Services",
+          value: data.Services,
+          icon: "/icon/icon-4.png",
+        },
+      ];
+
+      console.log("📌 FORMATTED STATS:", formatted);
+      setStats(formatted);
+    }
+
+    fetchStats();
+  }, []);
     return (
         <section className="container">
       <h2 className="title">
@@ -105,28 +125,33 @@ export default function aboutpage() {
       </div>
     </div>
     
-          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid ">
-            {stats.map((stat) => (
-              <div
-                key={stat.id}
-                className="relative bg-white rounded-2xl shadow-md text-center p-6 transition transform hover:-translate-y-1 hover:shadow-lg"
-              >
-                {/* Orange Corner Border */}
-                <div className="absolute bottom-0 left-0 w-full h-full rounded-2xl border-2 border-transparent">
-                  <div className="absolute bottom-0 left-0 w-1/3 h-1 border-b-4 border-orange-500 rounded-bl-xl"></div>
-                  <div className="absolute bottom-0 left-0 h-1/3 w-1 border-l-4 border-orange-500 rounded-bl-xl"></div>
+            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 stats-grid">
+              {stats.map((stat) => (
+                <div
+                  key={stat.id}
+                  className="relative bg-white rounded-2xl shadow-md text-center p-6 transition transform hover:-translate-y-1 hover:shadow-lg"
+                >
+                  <div className="absolute bottom-0 left-0 w-full h-full rounded-2xl border-2 border-transparent">
+                    <div className="absolute bottom-0 left-0 w-1/3 h-1 border-b-4 border-orange-500 rounded-bl-xl"></div>
+                    <div className="absolute bottom-0 left-0 h-1/3 w-1 border-l-4 border-orange-500 rounded-bl-xl"></div>
+                  </div>
+      
+                  <div className="stat-card">
+                    <div className="flex justify-center mb-3 stat-icon">
+                      <Image
+                        src={stat.icon}
+                        alt={stat.label}
+                        width={50}
+                        height={50}
+                        unoptimized
+                      />
+                    </div>
+                    <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
+                    <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
+                  </div>
                 </div>
-                <div className="stat-card">
-                    <div className="corner-border"></div>
-                <div className="flex justify-center mb-3 stat-icon">
-                  <Image src={stat.icon} alt={stat.label} width={50} height={50} />
-                </div>
-                <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
-                <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           <div className="team-container">
       <h2 className="team-heading">
         Meet <span>Our Team</span>
@@ -145,7 +170,7 @@ export default function aboutpage() {
                 className="rounded-img"
               />
             </div>
-            <h4>{member.name}</h4>
+            <h4>{member.name}</h4>  
             <span className="team-role">{member.title}</span>
           </div>
         ))}

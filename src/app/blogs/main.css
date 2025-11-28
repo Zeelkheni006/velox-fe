@@ -78,7 +78,7 @@
 
 /* blogs media css */
 
-@media (max-width: 375px) {
+@media (min-width: 110px) and (max-width: 768px) {
     .container {
         padding: 16px 12px;
     }
