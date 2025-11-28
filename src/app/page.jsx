@@ -78,32 +78,7 @@ const bestServices = [
 ];
 const fullServices =
   bestServices.length < 6 ? [...bestServices, ...bestServices] : bestServices;
-const stats = [
-  {
-    id: 1,
-    icon: "/icon/icon-1.png", 
-    value: "187",
-    label: "Services",
-  },
-  {
-    id: 2,
-    icon: "/icon/icon-3.png",
-    value: "15",
-    label: "City",
-  },
-  {
-    id: 3,
-    icon: "/icon/icon-2.png",
-    value: "22",
-    label: "Franchises",
-  },
-  {
-    id: 4,
-    icon: "/icon/icon-4.png",
-    value: "2113",
-    label: "Happy Customer",
-  },
-];
+
 const order = [
   {
     id: 1,

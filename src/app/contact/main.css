@@ -79,7 +79,7 @@ button:hover {
 
 /* contact media css */
 
-@media (max-width: 375px) {
+@media (min-width: 110px) and (max-width: 768px) {
     .contactContainer {
         display: flex;
         flex-direction: column;

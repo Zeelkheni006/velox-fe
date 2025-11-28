@@ -4,12 +4,21 @@ import Image from "next/image";
 import { AiFillClockCircle } from "react-icons/ai";
 import { FcApproval } from "react-icons/fc";
 import { useState } from "react";
-
+import { TfiLayoutGrid3Alt } from "react-icons/tfi";
 
 export default function ServiceDetails({ params }) {
+  const [showGallery, setShowGallery] = useState(false);
    const [modalImage, setModalImage] = useState(null);
    const [openDetail, setOpenDetail] = useState(false);
+   const [active, setActive] = useState(false);
      const [count, setCount] = useState(0);
+     const galleryImages = [
+  "/images/image1.jpg",
+  "/images/image1.jpg",
+  "/images/image1.jpg",
+  "/images/image1.jpg",
+  "/images/image1.jpg",
+];
   const service = {
     title: "Split AC Regular Water Jet Service",
     banner_image: "/images/image1.jpg",
@@ -29,16 +38,19 @@ export default function ServiceDetails({ params }) {
 
   return (
     <div className="service-detail-container">
-     <div className="service-heading-box">
-    <Image
-      src="/icon/ac-service.png" // icon path
-      alt="AC Service"
-      width={30}
-      height={30}
-      className="service-heading-icon"
-    />
-    <p className="service-heading-text">Split AC</p>
-  </div>
+ <div
+  className={`service-heading-box ${active ? "active" : ""}`}
+  onClick={() => setActive(!active)}
+>
+  <Image
+    src="/icon/ac-service.png"
+    alt="AC Service"
+    width={30}
+    height={30}
+    className="service-heading-icon"
+  />
+  <p className="service-heading-text">Split AC</p>
+</div>
       <div className="service-box">
       <p className="all-services-heading">All Services</p>
         <div className="service-detail-box">
@@ -181,16 +193,46 @@ export default function ServiceDetails({ params }) {
       </div>
 {modalImage && (
   <div className="image-modal" onClick={() => setModalImage(null)}>
-    
-    {/* 🔹 Top Right Icons */}
+
+    {/* 🔹 Top Right Controls */}
     <div className="modal-controls" onClick={(e) => e.stopPropagation()}>
+      
+      {/* Close Button */}
       <button className="modal-btn" onClick={() => setModalImage(null)}>✖</button>
- 
+
+      {/* Grid Button */}
+      <button 
+        className="modal-btn" 
+        onClick={() => setShowGallery(!showGallery)}
+      >
+        <TfiLayoutGrid3Alt size={20} />
+      </button>
+
     </div>
 
-    <img src={modalImage} alt="Service Image" />
+    {/* Main Image */}
+    <img src={modalImage} alt="Service Image" className="modal-main-img" />
+
+    {/* 🔹 Gallery (5 Images) */}
+    {showGallery && (
+      <div className="modal-gallery">
+        {galleryImages.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            className="thumb-img"
+            onClick={(e) => {
+              e.stopPropagation();
+              setModalImage(img);
+            }}
+          />
+        ))}
+      </div>
+    )}
+
   </div>
 )}
+
 
 {openDetail && (
   <div className="side-modal-overlay" onClick={() => setOpenDetail(false)}>

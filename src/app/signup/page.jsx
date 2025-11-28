@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { signupUser, verifyEmail, verifyPhone } from "../api/auth/signup";
 import usePopup from '../admin/components/popup';
 import PopupAlert from "../admin/components/PopupAlert";
+import './main.css';  
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     username: "",

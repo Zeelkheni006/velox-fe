@@ -3,7 +3,7 @@
   import React from 'react';
   import Image from "next/image";
   import './main.css';  
-  import { getAllCountries ,getCategoryList, getallStates, getallCities ,getSubcategoriesAndServices} from "../api/user-side/register-professional/location";
+  import { getAllCountries ,getCategoryList, getallStates, getallCities } from "../api/user-side/register-professional/location";
   import { useState, useEffect } from "react";
   import usePopup from '../admin/components/popup';
   import PopupAlert from "../admin/components/PopupAlert";
@@ -54,30 +54,19 @@ import Select from "react-select";
       },
     
     ];
-  const EasyRegisterProcess = () => {
-    const [countries, setCountries] = useState([]);
-    const [states, setStates] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [categories, setCategories] = useState([]);
- 
- 
-    const [selectedState, setSelectedState] = useState("");
-    const [selectedCity, setSelectedCity] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("");
-  
-  const [popupCategoryTitle, setPopupCategoryTitle] = useState("");
-    const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState(null);
-  const [subcategories, setSubcategories] = useState([]);
-  const [services, setServices] = useState([]);
-
-
-    const [pancardFile, setPancardFile] = useState(null);
-    const [step, setStep] = useState(1);
-    const [aadharFront, setAadharFront] = useState(null);
-  const [aadharBack, setAadharBack] = useState(null);
-  const [ownerName, setOwnerName] = useState("");
-
+const EasyRegisterProcess = () => {
+const [countries, setCountries] = useState([]);
+const [states, setStates] = useState([]);
+const [cities, setCities] = useState([]);
+const [categories, setCategories] = useState([]);
+const [selectedState, setSelectedState] = useState("");
+const [selectedCity, setSelectedCity] = useState("");
+const [selectedCategory, setSelectedCategory] = useState("");
+const [pancardFile, setPancardFile] = useState(null);
+const [step, setStep] = useState(1);
+const [aadharFront, setAadharFront] = useState(null);
+const [aadharBack, setAadharBack] = useState(null);
+const [ownerName, setOwnerName] = useState("");
 const [address, setAddress] = useState("");
 const [email, setEmail] = useState("");
 const [pincode, setPincode] = useState("");
@@ -98,8 +87,6 @@ const [countryCode, setCountryCode] = useState(
   countries.length ? countries[0].phonecode : ""
 );
 const [phone, setPhone] = useState(countries.length ? countries[0].phonecode : "");
-
-
     // Fetch Countries & Categories on load
     const categoryOptions = categories?.map((cat) => ({
   value: cat.id,
@@ -109,7 +96,7 @@ const [phone, setPhone] = useState(countries.length ? countries[0].phonecode : "
    useEffect(() => {
   loadCountries();
 }, []);
-
+// fetch country list
 const loadCountries = async () => {
   const data = await getAllCountries();
   setCountries(data);
@@ -133,20 +120,19 @@ const handleCountryChange = (e) => {
 
 useEffect(() => {
   if (countries.length > 0) {
-    // If a country is already selected, use it; otherwise default to first
     const initialCountry = selectedCountry || countries[0].id;
     setSelectedCountry(initialCountry);
 
     const country = countries.find(c => c.id === parseInt(initialCountry));
     if (country) {
       setCountryCode(country.phonecode);
-      setPhone(country.phonecode); // Pre-fill phone input with country code
+      setPhone(country.phonecode); 
     }
   }
 }, [countries]);
 
 
-    // Fetch States when Country changes
+    // Fetch States list
     useEffect(() => {
       if (!selectedCountry) {
         setStates([]);
@@ -158,7 +144,7 @@ useEffect(() => {
       getallStates(selectedCountry).then(setStates);
     }, [selectedCountry]);
 
-    // Fetch Cities when State changes
+    // Fetch Cities list
     useEffect(() => {
       if (!selectedState) {
         setCities([]);
@@ -179,7 +165,7 @@ useEffect(() => {
       });
     };
 
-
+// fetch category list
 useEffect(() => {
   async function loadCategories() {
     try {
@@ -213,7 +199,6 @@ const handleFinalSubmit = async () => {
   formData.append("owner_state_id", selectedState);
   formData.append("owner_city_id", selectedCity);
 
-  // Franchise info
   formData.append("franchise_name", ownerName);
   formData.append("franchise_address", address);
   formData.append("franchise_city_id", selectedCity);
@@ -223,17 +208,12 @@ const handleFinalSubmit = async () => {
   formData.append("franchise_email", email);
   formData.append("franchise_phone", phone);
 
-  // 🌟 MULTIPLE CATEGORY ARRAY
 const categoryIds = selectedCategories.map(item => item.value);
-formData.append("category_list", JSON.stringify(categoryIds)); // correct
-
+formData.append("category_list", JSON.stringify(categoryIds)); 
   formData.append("message", franchiseMessage);
-
-  // Files
   if (pancardFile) formData.append("pan_card_image", pancardFile);
   if (aadharFront) formData.append("adhar_card_front_image", aadharFront);
   if (aadharBack) formData.append("adhar_card_back_image", aadharBack);
-
   try {
     const data = await submitFranchiseRequest(formData);
     console.log("FINAL RESPONSE:", data);
@@ -243,7 +223,6 @@ formData.append("category_list", JSON.stringify(categoryIds)); // correct
     console.log(error);
   }
 };
-
 const validateStep1 = () => {
   if (!ownerName.trim()) {
     showPopup("Please enter your name","error");
@@ -339,7 +318,6 @@ const validateStep3 = () => {
     alert("Please upload Aadhar Back");
     return false;
   }
-
   return true;
 };
 
@@ -451,13 +429,8 @@ const validateStep3 = () => {
     <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
   </div>
 </div>
-
-
         <h2 className="heading">Personal <span>Details</span></h2>
-      
-
         <form onSubmit={handleSubmit} className="form">
-
           <div className="row">
           <input
   type="text"
@@ -466,39 +439,25 @@ const validateStep3 = () => {
   value={ownerName}
   onChange={(e) => setOwnerName(e.target.value)}
 />
-
-
 <div className="phone-field">
   <div className="phone-input-wrapper">
     <span className="prefix">{countryCode} |</span>
-
     <input
       type="text"
       id="phone"
-      maxLength={10}  // ✅ allow only 10 digits
-      value={phone.replace(countryCode, "")} // show only digits, not +91
+      maxLength={10}  
+      value={phone.replace(countryCode, "")} 
       onChange={(e) => {
-        let numberPart = e.target.value.replace(/\D/g, ""); // only digits
-
-        numberPart = numberPart.slice(0, 10); // ✅ restrict to 10 digits
-
-        setPhone(countryCode + numberPart); // store full number +91XXXXXXXXXX
+        let numberPart = e.target.value.replace(/\D/g, ""); 
+        numberPart = numberPart.slice(0, 10); 
+        setPhone(countryCode + numberPart); 
       }}
       required
     />
-
     <label htmlFor="phone">Phonenumber (will be use admin login)</label>
   </div>
 </div>
-
-
-
 </div>
-
-
-
-          
-
           <div className="row">
            <input
   type="text"
@@ -507,12 +466,8 @@ const validateStep3 = () => {
   value={address}
   onChange={(e) => setAddress(e.target.value)}
 />
-          </div>
-
-          
+          </div>  
        <div className="row">   
-
-
   <input
     type="email"
     value={email}
@@ -520,9 +475,6 @@ const validateStep3 = () => {
     required
   />
   <label>Email (will be use admin login)</label>
-
-
-
 <input
   type='text'
   placeholder='Pincode'
@@ -531,7 +483,6 @@ const validateStep3 = () => {
   onChange={(e) => setPincode(e.target.value)}
 />
           </div>
-
           <div className="row">
 <select value={selectedCountry} onChange={handleCountryChange} required>
   {countries.map(c => (
@@ -539,12 +490,8 @@ const validateStep3 = () => {
       {c.name}
     </option>
   ))}
-</select>
-
-
-          
+</select>  
           </div>
-
           <div className="row">
             <select value={selectedCity} onChange={(e) => setSelectedCity(e.target.value)} required disabled={!selectedState}>
               <option value="">Select City</option>
@@ -554,11 +501,7 @@ const validateStep3 = () => {
               <option value="">Select State</option>
               {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
-            {/* Category */}
-          
           </div>
-
-          {/* NEXT BUTTON – go to page 2 */}
       <div className="buttonrow">
 <button
   type="button"
@@ -604,9 +547,7 @@ const validateStep3 = () => {
     <span className="stepLabel">Franchise Info</span>
     <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
   </div>
-
   <div className="stepLine"></div>
-
   {/* STEP 3 */}
   <div
     className="stepItem"
@@ -619,18 +560,27 @@ const validateStep3 = () => {
     <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
   </div>
 </div>
-
-
-      <h2 className="heading">Franchise <span>Info</span></h2>
-
+ <h2 className="heading">Franchise <span>Info</span></h2>
       <form onSubmit={handleSubmit} className="form">
-
         {/* Name & Phone */}
         <div className="row">
         <input type="text" placeholder="Enter Name" value={franchiseName} onChange={(e) => setFranchiseName(e.target.value)} required />
-<input type="tel" placeholder="Enter Phone" value={franchisePhone} onChange={(e) => setFranchisePhone(e.target.value)} required />
+  <div className="phone-input-wrapper">
+    <span className="prefix">{countryCode} |</span>
+    <input
+      type="text"
+      id="phone"
+      maxLength={10}  
+      value={franchisePhone.replace(countryCode, "")} 
+      onChange={(e) => {
+        let numberPart = e.target.value.replace(/\D/g, ""); 
+        numberPart = numberPart.slice(0, 10); 
+        setFranchisePhone(countryCode + numberPart); 
+      }}
+      required
+    />
+  </div>
         </div>
-
         {/* Email */}
        <div className="row">
   <input
@@ -641,38 +591,32 @@ const validateStep3 = () => {
     required
   />
 </div>
-
-
-        {/* Address & Pincode */}
+  {/* Address & Pincode */}
         <div className="row">
-
                  <input type="email" placeholder="Enter Email" value={franchiseEmail} onChange={(e) => setFranchiseEmail(e.target.value)} required />
          <input type="text" placeholder="Pincode" value={franchisePincode} onChange={(e) => setFranchisePincode(e.target.value)} required />
         </div>
-
         {/* Country & State */}
         <div className="row">
-        <select value={selectedCountry} onChange={handleCountryChange} required>
-  <option value="">Select Country</option>
-  {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+  <select value={selectedCountry} onChange={handleCountryChange} required>
+  {countries.map(c => (
+    <option key={c.id} value={c.id}>
+      {c.name}
+    </option>
+  ))}
 </select>
-
           <select value={franchiseState} onChange={(e) => setFranchiseState(e.target.value)} required disabled={!selectedCountry}>
             <option value="">Select State</option>
             {states.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
-
         {/* City & Category */}
         <div className="row">
           <select value={franchiseCity} onChange={(e) => setFranchiseCity(e.target.value)} required disabled={!selectedState}>
             <option value="">Select City</option>
             {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-
-
  </div>
-
   <div style={{ width: "100%" }}>
 <Select
   isMulti
@@ -681,16 +625,13 @@ const validateStep3 = () => {
   value={selectedCategories}
   onChange={setSelectedCategories}
 />
-
 </div>
-
-
         {/* Message */}
         <div className="row">
        <textarea
   placeholder="Message"
   rows={4}
-  maxLength={300}                 // ⭐ CHARACTER LIMIT
+  maxLength={300}                 
   value={franchiseMessage}
   onChange={(e) => setFranchiseMessage(e.target.value)}
 ></textarea>
@@ -699,8 +640,6 @@ const validateStep3 = () => {
   {franchiseMessage.length}/300 characters
 </p>
         </div>
-
-      
   <div className="buttonRow">
     {/* Back button on the left */}
     <button
@@ -710,7 +649,6 @@ const validateStep3 = () => {
     >
       ← Back
     </button>
-
     {/* Next button on the right */}
     <button
       type="button"
@@ -740,9 +678,7 @@ const validateStep3 = () => {
       <span className="stepLabel">Personal Details</span>
       <div className={`stepCircle ${step === 1 ? "active" : ""}`}>1</div>
     </div>
-
     <div className="stepLine"></div>
-
     <div 
       className="stepItem"
       style={{ cursor: "pointer" }}
@@ -751,9 +687,7 @@ const validateStep3 = () => {
       <span className="stepLabel">Franchise Info</span>
       <div className={`stepCircle ${step === 2 ? "active" : ""}`}>2</div>
     </div>
-
     <div className="stepLine"></div>
-
     <div 
       className="stepItem"
       style={{ cursor: "pointer" }}
@@ -763,12 +697,8 @@ const validateStep3 = () => {
       <div className={`stepCircle ${step === 3 ? "active" : ""}`}>3</div>
     </div>
   </div>
-
-
       <h2 className="heading">Documents <span>Upload</span></h2>
-
       <form className="form">
-
         {/* Top row: Pancard */}
       <div className="row1" style={{ marginBottom: " 50px" }}>
     {/* Pancard Upload */}
@@ -796,7 +726,6 @@ const validateStep3 = () => {
             style={{ display: "none" }}
             onChange={(e) => e.target.files && setPancardFile(e.target.files[0])}
           />
-
           {/* Show uploaded file name */}
           {pancardFile && (
             <div style={{ marginTop: "10px" }}>Uploaded: {pancardFile.name}</div>
@@ -805,7 +734,6 @@ const validateStep3 = () => {
       </div>
     </div>
   </div>
-
   {/* Aadhar Uploads (Front & Back) */}
   <div className="row1">
     {/* Aadhar Front */}
@@ -841,7 +769,6 @@ const validateStep3 = () => {
         </label>
       </div>
     </div>
-
     {/* Aadhar Back */}
     <div style={{ flex: 1 }}>
       <h4 style={{ textAlign: "center", marginBottom: "10px" }}>Aadhar Back Upload</h4>
@@ -867,7 +794,6 @@ const validateStep3 = () => {
             style={{ display: "none" }}
             onChange={(e) => e.target.files && setAadharBack(e.target.files[0])}
           />
-
           {/* Show uploaded file name */}
           {aadharBack && (
             <div style={{ marginTop: "10px" }}>Uploaded: {aadharBack.name}</div>
@@ -895,9 +821,7 @@ const validateStep3 = () => {
       </form>
     </div>
   )}
-
   </div>
-
         <div className="container-benefits">
         <h2 className="heading">
           Benefits for <span>Vendors</span>
