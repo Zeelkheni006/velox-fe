@@ -42,7 +42,7 @@ const handleRecoverAccount = async (id) => {
   try {
     await recoverCustomer(id);
     showPopup("✅ Account recovered successfully!");
-    setCustomers(customers.filter(c => (c._id || c.id) !== id)); // remove from deleted list
+    setCustomers(customers.filter(c => (c._id || c.id) !== id));
   } catch (err) {
     showPopup("❌ " + err.message);
   }
@@ -100,10 +100,10 @@ const handleRecoverAccount = async (id) => {
 
   const uniqueCities = [...new Set(customers.map((c) => c.city))];
      const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard"); 
   };
     const goToManageCustomer = () => {
-    router.push("/admin/customer"); // Customer page
+    router.push("/admin/customer"); 
   };
   return (
     <Layout>
@@ -172,7 +172,11 @@ const handleRecoverAccount = async (id) => {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: "center", padding: "20px" }}>Loading deleted accounts...</div>
+            <tr>
+      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
+        <div className={styles.spinner}></div>
+      </td>
+    </tr>
           ) : (
             <table className={styles.table}>
               <thead>

@@ -100,7 +100,7 @@ const sortedSliders = useMemo(() => {
   };
 
     const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard"); 
   };
 
 
@@ -183,62 +183,76 @@ const sortedSliders = useMemo(() => {
               </tr>
             </thead>
 
-            <tbody>
-              {currentSliders.length === 0 ? (
-                  <tr>
-      <td colSpan={5} style={{ textAlign: "center" }}>No Entries Found </td>
+         <tbody>
+  {loading ? (
+  
+    <tr>
+      <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+        <div className="spinner"></div>
+      </td>
     </tr>
-              ) : (
-                currentSliders.map((slide) => {
-                  const isActive = !!slide.status;
-                  return (
-                    <tr
-                      key={slide._id}
-                      onDoubleClick={() => handleEdit(slide._id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td onClick={(e) => handleCopy(e, slide.title, "title", showPopup)}>
-                        {slide.title}
-                      </td>
+  ) : currentSliders.length === 0 ? (
 
-                      <td>
-<img
-          src={slide.image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}` : "https://via.placeholder.com/800x500"}
-  alt={slide?.title || "Slider Image"}
-  className="slider-img"
-  style={{ width: "170px", height: "50px", objectFit: "cover" }}
-/>
-                      </td>
+    <tr>
+      <td colSpan={5} style={{ textAlign: "center" }}>No Entries Found</td>
+    </tr>
+  ) : (
+   
+    currentSliders.map((slide) => {
+      const isActive = !!slide.status;
+      return (
+        <tr
+          key={slide._id}
+          onDoubleClick={() => handleEdit(slide._id)}
+          style={{ cursor: "pointer" }}
+        >
+          <td onClick={(e) => handleCopy(e, slide.title, "title", showPopup)}>
+            {slide.title}
+          </td>
 
-                      <td onClick={(e) => handleCopy(e, stripHTML(slide.description), "description", showPopup)}>
-                        {stripHTML(slide.description)}
-                      </td>
+          <td>
+            <img
+              src={
+                slide.image
+                  ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}`
+                  : "https://via.placeholder.com/800x500"
+              }
+              alt={slide?.title || "Slider Image"}
+              className="slider-img"
+              style={{ width: "170px", height: "50px", objectFit: "cover" }}
+            />
+          </td>
 
-                      <td>
-                        <span className={`status ${isActive ? "active" : "inactive"}`}>
-                          {isActive ? "ACTIVE" : "INACTIVE"}
-                        </span>
-                      </td>
+          <td onClick={(e) => handleCopy(e, stripHTML(slide.description), "description", showPopup)}>
+            {stripHTML(slide.description)}
+          </td>
 
-                      <td>
-                        <button className="edit-btn" onClick={() => handleEdit(slide._id)}>Edit</button>
-                        <button className="delete-btn" onClick={() => handleDelete(slide._id)}>Delete</button>
-                        <button
-                          className="toggle-btn"
-                          style={{
-                            backgroundColor: isActive ? "#5cb85c" : "#d9534f",
-                            color: "white",
-                          }}
-                          onClick={() => handleToggleStatus(slide._id)}
-                        >
-                          {isActive ? "Inactive" : "Active"}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
+          <td>
+            <span className={`status ${isActive ? "active" : "inactive"}`}>
+              {isActive ? "ACTIVE" : "INACTIVE"}
+            </span>
+          </td>
+
+          <td>
+            <button className="edit-btn" onClick={() => handleEdit(slide._id)}>Edit</button>
+            <button className="delete-btn" onClick={() => handleDelete(slide._id)}>Delete</button>
+
+            <button
+              className="toggle-btn"
+              style={{
+                backgroundColor: isActive ? "#5cb85c" : "#d9534f",
+                color: "white",
+              }}
+              onClick={() => handleToggleStatus(slide._id)}
+            >
+              {isActive ? "Inactive" : "Active"}
+            </button>
+          </td>
+        </tr>
+      );
+    })
+  )}
+</tbody>
           </table>
 
           <div className="pagination">

@@ -148,21 +148,21 @@ try {
 
    
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    try {
-      const newToken = await refreshToken();
-      if (newToken) {
-        console.log("✅ Refresh token successful:", newToken);
-      } else {
-        console.error("❌ Refresh token failed");
-      }
-    } catch (err) {
-      console.error("Error calling refresh token API:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const handleRefresh = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const newToken = await refreshToken();
+  //     if (newToken) {
+  //       console.log("✅ Refresh token successful:", newToken);
+  //     } else {
+  //       console.error("❌ Refresh token failed");
+  //     }
+  //   } catch (err) {
+  //     console.error("Error calling refresh token API:", err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   return (
     <Layout>
        <PopupAlert message={popupMessage} type={popupType} />
@@ -186,9 +186,9 @@ try {
           <h3>Categories</h3>
      
           <button className={styles.addBtn} onClick={handleAddCategory}>+ Add New</button>
-        <button onClick={handleRefresh} disabled={loading} className="addBtn">
+        {/* <button onClick={handleRefresh} disabled={loading} className="addBtn">
       {loading ? "Refreshing..." : "+ Refresh Token"}
-    </button>
+    </button> */}
 </div>
           <div className={styles.showEntries}>
             <label>
@@ -212,13 +212,7 @@ try {
             </label>
           </div>
 
-          {loading ? (
-            <table className={styles.table}>
-    <tbody>
-     
-    </tbody>
-  </table>
-          ) : (
+  
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -297,7 +291,7 @@ try {
                 )}
               </tbody>
             </table>
-          )}
+          
 
           <div className={styles.pagination}>
             <span>

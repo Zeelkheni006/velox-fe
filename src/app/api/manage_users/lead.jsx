@@ -243,31 +243,39 @@ export const getLeadDetails = async (id, token) => {
 
 // services/kyc.js
 
-export const fetchKycDocuments = async (leadId) => {
-  try {
-    const token = localStorage.getItem("access_token");
+// Add this function
+export const addLeadToFranchise = async (leadId) => {
+  if (!leadId) throw new Error("Lead ID is required");
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/get/kyc-documents/${leadId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Access token is missing");
 
-    const data = await res.json();
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/make-admin/${leadId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
 
-    return data?.data || null;
+  const data = await response.json();
 
-  } catch (error) {
-    console.error("KYC ERROR:", error);
-    return null;
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to add lead to franchise");
   }
+
+  return data;
 };
+
+
+
+
+
+
+
+
+
+
 
 
 

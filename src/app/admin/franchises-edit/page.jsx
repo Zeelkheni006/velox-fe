@@ -2,10 +2,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import Layout from "../pages/page";
 import Select from "react-select";
-import L from "leaflet";
+ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
-import "leaflet-draw";
+ import "leaflet-draw/dist/leaflet.draw.css";
+ import "leaflet-draw";
+ import usePopup from "../components/popup"
+ import PopupAlert from "../components/PopupAlert";
+import dynamic from "next/dynamic";
+
 import styles from "../styles/Franchises.module.css";
 import { fetchGooglePoints } from "../../api/admin-franchise/franchise"; 
 import { SlHome } from "react-icons/sl";
@@ -13,6 +17,8 @@ import { useRouter } from "next/navigation";
 
 export default function EditFranchise() {
     const router = useRouter();
+    const { popupMessage, popupType, showPopup } = usePopup();
+    const Select = dynamic(() => import("react-select"), { ssr: false });
   const [selectedServices, setSelectedServices] = useState([]);
   const [workingCities, setWorkingCities] = useState([{ label: "Jamnagar", value: "jamnagar" }]);
   const [form, setForm] = useState({
@@ -126,12 +132,27 @@ workingCities.forEach(city => {
     });
     map.addControl(drawControl);
 
-    map.on(L.Draw.Event.CREATED, (e) => {
-      const layer = e.layer;
-      drawnItems.clearLayers();
-      drawnItems.addLayer(layer);
-      polygonRef.current = layer;
-    });
+ map.on(L.Draw.Event.CREATED, (e) => {
+  const layer = e.layer;
+
+  // AUTO-CLOSE POLYGON
+  if (layer instanceof L.Polygon) {
+    let latlngs = layer.getLatLngs()[0];
+
+    const first = latlngs[0];
+    const last = latlngs[latlngs.length - 1];
+
+    // If first & last point are not equal → close polygon
+    if (first.lat !== last.lat || first.lng !== last.lng) {
+      latlngs.push(first); // close loop
+      layer.setLatLngs([latlngs]); // update polygon shape
+    }
+  }
+
+  drawnItems.clearLayers();
+  drawnItems.addLayer(layer);
+  polygonRef.current = layer;
+});
 
     drawWorkingCity(map);
 
@@ -146,27 +167,50 @@ workingCities.forEach(city => {
     }
   }, [workingCities]);
 
-  const handleLoadPoints = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) { alert("⚠️ Please login."); return; }
-    if (!polygonRef.current) { alert("Please draw a polygon first!"); return; }
+ const handleLoadPoints = async () => {
+  const token = localStorage.getItem("access_token");
+  if (!token) { showPopup("⚠️ Please login.","error"); return; }
+  if (!polygonRef.current) { showPopup("Please draw a polygon first!","error"); return; }
 
-    const polygonPoints = polygonRef.current.getLatLngs()[0].map(p => ({ latitude: p.lat, longitude: p.lng }));
+  let latlngs = polygonRef.current.getLatLngs()[0];
 
-    try {
-      const points = await fetchGooglePoints(polygonPoints);
-      if (!points.length) { alert("⚠️ No points found."); return; }
+  // Extract first point
+  const first = latlngs[0];
 
-      pointsLayerRef.current.clearLayers();
-      points.forEach(p => L.marker([p.latitude, p.longitude]).addTo(pointsLayerRef.current));
-      alert("✅ Points loaded!");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Failed to load points.");
-    }
-  };
+  // Convert to array format
+  let polygonPoints = latlngs.map(p => ({
+    latitude: p.lat,
+    longitude: p.lng
+  }));
 
-  const handleSubmit = (e) => { e.preventDefault(); alert("✅ Franchise updated!"); };
+  // FORCE last point = first point
+  const last = polygonPoints[polygonPoints.length - 1];
+  if (last.latitude !== first.lat || last.longitude !== first.lng) {
+    polygonPoints.push({
+      latitude: first.lat,
+      longitude: first.lng
+    });
+  }
+
+  console.log("FINAL POLYGON POINTS:", polygonPoints); // <-- You will now see repeated first point
+
+  try {
+    const points = await fetchGooglePoints(polygonPoints);
+
+    if (!points.length) { showPopup("⚠️ No points found."); return; }
+
+    pointsLayerRef.current.clearLayers();
+    points.forEach(p => L.marker([p.latitude, p.longitude]).addTo(pointsLayerRef.current));
+    showPopup("✅ Points loaded!");
+
+  } catch (err) {
+    console.error(err);
+    showPopup("❌ Failed to load points.","error");
+  }
+};
+
+
+  const handleSubmit = (e) => { e.preventDefault(); showPopup("✅ Franchise updated!"); };
       const goToDashboard = () => {
     router.push("/admin/dashboard"); // Replace with your dashboard route
   };
@@ -175,6 +219,8 @@ workingCities.forEach(city => {
   };
   return (
     <Layout>
+          <PopupAlert message={popupMessage} type={popupType} />
+      
       <div className={styles.editcontainer}>
         <div className={styles.headerContainer}>
           <div>

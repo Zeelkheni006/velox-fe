@@ -25,7 +25,6 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
 const { popupMessage, popupType, showPopup } = usePopup();
 
-  // 🔹 Fetch data from API
 useEffect(() => {
   const fetchServices = async () => {
     setLoading(true);
@@ -33,7 +32,6 @@ useEffect(() => {
     setServicesList(res?.data?.services || []);
     setLoading(false);
 
-    // ✅ Check for updated service after fetching
     const updatedService = localStorage.getItem("updatedService");
     if (updatedService) {
       const service = JSON.parse(updatedService);
@@ -47,16 +45,12 @@ useEffect(() => {
   fetchServices();
 }, []);
 
-
-
-  // 🔹 Search filter
   const filteredServices = servicesList.filter(service =>
     (service.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
     (service.category?.toLowerCase() || "").includes(search.toLowerCase()) ||
     (service.sub_category?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
-  // 🔹 Sorting
   const sortedServices = [...filteredServices];
   if (sortConfig.key) {
     sortedServices.sort((a, b) => {
@@ -77,13 +71,13 @@ useEffect(() => {
     });
   }
 
-  // 🔹 Pagination
+  //  Pagination
   const totalPages = Math.ceil(sortedServices.length / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, sortedServices.length);
   const currentItems = sortedServices.slice(startIndex, endIndex);
 
-  // 🔹 Dropdown close on outside click
+  //  Dropdown close on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(`.${styles.action}`)) {
@@ -102,7 +96,6 @@ const handleToggleStatus = (index) => {
       updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
     setServicesList(updated);
 
-    // ✅ Show popup
     showPopup(
       `Service "${updated[originalIndex].title}" status changed to ${updated[originalIndex].status}`,
       "success"
@@ -119,7 +112,6 @@ const handleToggleStatus = (index) => {
     updated.splice(originalIndex, 1);
     setServicesList(updated);
 
-    // ✅ Show popup
     showPopup(`Service "${deletedService}" deleted successfully!`, "success");
   }
   setOpenDropdownIndex(null);
@@ -139,7 +131,7 @@ const handleToggleStatus = (index) => {
     </span>
   );
    const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard"); 
   };
   return (
     <Layout>
@@ -234,19 +226,23 @@ const handleToggleStatus = (index) => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="8" style={{ textAlign: "center" }}>Loading services...</td></tr>
+                    <tr>
+      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
+        <div className={styles.spinner}></div>
+      </td>
+    </tr>
               ) : currentItems.length > 0 ? (
                 currentItems.map((service, index) => (
                    <tr
         key={index}
         onDoubleClick={() => {
-          // Row double-click -> navigate to edit page
+     
           localStorage.setItem("selectedService", JSON.stringify(service));
           router.push(
             `/admin/edit-services?service_id=${service.id}&sub_category_id=${service.sub_category_id}`
           );
         }}
-        style={{ cursor: "pointer" }} // optional, pointer cursor for UX
+        style={{ cursor: "pointer" }}
       >
                     <td>{startIndex + index + 1}</td>
                     <td onClick={(e)=>handleCopy(e, service.title , "title" , showPopup)}>{service.title}</td>
@@ -276,7 +272,6 @@ const handleToggleStatus = (index) => {
                       {openDropdownIndex === index && (
                         <div className={styles.dropdownMenu}>
                           <ul>
-                            {/* ✅ Fixed Edit Button */}  
 <li
   onClick={() => {
     localStorage.setItem("selectedService", JSON.stringify(service));
@@ -285,7 +280,6 @@ const handleToggleStatus = (index) => {
 >  <FontAwesomeIcon icon={faEdit} />
   Edit
 </li>
-
                             <li onClick={() => handleDelete(index)}>
                               <FontAwesomeIcon icon={faTrash} /> Delete
                             </li>

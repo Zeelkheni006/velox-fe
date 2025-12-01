@@ -43,104 +43,31 @@ export const fetchCategories = async () => {
   try {
     if (typeof window === "undefined") return [];
 
-    let accessToken = localStorage.getItem("access_token");
+    const accessToken = localStorage.getItem("access_token");
 
-    // Check if refresh token previously failed
-    const refreshError = localStorage.getItem("refresh_error");
-    if (refreshError) {
-      console.error("Refresh token previously failed:", refreshError);
-      return { error: refreshError }; // return saved error
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/get`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    console.log("CATEGORY API RESPONSE:", data);
+
+    if (data.success && Array.isArray(data.data)) {
+      return data.data; // return only categories
     }
 
-    // If no access token, try to refresh immediately
-    if (!accessToken) {
-      console.log("No access token → calling refresh token API");
-      accessToken = await refreshToken();
+    return []; // fallback
 
-      if (!accessToken) {
-        const errorMsg = "Refresh token failed";
-        console.log("❌", errorMsg);
-        localStorage.setItem("refresh_error", errorMsg);
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        return { error: errorMsg };
-      }
-
-      localStorage.setItem("access_token", accessToken);
-      localStorage.removeItem("refresh_error");
-    }
-
-    const fetchWithToken = async (token) => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/category/get`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-      console.log("CATEGORY API RESPONSE:", data);
-
-      const msg = (data?.message || "").toLowerCase();
-
-      if (
-        msg.includes("access token expired") ||
-        msg.includes("invalid token") ||
-        msg.includes("unauthorized")
-      ) {
-        return "EXPIRED";
-      }
-
-      if (msg.includes("login required") || msg.includes("please login")) {
-        return "LOGIN_REQUIRED";
-      }
-
-      if (data.success && Array.isArray(data.data)) return data.data;
-
-      return [];
-    };
-
-    let categories = await fetchWithToken(accessToken);
-
-    if (categories === "EXPIRED") {
-      console.log("Access token expired → calling refresh token API");
-
-      const newToken = await refreshToken();
-
-      if (!newToken) {
-        const errorMsg = "Refresh token failed";
-        console.log("❌", errorMsg);
-        localStorage.setItem("refresh_error", errorMsg);
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        return { error: errorMsg };
-      }
-
-      // Save new token and remove previous error
-      localStorage.setItem("access_token", newToken);
-      localStorage.removeItem("refresh_error");
-
-      // Retry API
-      categories = await fetchWithToken(newToken);
-
-      if (categories === "LOGIN_REQUIRED") {
-        const errorMsg = "Login required even after refresh";
-        console.log("❌", errorMsg);
-        localStorage.setItem("refresh_error", errorMsg);
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        return { error: errorMsg };
-      }
-    }
-
-    return categories || [];
   } catch (err) {
     console.error("Error fetching categories:", err);
-    return { error: err.message || "Unknown error" };
+    return [];
   }
 };
 

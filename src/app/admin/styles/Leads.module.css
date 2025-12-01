@@ -1092,5 +1092,19 @@
     background: #334155;
 }
 
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #ddd;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+    /* center */
+}
 
-/* (will be use admin login) */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
