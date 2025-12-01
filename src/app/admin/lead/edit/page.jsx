@@ -30,7 +30,7 @@ useEffect(() => {
 }, []);
 useEffect(() => {
   if (typeof window !== "undefined") {
-    const savedToken = localStorage.getItem("access_token"); // ✅ FIXED KEY
+    const savedToken = localStorage.getItem("access_token"); 
     console.log("TOKEN LOADED =", savedToken);
     setToken(savedToken);
   }
@@ -65,7 +65,6 @@ useEffect(() => {
     message: "",
   });
 
-  // Fetch lead data
 useEffect(() => {
   async function loadInitialData() {
     try {
@@ -96,8 +95,6 @@ useEffect(() => {
 }, []);
 
 
-
-  // Fetch lead details
 useEffect(() => {
   if (!leadId || !token) return;
 
@@ -156,8 +153,6 @@ useEffect(() => {
   fetchLead();
 }, [leadId, token]);
 
-
-  // Handle state changes separately for owner and franchise
   const handleOwnerStateChange = async (e) => {
     const stateId = e.target.value;
     setForm({ ...form, owner_state_id: stateId, owner_city_id: "" });
@@ -257,10 +252,8 @@ useEffect(() => {
             <span className={styles.breadcrumbActive}>Edit Lead</span>
           </div>
         </div>
-
-        {/* Owner & Franchise Info */}
+     
         <div className={styles.twoColWrap}>
-          {/* Owner Details */}
           <div className={styles.editcard}>
             <h2 className={styles.sectiontitle}>Owner Details</h2>
             <div className={styles.gridbox}>

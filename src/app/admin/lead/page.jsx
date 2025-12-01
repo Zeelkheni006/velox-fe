@@ -4,7 +4,7 @@ import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { useRouter,useSearchParams } from 'next/navigation';
 import dynamic from "next/dynamic";
-import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails,fetchKycDocuments} from "../../api/manage_users/lead";
+import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails,fetchKycDocuments,addLeadToFranchise} from "../../api/manage_users/lead";
 import Select from "react-select";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
@@ -16,6 +16,7 @@ const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false
 
 export default function LeadsPage() {
   const router = useRouter();
+   const [loading, setLoading] = useState(true);
 const [showFilter, setShowFilter] = useState(false);
   const [leads, setLeads] = useState([]);
   const [totalLeads, setTotalLeads] = useState(0);
@@ -54,6 +55,7 @@ const [franchiseMessage, setFranchiseMessage] = useState("");
 
   const [loadingKyc, setLoadingKyc] = useState(false);
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
+   setLoading(true);
   try {
     const { leads, total } = await getLeads(page, perPage, filters);
     const normalizedLeads = leads.map(l => {
@@ -74,9 +76,11 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
   } catch (err) {
     showPopup(err.message || "Something went wrong!", "error");
   }
+    setLoading(false);
 };
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
 useEffect(() => {
+   setLoading(true);
   if (!initialized.current) return;
   fetchLeadsData(currentPage, entriesPerPage, {
     name: selectedName,
@@ -86,6 +90,7 @@ useEffect(() => {
     status: selectedStatus,
     category_list: selectedCategories.map(c => Number(c.value))
   });
+    setLoading(false);
 }, [currentPage, entriesPerPage, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
   
 const handleNextPage = () => {
@@ -145,16 +150,23 @@ const sortedLeads = useMemo(() => {
   return sorted;
 }, [leads, sortConfig]);
 
-const handleAddToFranchise = (lead) => { 
-  const isTaken = false; 
-  if (isTaken) {
-    setFranchiseMessage("⚠️ This Mobile Number Has Already Been Taken");
-  } else {
-    setFranchiseMessage(" This Mobile Number Has Already Been Taken");
+
+
+ const handleAddToFranchise = async (lead) => {
+  if (!lead?.id) return showPopup("Lead ID is missing!", "error");
+
+  try {
+    setFranchiseMessage("Processing...");
+    setShowFranchisePopup(true);
+
+    const data = await addLeadToFranchise(lead.id);
+
+    setFranchiseMessage("✅ Lead added to franchise successfully");
+  } catch (err) {
+    setFranchiseMessage(err.message || "⚠️ Something went wrong!");
   }
-  setShowFranchisePopup(true);
 };
- 
+
 useEffect(() => {
   setCurrentPage(1);
 }, [search]);
@@ -584,137 +596,214 @@ if (values.length > 0) {
     <th>Action</th>
   </tr>
 </thead>
-              <tbody>
-              {sortedLeads.map((lead, index) => (
-                 <tr
-  key={index}
-onDoubleClick={() => router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)}
-  style={{ cursor: "pointer" }}
->
-                    <td
-  onClick={(e) => handleCopy(e, lead.owner_name, "Owner Name", showPopup)}
-  className={styles.copyCell}
->
-  {lead.owner_name}
-</td>
-                    <td
- onClick={(e) => handleCopy(e, lead.franchise_email, "Franchise Email", showPopup)}
-  className={styles.copyCell}
->
-  {lead.franchise_email}
-</td>
-                    <td
-  onClick={(e) => handleCopy(e, lead.franchise_phone , "Franchise Phone",showPopup )}
-  className={styles.copyCell}
->
-  {lead.franchise_phone}
-</td>
-<td className={styles.messageCell}onClick={(e) => handleCopy(e, lead.message, "message", showPopup)}>
-  <div className={styles.messageContent}>
-    {expandedMessageIndex === index
-      ? formatMessage(lead.message)
-      : formatMessage(lead.message).split("\n").slice(0, 2).join("\n")}
-  </div>
+             <tbody>
+  {loading ? (
+    <tr>
+      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
+        <div className={styles.spinner}></div>
+      </td>
+    </tr>
+  ) : sortedLeads.length === 0 ? (
+    <tr>
+      <td colSpan={9} style={{ textAlign: "center" }}>
+        No leads found
+      </td>
+    </tr>
+  ) : (
+    sortedLeads.map((lead, index) => (
+      <tr
+        key={index}
+        onDoubleClick={() =>
+          router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)
+        }
+        style={{ cursor: "pointer" }}
+      >
+        <td
+          onClick={(e) => handleCopy(e, lead.owner_name, "Owner Name", showPopup)}
+          className={styles.copyCell}
+        >
+          {lead.owner_name}
+        </td>
 
-  {formatMessage(lead.message).split("\n").length > 2 && (
-    <button
-      className={styles.showMoreBtn}
-      onClick={() =>
-        setExpandedMessageIndex(
-          expandedMessageIndex === index ? null : index
-        )
-      }
-    >
-      {expandedMessageIndex === index ? "Show Less" : "Show More"}
-    </button>
-  )}
-</td>        
-<td className={styles.categoryCell}>
-  <div className={styles.categoryContent}>
-    {(() => {
-      const list = Array.isArray(lead.categories) ? lead.categories : [];
-      const isExpanded = expandedMessageIndex === index;
-      const limited = list.slice(0, isExpanded ? list.length : 2);
+        <td
+          onClick={(e) =>
+            handleCopy(
+              e,
+              lead.franchise_email,
+              "Franchise Email",
+              showPopup
+            )
+          }
+          className={styles.copyCell}
+        >
+          {lead.franchise_email}
+        </td>
 
-      return (
-        <>
-          {limited.map((cat, i) => (
-            <div
-              key={i}
-              className={styles.categoryBox} // each category gets its own box
-              onClick={(e) => handleCopy(e, cat, "Category", showPopup)}
-            >
-              {cat}
-            </div>
-          ))}
+        <td
+          onClick={(e) =>
+            handleCopy(
+              e,
+              lead.franchise_phone,
+              "Franchise Phone",
+              showPopup
+            )
+          }
+          className={styles.copyCell}
+        >
+          {lead.franchise_phone}
+        </td>
 
-          {list.length > 2 && (
+        {/* message */}
+        <td
+          className={styles.messageCell}
+          onClick={(e) => handleCopy(e, lead.message, "message", showPopup)}
+        >
+          <div className={styles.messageContent}>
+            {expandedMessageIndex === index
+              ? formatMessage(lead.message)
+              : formatMessage(lead.message)
+                  .split("\n")
+                  .slice(0, 2)
+                  .join("\n")}
+          </div>
+
+          {formatMessage(lead.message).split("\n").length > 2 && (
             <button
               className={styles.showMoreBtn}
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpandedMessageIndex(isExpanded ? null : index);
-              }}
+              onClick={() =>
+                setExpandedMessageIndex(
+                  expandedMessageIndex === index ? null : index
+                )
+              }
             >
-              {isExpanded ? "Show Less" : "Show More"}
+              {expandedMessageIndex === index ? "Show Less" : "Show More"}
             </button>
           )}
-        </>
-      );
-    })()}
-  </div>
-</td> 
+        </td>
 
-                    <td onClick={(e) => handleCopy(e, lead.state, "Franchise state", showPopup)}>{lead.franchise_state?.name}</td>
-                    <td onClick={(e) => handleCopy(e, lead.city, "Franchise city", showPopup)}>{lead.franchise_city?.name}</td>
-                  <td>
-  <span
-    className={`${styles.badge} ${
-      lead.status === "PENDING" ? styles.pending :
-      lead.status === "ACCEPTED" ? styles.accept : styles.decline 
-    }`}
-    onClick={() => handleManageStatusClick(lead)} 
-    style={{ cursor: "pointer" }} 
-  >
-    {lead.status}
-  </span>
-</td>
-                    <td>
-  <button
-    className={styles.editBtn}
-    onClick={() => {
-    router.push(`/admin/lead/edit?id=${lead._id || lead.id}`);
-    }}
-  >
-    Edit
-  </button>
-  
+        {/* categories */}
+        <td className={styles.categoryCell}>
+          <div className={styles.categoryContent}>
+            {(() => {
+              const list = Array.isArray(lead.categories)
+                ? lead.categories
+                : [];
+              const isExpanded = expandedMessageIndex === index;
+              const limited = list.slice(
+                0,
+                isExpanded ? list.length : 2
+              );
 
-                      <button className={styles.statusBtn} onClick={() => handleManageStatusClick(lead)}>Manage Status</button>
-       <button
-  className={styles.statusBtn}
-  onClick={() => fetchLeadDetails(lead._id || lead.id)}
->
-  View All Details
-</button>
-  <button 
-    className={styles.kycBtn}
-    onClick={() => handleViewKyc(lead)}
-  >
-    KYC Documents
-  </button>
-{lead.status?.toUpperCase() === "ACCEPTED" && (
-  <button 
-    className={styles.franchiseBtn}
-    onClick={() => handleAddToFranchise(lead)}
-  >
-    Add To Franchises
-  </button>
-)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              return (
+                <>
+                  {limited.map((cat, i) => (
+                    <div
+                      key={i}
+                      className={styles.categoryBox}
+                      onClick={(e) =>
+                        handleCopy(e, cat, "Category", showPopup)
+                      }
+                    >
+                      {cat}
+                    </div>
+                  ))}
+
+                  {list.length > 2 && (
+                    <button
+                      className={styles.showMoreBtn}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setExpandedMessageIndex(
+                          isExpanded ? null : index
+                        );
+                      }}
+                    >
+                      {isExpanded ? "Show Less" : "Show More"}
+                    </button>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </td>
+
+        <td
+          onClick={(e) =>
+            handleCopy(e, lead.state, "Franchise state", showPopup)
+          }
+        >
+          {lead.franchise_state?.name}
+        </td>
+
+        <td
+          onClick={(e) =>
+            handleCopy(e, lead.city, "Franchise city", showPopup)
+          }
+        >
+          {lead.franchise_city?.name}
+        </td>
+
+        <td>
+          <span
+            className={`${styles.badge} ${
+              lead.status === "PENDING"
+                ? styles.pending
+                : lead.status === "ACCEPTED"
+                ? styles.accept
+                : styles.decline
+            }`}
+            onClick={() => handleManageStatusClick(lead)}
+            style={{ cursor: "pointer" }}
+          >
+            {lead.status}
+          </span>
+        </td>
+
+        <td>
+          <button
+            className={styles.editBtn}
+            onClick={() =>
+              router.push(`/admin/lead/edit?id=${lead._id || lead.id}`)
+            }
+          >
+            Edit
+          </button>
+
+          <button
+            className={styles.statusBtn}
+            onClick={() => handleManageStatusClick(lead)}
+          >
+            Manage Status
+          </button>
+
+          <button
+            className={styles.statusBtn}
+            onClick={() => fetchLeadDetails(lead._id || lead.id)}
+          >
+            View All Details
+          </button>
+
+          <button
+            className={styles.kycBtn}
+            onClick={() => handleViewKyc(lead)}
+          >
+            KYC Documents
+          </button>
+
+          {lead.status?.toUpperCase() === "ACCEPTED" && (
+            <button
+              className={styles.franchiseBtn}
+              onClick={() => handleAddToFranchise(lead)}
+            >
+              Add To Franchises
+            </button>
+          )}
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+
             </table>
        <div className={styles.pagination}>
   <span>

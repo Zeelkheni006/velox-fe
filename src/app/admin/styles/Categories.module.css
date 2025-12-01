@@ -173,7 +173,11 @@
 }
 
 .inactiveBtn {
-    background-color: #d9534f;
+    background-color: #e97480;
+}
+
+.inactiveBtn:hover {
+    background-color: rgb(253, 109, 109);
 }
 
 .activeBtn {
@@ -459,11 +463,11 @@
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto;
-    /* Center inside table cell */
+    /* center */
 }
 
 @keyframes spin {
-    to {
+    100% {
         transform: rotate(360deg);
     }
 }

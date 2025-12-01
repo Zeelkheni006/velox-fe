@@ -369,27 +369,34 @@ const fetchSuggestions = async (value) => {
     </section>
 
 <section className="services-section">
-  <div className="services-grid">
-    {services.map((service) => (
-      <Link
-        key={service.id}
-        href={`/services-list/${service.slug}`}   // 👈 OPEN DETAILS PAGE
-        className="service-card"
-      >
-        <div className="service-image">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
-            alt={service.title}
-            width={50}
-            height={50}
-            className="service-img"
-          />
-        </div>
-        <p className="service-label">{service.title}</p>
-      </Link>
-    ))}
-  </div>
+  {loading ? (
+    <div className="spinner-container">
+      <div className="spinner"></div>
+    </div>
+  ) : (
+    <div className="services-grid">
+      {services.map((service) => (
+        <Link
+          key={service.id}
+          href={`/services-list/${service.slug}`}
+          className="service-card"
+        >
+          <div className="service-image">
+            <Image
+              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
+              alt={service.title}
+              width={50}
+              height={50}
+              className="service-img"
+            />
+          </div>
+          <p className="service-label">{service.title}</p>
+        </Link>
+      ))}
+    </div>
+  )}
 </section>
+
       <section className="py-10 px-4  ">
         <div className="best-service">
           <h2 className="text-center text-2xl font-bold mb-2">Best Services</h2>
