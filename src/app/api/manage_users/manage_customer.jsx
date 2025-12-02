@@ -58,7 +58,6 @@ export async function getCustomers({ deleted = false } = {}) {
   const token = localStorage.getItem("access_token");
   if (!token) throw new Error("Access token not found. Please login.");
 
-  // Append query parameter to indicate deleted accounts
   const url = new URL(`${API_BASE_URL}/api/v1/admin/manage-users/customers/get`);
   if (deleted) url.searchParams.append("status", "deleted");
 
@@ -71,10 +70,14 @@ export async function getCustomers({ deleted = false } = {}) {
 
   const result = await res.json();
 
-  if (!res.ok) throw new Error(result.message || `Request failed with status ${res.status}`);
+  if (!res.ok) {
+    throw new Error(result.message || `Request failed with status ${res.status}`);
+  }
 
-  return result.data?.customers || [];
+  // FIX HERE:
+  return result?.message?.data?.customers || [];
 }
+
 
 // manage_customer.js
 // src/api/manage_users/manage_customer.js

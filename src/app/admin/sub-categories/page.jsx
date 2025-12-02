@@ -31,31 +31,31 @@ const { popupMessage, popupType, showPopup } = usePopup();
 const fetchData = async () => {
   setLoading(true);
   try {
-    const res = await getSubCategories(1, 500, search); // fetch all
+    const res = await getSubCategories(1, 500, search);
+
     if (res.success) {
-      const normalizedData = res.data.map(item => ({
+      const list = res.data?.sub_category || [];
+
+      const normalizedData = list.map(item => ({
         ...item,
-        status: item.status === true || item.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'
+        status: item.status === true || item.status === "ACTIVE" ? "ACTIVE" : "INACTIVE",
       }));
+
       setTotalItems(normalizedData.length);
       setTotalPages(Math.ceil(normalizedData.length / entriesPerPage));
 
-      // slice for current page
+      // Slice items for pagination
       const start = (currentPage - 1) * entriesPerPage;
       const end = start + entriesPerPage;
+
       setSubCategories(normalizedData.slice(start, end));
     }
   } catch (err) {
-  showPopup(err.message || " Something went wrong while fetching subcategories", "error");
-} finally {
-  setLoading(false);
-}
-
+    showPopup(err.message || "Something went wrong fetching subcategories", "error");
+  } finally {
+    setLoading(false);
+  }
 };
-
-useEffect(() => {
-  fetchData();
-}, [currentPage, entriesPerPage, search]);
 
   useEffect(() => {
     fetchData(currentPage, entriesPerPage);

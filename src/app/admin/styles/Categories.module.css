@@ -9,6 +9,39 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.topRow {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.select {
+    padding: 8px 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.filterGroup {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filterBtn {
+    background: #4b76f1;
+    color: white;
+    padding: 7px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.filterBtn:hover {
+    background: #345ad6;
+}
+
 .headerContainer {
     background-color: #ffffff;
     display: flex;
