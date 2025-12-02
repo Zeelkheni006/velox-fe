@@ -8,7 +8,7 @@ import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
-
+import Select from "react-select";
 
 import { refreshToken } from '../../api/auth/admin-refresh-tocken';
 function SortArrow({ direction }) {
@@ -28,7 +28,7 @@ export default function Categories() {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState('');
 const { popupMessage, popupType, showPopup } = usePopup();
-
+const [showFilter, setShowFilter] = useState(false);
   const [sortConfig, setSortConfig] = useState({
     key: searchParams.get('sortBy') || null,
     direction: searchParams.get('sortOrder') || null,
@@ -39,23 +39,28 @@ const loadCategories = async () => {
   setLoading(true);
   try {
     const data = await fetchCategories();
-    // Ensure each category has id, title, logo, description, and status
-    const normalized = data.map(cat => ({
-      id: cat.id, // <-- important
-      title: cat.title || '',
-      logo: cat.logo || '',
-      description: cat.description || '',
-      status: cat.status === true || cat.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
-    }));
+    console.log("FETCHED DATA RAW:", data);
+
+    const normalized = data.map(cat => {
+      console.log("CAT ITEM:", cat);
+      return {
+        id: cat.id,
+        title: cat.title || '',
+        logo: cat.logo || '',
+        description: cat.description || '',
+        status: cat.status === true || cat.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+      };
+    });
+
     setCategories(normalized);
   } catch (err) {
-  const msg = err?.message || "❌ Something went wrong while fetching categories";
-  showPopup(msg, "error");
-  setCategories([]);
-} finally {
+    console.log("API ERROR:", err);
+    showPopup("❌ Something went wrong", "error");
+  } finally {
     setLoading(false);
   }
 };
+
   useEffect(() => {
     loadCategories();
   }, []);
@@ -69,7 +74,7 @@ const loadCategories = async () => {
     });
   }, [searchParams]);
 
-  // Filter by search
+ 
   const filteredCategories = categories.filter(cat =>
     cat.title.toLowerCase().includes(search.toLowerCase())
   );
@@ -95,27 +100,27 @@ const loadCategories = async () => {
   // Toggle status
 const toggleStatus = async (index) => {
   const cat = currentCategories[index];
-  const globalIndex = categories.findIndex(c => c.id === cat.id); // compare by id
+  const globalIndex = categories.findIndex(c => c.id === cat.id); 
   const newStatus = cat.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
 
 try {
-  const res = await updateCategoryStatus(cat.id, newStatus); // id will be valid
+  const res = await updateCategoryStatus(cat.id, newStatus); 
   if (res.success) {
     setCategories(prev => {
       const newCats = [...prev];
       newCats[globalIndex] = { ...newCats[globalIndex], status: newStatus };
       return newCats;
     });
-    showPopup("✅ Status updated successfully!", "success"); // ✅ popup
+    showPopup("✅ Status updated successfully!", "success"); 
     
   } else {
-    showPopup(res.message || "❌ Failed to update status", "error"); // ❌ popup
+    showPopup(res.message || "❌ Failed to update status", "error"); 
   
   }
 
 } catch (err) {
   console.error("Error updating status:", err);
-  showPopup("❌ Something went wrong while updating status", "error"); // ❌ popup
+  showPopup("❌ Something went wrong while updating status", "error"); 
  
 }
 };
@@ -143,7 +148,7 @@ try {
     setSortConfig({ key, direction });
   };
      const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard");
   };
 
    
@@ -190,29 +195,49 @@ try {
       {loading ? "Refreshing..." : "+ Refresh Token"}
     </button> */}
 </div>
-          <div className={styles.showEntries}>
-            <label>
-              Show{" "}
-              <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-              </select>{" "}
-              entries
-            </label>
-            <label className={styles.searchLabel}>
-              Search:{" "}
-              <input
-                type="text"
-                placeholder="Search..."
-                className={styles.search}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </label>
-          </div>
+ 
+ 
 
-  
+  {/* LEFT SIDE — Filter Button + Show Entries */}
+  <div className={styles.topRow}>
+    <button 
+      className={styles.filterBtn}
+      onClick={() => setShowFilter(prev => !prev)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+   
+   {showFilter && (
+       <div className={styles.filterGroup}>
+      <Select
+        placeholder="Select Name"
+       
+        className={styles.select}
+        isClearable 
+      />
+  </div>
+    )}
+      </div>
+  {/* RIGHT SIDE — Search Box ALWAYS beside Filter Button */}
+
+
+
+ 
+    {/* Show Entries UNDER filter button */}
+    <div className={styles.showEntries}>
+      <label>
+        Show{" "}
+        <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+        </select>{" "}
+        entries
+      </label>
+    </div>
+ 
+
+ 
             <table className={styles.table}>
               <thead>
                 <tr>

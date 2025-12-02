@@ -37,14 +37,14 @@ const { popupMessage, popupType, showPopup } = usePopup();
 
   // Recover account handler
 const handleRecoverAccount = async (id) => {
-  if (!id) return alert("Customer ID missing!");
+  if (!id) return showPopup("Customer ID missing!","error");
 
   try {
     await recoverCustomer(id);
     showPopup("✅ Account recovered successfully!");
     setCustomers(customers.filter(c => (c._id || c.id) !== id));
   } catch (err) {
-    showPopup("❌ " + err.message);
+    showPopup("❌ " + err.message,"error");
   }
 };
 
@@ -171,13 +171,7 @@ const handleRecoverAccount = async (id) => {
             </div>
           </div>
 
-          {loading ? (
-            <tr>
-      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
-        <div className={styles.spinner}></div>
-      </td>
-    </tr>
-          ) : (
+       
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -197,7 +191,14 @@ const handleRecoverAccount = async (id) => {
                 </tr>
               </thead>
               <tbody>
-                {currentCustomers.length > 0 ? (
+                   {loading ? (
+            <tr>
+      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
+        <div className={styles.spinner}></div>
+      </td>
+    </tr>
+          ) : 
+                currentCustomers.length > 0 ? (
                   currentCustomers.map((cust) => (
                     <tr key={cust.id}>
                       <td onClick={(e) => handleCopy(e, cust.name, "name", showPopup)}>{cust.name}</td>
@@ -223,7 +224,7 @@ const handleRecoverAccount = async (id) => {
                 )}
               </tbody>
             </table>
-          )}
+          
 
           <div className={styles.pagination}>
             <span>

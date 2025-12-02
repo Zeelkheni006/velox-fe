@@ -37,8 +37,6 @@ export async function createCategory({ title, logo, description }) {
 }
 
 // get category
-import { refreshToken } from "../auth/admin-refresh-tocken";
-
 export const fetchCategories = async () => {
   try {
     if (typeof window === "undefined") return [];
@@ -59,17 +57,19 @@ export const fetchCategories = async () => {
     const data = await res.json();
     console.log("CATEGORY API RESPONSE:", data);
 
-    if (data.success && Array.isArray(data.data)) {
-      return data.data; // return only categories
+    if (data.success && data.data?.categories && Array.isArray(data.data.categories)) {
+      return data.data.categories; // ✅ return the nested categories array
     }
 
-    return []; // fallback
+    return []; // fallback if structure is unexpected
 
   } catch (err) {
     console.error("Error fetching categories:", err);
     return [];
   }
 };
+
+
 
 
 

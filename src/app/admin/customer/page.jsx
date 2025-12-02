@@ -9,9 +9,10 @@ import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
-
+import Select from "react-select";
 export default function ManageCustomerPage() {
   const router = useRouter();
+  const [showFilter, setShowFilter] = useState(false);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -25,23 +26,23 @@ const { popupMessage, popupType, showPopup } = usePopup();
   // Fetch customers from API
 useEffect(() => {
   const fetchCustomers = async () => {
+    setLoading(true);
     try {
-   const res = await getCustomers(); 
-console.log("API Response:", res);
+      const customersArray = await getCustomers();
+      console.log("Final Customers:", customersArray);
 
-const normalized = res.map(c => ({
-  id: c.id,
-  username: c.username || "",
-  email: c.email || "",
-  phonenumber: c.phone || "",
-  city: c.city || ""
-}));
-
-      console.log("Normalized customers:", normalized);
+      const normalized = customersArray.map(c => ({
+        id: c.id,
+        username: c.username || "",
+        email: c.email || "",
+        phonenumber: c.phone || "",
+        city: c.city || ""
+      }));
 
       setCustomers(normalized);
+
     } catch (err) {
-      showPopup("Error fetching customers: " + err.message);
+      showPopup("Error fetching customers: " + err.message,"error");
     } finally {
       setLoading(false);
     }
@@ -49,6 +50,8 @@ const normalized = res.map(c => ({
 
   fetchCustomers();
 }, []);
+
+
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -65,26 +68,34 @@ const normalized = res.map(c => ({
 
   // Filter + Sort customers
 const filteredCustomers = useMemo(() => {
-  let filtered = customers
-    .filter((cust) => cust) 
-    .filter((cust) => {
-     const matchesSearch =
-  ((cust.username || cust.name) || "").toLowerCase().includes(search.toLowerCase()) ||
-  (cust.email || "").toLowerCase().includes(search.toLowerCase()) ||
-  ((cust.phonenumber || cust.mobile) || "").includes(search);
-      const matchesCity = selectedCity ? cust.city === selectedCity : true;
-      return matchesSearch && matchesCity;
-    });
+  let filtered = customers.filter((cust) => {
+    const searchLower = search.toLowerCase();
 
-  if (!sortConfig.key || !sortConfig.direction) return filtered;
-  return [...filtered].sort((a, b) => {
-    const aVal = a[sortConfig.key]?.toString().toLowerCase() || "";
-    const bVal = b[sortConfig.key]?.toString().toLowerCase() || "";
-    if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-    if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-    return 0;
+    const matchesSearch =
+      (cust.username || "").toLowerCase().includes(searchLower) ||
+      (cust.email || "").toLowerCase().includes(searchLower) ||
+      (cust.phonenumber || "").includes(search);
+
+    const matchesCity = selectedCity ? cust.city?.toLowerCase() === selectedCity.toLowerCase() : true;
+
+    return matchesSearch && matchesCity;
   });
+
+  // sorting
+  if (sortConfig.key && sortConfig.direction) {
+    filtered = [...filtered].sort((a, b) => {
+      const aVal = (a[sortConfig.key] || "").toString().toLowerCase();
+      const bVal = (b[sortConfig.key] || "").toString().toLowerCase();
+
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  return filtered;
 }, [customers, search, selectedCity, sortConfig]);
+
 
   // Pagination
   const totalPages = Math.ceil(filteredCustomers.length / entriesPerPage);
@@ -106,7 +117,7 @@ const handleDelete = async (id) => {
     setCustomers((prev) => prev.filter((cust) => cust.id !== id)); 
     showPopup("Customer moved to Deleted Accounts!");
   } catch (err) {
-    showPopup("Error deleting customer: " + err.message);
+    showPopup("Error deleting customer: " + err.message,"error");
   }
 };
 
@@ -145,7 +156,25 @@ const handleDelete = async (id) => {
         </div>
         <div className={styles.tableCard}>
           <h3 className={styles.tableTitle}>Manage Customers</h3>
-
+  <div className={styles.topRow}>
+    <button 
+      className={styles.filterBtn}
+      onClick={() => setShowFilter(prev => !prev)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+   
+   {showFilter && (
+       <div className={styles.filterGroup}>
+      <Select
+        placeholder="Select Name"
+       
+        className={styles.select}
+        isClearable 
+      />
+  </div>
+    )}
+      </div>
           <div className={styles.tableControls}>
             <div>
               Show{" "}
@@ -192,14 +221,14 @@ const handleDelete = async (id) => {
                 <th>Options</th>
               </tr>
             </thead>
-          <tbody>
+         <tbody>
   {loading ? (
     <tr>
-      <td colSpan={5} style={{ textAlign: "center", padding: "50px" }}>
+      <td colSpan={9} style={{ textAlign: "center", padding: "50px" }}>
         <div className={styles.spinner}></div>
       </td>
     </tr>
-  ) : currentCustomers.length > 0 ? (
+  ) : currentCustomers && currentCustomers.length > 0 ? (
     currentCustomers.map((cust) => (
       <tr key={cust.id}>
         <td onClick={(e) => handleCopy(e, cust.username, "Username", showPopup)}>
@@ -226,10 +255,13 @@ const handleDelete = async (id) => {
     ))
   ) : (
     <tr>
-      <td colSpan={5}>No matching records found.</td>
+      <td colSpan={9} style={{ textAlign: "center", padding: "20px" }}>
+        No matching records found.
+      </td>
     </tr>
   )}
 </tbody>
+
           </table>
 
           <div className={styles.pagination}>

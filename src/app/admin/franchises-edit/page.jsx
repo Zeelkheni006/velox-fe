@@ -209,6 +209,45 @@ workingCities.forEach(city => {
   }
 };
 
+const addVertexMarkers = (polygonLayer) => {
+  if (!leafletRef.current) return;
+
+  const map = leafletRef.current._leaflet_map;
+  const latlngs = polygonLayer.getLatLngs()[0];
+
+  // Remove existing markers before adding new ones
+  if (pointsLayerRef.current) pointsLayerRef.current.clearLayers();
+
+  latlngs.forEach((point, index) => {
+    const marker = L.circleMarker(point, {
+      radius: 6,
+      color: "red",
+      fillColor: "white",
+      fillOpacity: 1,
+      weight: 2
+    }).addTo(pointsLayerRef.current);
+
+    // 3️⃣ DELETE POINT ON CLICK
+    marker.on("click", () => {
+      if (latlngs.length <= 4) {
+        alert("Polygon must have minimum 3 points!");
+        return;
+      }
+
+      latlngs.splice(index, 1); // Remove point
+
+      // Fix auto-close after delete
+      const first = latlngs[0];
+      const last = latlngs[latlngs.length - 1];
+      if (first.lat !== last.lat || first.lng !== last.lng) {
+        latlngs[latlngs.length - 1] = first;
+      }
+
+      polygonLayer.setLatLngs([latlngs]);
+      addVertexMarkers(polygonLayer); // Refresh markers
+    });
+  });
+};
 
   const handleSubmit = (e) => { e.preventDefault(); showPopup("✅ Franchise updated!"); };
       const goToDashboard = () => {
