@@ -8,7 +8,7 @@ import usePopup from "../components/popup";
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
-
+import Select from "react-select";
 
 export default function SliderTable() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function SliderTable() {
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [searchText, setSearchText] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-
+const [showFilter, setShowFilter] = useState(false);
   const { popupMessage, popupType, showPopup } = usePopup();
 
   useEffect(() => {
@@ -126,11 +126,32 @@ const sortedSliders = useMemo(() => {
         </div>
 </div>
         <div className="tableCard">
+              <div classNam="header">
           <h3 className="tableTitle">Manage Sliders</h3>
           <button className="addBtn" onClick={() => router.push("/admin/admin-add/add-slider")}>
             + Add New
           </button>
+</div>
 
+  <div className="topRow">
+    <button 
+      className="filterBtn"
+      onClick={() => setShowFilter(prev => !prev)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+   
+   {showFilter && (
+       <div className="filterGroup">
+      <Select
+        placeholder="Select Name"
+       
+        className="select"
+        isClearable 
+      />
+  </div>
+    )}
+      </div>
           <div className="tableControls">
             <div>
               Show{" "}

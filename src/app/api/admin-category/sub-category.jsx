@@ -32,8 +32,6 @@ export async function createSubCategory(formData) {
   }
 }
 
-
-
 // sub-category api 
 export async function getSubCategories(page = 1, per_page = 10, search = "") {
   try {

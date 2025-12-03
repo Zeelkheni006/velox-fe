@@ -9,6 +9,7 @@ import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl"
+import Select from "react-select";
 function SortArrow({ direction }) {
   return <span style={{ marginLeft: '5px', fontSize: '12px' }}>
     {direction === 'asc' ? '▲' : direction === 'desc' ? '▼' : '↕'}
@@ -24,7 +25,7 @@ export default function SubCategories() {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  
+  const [showFilter, setShowFilter] = useState(false);
   const router = useRouter();
 const { popupMessage, popupType, showPopup } = usePopup();
 
@@ -150,7 +151,25 @@ const fetchData = async () => {
               + Add new
             </button>
           </div>
-
+  <div className={styles.topRow}>
+    <button 
+      className={styles.filterBtn}
+      onClick={() => setShowFilter(prev => !prev)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+   
+   {showFilter && (
+       <div className={styles.filterGroup}>
+      <Select
+        placeholder="Select Name"
+       
+        className={styles.select}
+        isClearable 
+      />
+  </div>
+    )}
+      </div>
           <div className={styles.controls}>
             <label>
               Show{" "}

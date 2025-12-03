@@ -1,3 +1,5 @@
+
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 export async function getLeads(page = 1, perPage = 10, filters = {}) {
@@ -266,6 +268,30 @@ export const addLeadToFranchise = async (leadId) => {
 
   return data;
 };
+
+export const fetchRequestedServices = async (leadId) => {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Access token missing");
+
+  if (!leadId) return null;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/admin/manage-users/leads/get/requested-services/${leadId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error fetching requested services:", err);
+    return null;
+  }
+};
+
 
 
 
