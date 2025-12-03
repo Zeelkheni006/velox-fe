@@ -4,13 +4,13 @@ import Layout from "../pages/page";
 import styles from "../styles/Leads.module.css";
 import { useRouter,useSearchParams } from 'next/navigation';
 import dynamic from "next/dynamic";
-import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails,fetchKycDocuments,addLeadToFranchise} from "../../api/manage_users/lead";
+import { getLeads, updateLeadStatus,getFilterDropdownData,getLeadDetails,fetchKycDocuments,addLeadToFranchise,fetchRequestedServices } from "../../api/manage_users/lead";
 import Select from "react-select";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
-import { FcCancel } from "react-icons/fc";
+import { FcCancel, FcCheckmark ,FcSynchronize } from "react-icons/fc";
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
@@ -31,6 +31,7 @@ const [expandedMessageIndex, setExpandedMessageIndex] = useState(null);
 const { popupMessage, popupType, showPopup } = usePopup();
 const [showKycPopup, setShowKycPopup] = useState(false);
 const [kycData, setKycData] = useState(null);
+const [franchiseStatus, setFranchiseStatus] = useState("");
 const [dropdownData, setDropdownData] = useState({
   name: [],
   email: [],
@@ -51,8 +52,9 @@ const [kycFiles, setKycFiles] = useState(null);
 const [selectedStatus, setSelectedStatus] = useState(null);
 const currentLeads = leads;
 const initialized = useRef(false);
+const [selectedLead, setSelectedLead] = useState(null);
 const [franchiseMessage, setFranchiseMessage] = useState("");
-
+const [isProcessing, setIsProcessing] = useState(false);
   const [loadingKyc, setLoadingKyc] = useState(false);
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
    setLoading(true);
@@ -152,20 +154,46 @@ const sortedLeads = useMemo(() => {
 
 
 
- const handleAddToFranchise = async (lead) => {
+const handleAddToFranchise = async (lead) => {
   if (!lead?.id) return showPopup("Lead ID is missing!", "error");
 
-  try {
-    setFranchiseMessage("Processing...");
-    setShowFranchisePopup(true);
+    setSelectedLead(lead);   // <-- FIXED (now valid)
+  setShowFranchisePopup(true);
+  setIsProcessing(true);
+  setFranchiseMessage("Processing...");
+  setFranchiseStatus("");
 
+  try {
     const data = await addLeadToFranchise(lead.id);
 
-    setFranchiseMessage("✅ Lead added to franchise successfully");
+    setIsProcessing(false);
+
+    if (data.success) {
+      setFranchiseMessage("Lead added successfully!");
+      setFranchiseStatus("success");
+    } else {
+      setFranchiseMessage(data.message || "Already created or failed!");
+      setFranchiseStatus("error");
+    }
+
   } catch (err) {
-    setFranchiseMessage(err.message || "⚠️ Something went wrong!");
+    setIsProcessing(false);
+    setFranchiseMessage("Something went wrong!");
+    setFranchiseStatus("error");
   }
 };
+
+const handleOkClick = async () => {
+  setShowFranchisePopup(false);
+
+  if (franchiseStatus === "success" && selectedLead?.id) {
+    await fetchRequestedServices(selectedLead.id);
+
+    // 🔥 ID sathe navigate karo
+       router.push(`/admin/create-franchise?leadId=${selectedLead.id}`);
+  }
+};
+
 
 useEffect(() => {
   setCurrentPage(1);
@@ -867,23 +895,53 @@ of {totalLeads} entries
 {showFranchisePopup && (
   <div className={styles.modalOverlay}>
     <div className={styles.modalContent}>
-      <button className={styles.closeBtn} onClick={() => setShowFranchisePopup(false)}>×</button>
-   <div className={styles.iconWrapper}>
-  <FcCancel size={80} className={styles.cancelIcon} />
-</div>
-      <h2 className={styles.h2}>Danger</h2>
-      <p className={styles.p}>{franchiseMessage}</p>
-      <div className={styles.modalActions}>
-        <button 
-          className={styles.acceptBtn}
-          onClick={() => setShowFranchisePopup(false)}
-        >
-          OK
-        </button>
+
+      <button
+        className={styles.closeBtn}
+        onClick={() => setShowFranchisePopup(false)}
+      >
+        ×
+      </button>
+
+      <div className={styles.iconWrapper}>
+        
+        {isProcessing ? (
+          <FcSynchronize size={80} className={styles.rotateIcon} />
+        ) : franchiseStatus === "success" ? (
+          <FcCheckmark size={80} className={styles.successIcon} />
+        ) : (
+          <FcCancel size={80} className={styles.cancelIcon} />
+        )}
+
       </div>
+
+      <h2 className={styles.h2}>
+        {isProcessing
+          ? "Processing..."
+          : franchiseStatus === "success"
+          ? "Success"
+          : "Danger"}
+      </h2>
+
+      <p className={styles.p}>{franchiseMessage}</p>
+
+      {!isProcessing && (
+        <div className={styles.modalActions}>
+          <button
+            className={styles.acceptBtn}
+            onClick={handleOkClick}
+          >
+            OK
+          </button>
+        </div>
+      )}
     </div>
   </div>
 )}
+
+
+
+
 {showLeadDetailsPopup && (
   <div className={styles.leadModalOverlay}>
     <div className={styles.leadModalContent}>

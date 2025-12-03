@@ -18,7 +18,11 @@ export default function PopupAlert({ message, type }) {
       )}
 
     
-      <span>{message.replace(/^✅ |^❌ /, "")}</span>
+<span>
+  {String(
+    typeof message === "object" ? message?.message ?? "" : message ?? ""
+  ).replace(/^✅ |^❌ /, "")}
+</span>
     </div>
   );
 }

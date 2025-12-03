@@ -14,6 +14,7 @@ import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { getServices } from "../../api/admin-service/category-list";
 import { SlHome } from "react-icons/sl";
+import Select from "react-select";
 export default function ServicesPage() {
   const router = useRouter();
   const [servicesList, setServicesList] = useState([]);
@@ -23,6 +24,7 @@ export default function ServicesPage() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const [openDropdownIndex, setOpenDropdownIndex] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showFilter, setShowFilter] = useState(false);
 const { popupMessage, popupType, showPopup } = usePopup();
 
 useEffect(() => {
@@ -161,6 +163,26 @@ const handleToggleStatus = (index) => {
             + Add new
           </button>
 </div>
+
+  <div className={styles.topRow}>
+    <button 
+      className={styles.filterBtn}
+      onClick={() => setShowFilter(prev => !prev)}
+    >
+      {showFilter ? "Hide Filter" : "Filter"}
+    </button>
+   
+   {showFilter && (
+       <div className={styles.filterGroup}>
+      <Select
+        placeholder="Select Name"
+       
+        className={styles.select}
+        isClearable 
+      />
+  </div>
+    )}
+      </div>
           {/* Search & Show entries */}
           <div className={styles.showEntries}>
             <label>
