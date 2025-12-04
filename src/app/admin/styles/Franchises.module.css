@@ -384,6 +384,10 @@
     font-size: 13px;
 }
 
+.createButton:hover {
+    background-color: #3fcf7b;
+}
+
 .actionCell {
     display: flex;
     align-items: center;
@@ -615,4 +619,13 @@
 
 .ownerBtn:hover {
     background: #0059c1;
+}
+
+.city-label {
+    background: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    color: black;
 }

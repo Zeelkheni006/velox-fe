@@ -42,7 +42,7 @@ const ManhattanMap = () => {
     if (!window.google) {
       const script = document.createElement("script");
       script.src =
-        "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=drawing";
+        "https://maps.googleapis.com/maps/api/js?key=AIzaSyAkN1nNIvHBpq6X8FyUoO1maojdqDpmrmI&libraries=drawing";
       script.async = true;
       script.defer = true;
       script.onload = loadGoogleMaps;

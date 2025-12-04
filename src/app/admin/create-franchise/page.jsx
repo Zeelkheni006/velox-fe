@@ -1,33 +1,36 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import Layout from "../pages/page";
-import Select from "react-select";
- import L from "leaflet";
-import "leaflet/dist/leaflet.css";
- import "leaflet-draw/dist/leaflet.draw.css";
- import "leaflet-draw";
- import usePopup from "../components/popup"
- import PopupAlert from "../components/PopupAlert";
 import dynamic from "next/dynamic";
-import { fetchRequestedServices } from "../../api/manage_users/lead";
-import styles from "../styles/Franchises.module.css";
-import { fetchGooglePoints } from "../../api/admin-franchise/franchise"; 
+import Script from "next/script";
+import usePopup from "../components/popup";
+import PopupAlert from "../components/PopupAlert";
 import { SlHome } from "react-icons/sl";
-import { useRouter,useSearchParams  } from "next/navigation";
-import {getLeadDetails} from "../../api/manage_users/lead"
-import {getAllCountries,getallStates,getallCities} from "../../api/user-side/register-professional/location"
+import { useRouter, useSearchParams } from "next/navigation";
+
+import { fetchRequestedServices, getLeadDetails } from "../../api/manage_users/lead";
+import { getAllCountries, getallStates, getallCities } from "../../api/user-side/register-professional/location";
+import { fetchGooglePoints } from "../../api/admin-franchise/franchise";
+import styles from "../styles/Franchises.module.css";
+
 export default function EditFranchise() {
-    const router = useRouter();
-    const [countries, setCountries] = useState([]);
-const [states, setStates] = useState([]);
-const [cities, setCities] = useState([]);
-    const searchParams = useSearchParams();
-const selectedLeadId = searchParams.get("leadId");
-    const [serviceOptions, setServiceOptions] = useState([]);
-    const { popupMessage, popupType, showPopup } = usePopup();
-    const Select = dynamic(() => import("react-select"), { ssr: false });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedLeadId = searchParams.get("leadId");
+
+  const Select = dynamic(() => import("react-select"), { ssr: false });
+  const { popupMessage, popupType, showPopup } = usePopup();
+
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [serviceOptions, setServiceOptions] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [workingCities, setWorkingCities] = useState([{ label: "Jamnagar", value: "jamnagar" }]);
+
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const polygonRef = useRef(null);
+
   const [form, setForm] = useState({
     country: "",
     state: "",
@@ -42,460 +45,272 @@ const selectedLeadId = searchParams.get("leadId");
     deliveryHours: "",
     deliveryMinutes: "",
     latitude: "",
-    longitude:"" ,
+    longitude: "",
   });
-useEffect(() => {
-  if (selectedLeadId) {
-    loadRequestedServices(selectedLeadId);
-  }
-}, [selectedLeadId]);
-const loadRequestedServices = async (leadId) => {
-  try {
-    const response = await fetchRequestedServices(leadId);
 
-    if (response?.success && Array.isArray(response.data)) {
-      const options = response.data.map(item => ({
-        label: item.title,
-        value: item.id
-      }));
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-      setServiceOptions(options);
-      setSelectedServices(options); // Pre-select all returned services
-    }
-
-  } catch (err) {
-    console.error("Failed to load requested services:", err);
-  }
-};
-
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleReset = () => setWorkingCities([]);
-
-  const leafletRef = useRef(null);
-  const polygonRef = useRef(null);
-  const pointsLayerRef = useRef(null);
-  const cityLayerRef = useRef(null); // 🌟 City polygon layer
-
-  // Function to draw working city polygon
-  const drawWorkingCity = (map) => {
-    if (!map) return;
-
-    if (cityLayerRef.current) cityLayerRef.current.clearLayers();
-    else cityLayerRef.current = new L.LayerGroup().addTo(map);
-
-workingCities.forEach(city => {
-  let geojson = null;
-
-  // Example for Surat based on your uploaded map (coordinates must match city's actual boundary)
-  if (city.value === "surat") {
-    geojson = {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: [[
-          [72.75, 21.21],
-          [72.76, 21.21],
-          [72.77, 21.22],
-          [72.78, 21.23],
-          [72.77, 21.24],
-          [72.76, 21.25],
-          [72.75, 21.25],
-          [72.74, 21.24],
-          [72.75, 21.23],
-          [72.75, 21.21]
-        ]]
-      }
-    };
-  }
-
-  if (geojson) {
-    L.geoJSON(geojson, {
-      style: { color: "red", weight: 4, fillOpacity: 0 } // red border, transparent fill
-    }).addTo(cityLayerRef.current);
-  }
-});
-  };
-
+  // 🌍 Load Countries
   useEffect(() => {
-    if (!leafletRef.current) return;
-
-    const map = L.map(leafletRef.current).setView([form.latitude, form.longitude], 13);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
-
-    const drawnItems = new L.FeatureGroup();
-    map.addLayer(drawnItems);
-
-    pointsLayerRef.current = new L.LayerGroup().addTo(map);
-
-    const drawControl = new L.Control.Draw({
-      edit: { featureGroup: drawnItems },
-      draw: {
-        polygon: {
-          allowIntersection: false,
-          shapeOptions: { color: "red", fillColor: "red", fillOpacity: 0.3, weight: 2 }
-        },
-        circle: false,
-        rectangle: false,
-        marker: false,
-        polyline: false,
-      }
-    });
-    map.addControl(drawControl);
-
- map.on(L.Draw.Event.CREATED, (e) => {
-  const layer = e.layer;
-
-  // AUTO-CLOSE POLYGON
-  if (layer instanceof L.Polygon) {
-    let latlngs = layer.getLatLngs()[0];
-
-    const first = latlngs[0];
-    const last = latlngs[latlngs.length - 1];
-
-    // If first & last point are not equal → close polygon
-    if (first.lat !== last.lat || first.lng !== last.lng) {
-      latlngs.push(first); // close loop
-      layer.setLatLngs([latlngs]); // update polygon shape
-    }
-  }
-
-  drawnItems.clearLayers();
-  drawnItems.addLayer(layer);
-  polygonRef.current = layer;
-});
-
-    drawWorkingCity(map);
-
-    return () => map.remove();
+    const loadCountries = async () => {
+      const response = await getAllCountries();
+      const countryList = response?.data || response?.countries || response || [];
+      setCountries(countryList);
+    };
+    loadCountries();
   }, []);
 
-  // Redraw city polygon when workingCities change
+  // 📌 Load Requested Services
   useEffect(() => {
-    if (leafletRef.current) {
-      const map = leafletRef.current._leaflet_map; // Leaflet map reference
-      if (map) drawWorkingCity(map);
+    if (selectedLeadId) loadRequestedServices(selectedLeadId);
+  }, [selectedLeadId]);
+
+  const loadRequestedServices = async (leadId) => {
+    const response = await fetchRequestedServices(leadId);
+    if (response?.success && Array.isArray(response.data)) {
+      const options = response.data.map((item) => ({ label: item.title, value: item.id }));
+      setServiceOptions(options);
+      setSelectedServices(options);
     }
-  }, [workingCities]);
-
- const handleLoadPoints = async () => {
-  const token = localStorage.getItem("access_token");
-  if (!token) { showPopup("⚠️ Please login.","error"); return; }
-  if (!polygonRef.current) { showPopup("Please draw a polygon first!","error"); return; }
-
-  let latlngs = polygonRef.current.getLatLngs()[0];
-
-  // Extract first point
-  const first = latlngs[0];
-
-  // Convert to array format
-  let polygonPoints = latlngs.map(p => ({
-    latitude: p.lat,
-    longitude: p.lng
-  }));
-
-  // FORCE last point = first point
-  const last = polygonPoints[polygonPoints.length - 1];
-  if (last.latitude !== first.lat || last.longitude !== first.lng) {
-    polygonPoints.push({
-      latitude: first.lat,
-      longitude: first.lng
-    });
-  }
-
-  console.log("FINAL POLYGON POINTS:", polygonPoints); // <-- You will now see repeated first point
-
-  try {
-    const points = await fetchGooglePoints(polygonPoints);
-
-    if (!points.length) { showPopup("⚠️ No points found."); return; }
-
-    pointsLayerRef.current.clearLayers();
-    points.forEach(p => L.marker([p.latitude, p.longitude]).addTo(pointsLayerRef.current));
-    showPopup("✅ Points loaded!");
-
-  } catch (err) {
-    console.error(err);
-    showPopup("❌ Failed to load points.","error");
-  }
-};
-
-const addVertexMarkers = (polygonLayer) => {
-  if (!leafletRef.current) return;
-
-  const map = leafletRef.current._leaflet_map;
-  const latlngs = polygonLayer.getLatLngs()[0];
-
-  // Remove existing markers before adding new ones
-  if (pointsLayerRef.current) pointsLayerRef.current.clearLayers();
-
-  latlngs.forEach((point, index) => {
-    const marker = L.circleMarker(point, {
-      radius: 6,
-      color: "red",
-      fillColor: "white",
-      fillOpacity: 1,
-      weight: 2
-    }).addTo(pointsLayerRef.current);
-
-    // 3️⃣ DELETE POINT ON CLICK
-    marker.on("click", () => {
-      if (latlngs.length <= 4) {
-        alert("Polygon must have minimum 3 points!");
-        return;
-      }
-
-      latlngs.splice(index, 1); // Remove point
-
-      // Fix auto-close after delete
-      const first = latlngs[0];
-      const last = latlngs[latlngs.length - 1];
-      if (first.lat !== last.lat || first.lng !== last.lng) {
-        latlngs[latlngs.length - 1] = first;
-      }
-
-      polygonLayer.setLatLngs([latlngs]);
-      addVertexMarkers(polygonLayer); // Refresh markers
-    });
-  });
-};
-
-
-useEffect(() => {
-  async function loadCountries() {
-    try {
-      const data = await getAllCountries();
-      setCountries(data || []);
-    } catch (err) {
-      console.error("Failed to load countries:", err);
-    }
-  }
-  loadCountries();
-}, []);
-
-const handleCountryChange = async (e) => {
-  const countryId = e.target.value;
-  setForm({ ...form, country: countryId, state: "", city: "" }); // reset state & city
-
-  if (countryId) {
-    const data = await getallStates(countryId);
-    setStates(data || []);
-  } else {
-    setStates([]);
-    setCities([]);
-  }
-};
-
-const handleStateChange = async (e) => {
-  const stateId = e.target.value;
-  setForm({ ...form, state: stateId, city: "" }); // reset city
-
-  if (stateId) {
-    const data = await getallCities(stateId);
-    setCities(data || []);
-  } else {
-    setCities([]);
-  }
-};
-
-  const handleSubmit = (e) => { e.preventDefault(); showPopup("✅ Franchise updated!"); };
-      const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
-  };
-    const goToManageCustomer = () => {
-    router.push("/admin/lead"); // Customer page
   };
 
-useEffect(() => {
-  const token = localStorage.getItem("access_token");
-  if (!selectedLeadId || !token) return;
+  // 📝 Load Existing Franchise Data
+  useEffect(() => {
+    if (!selectedLeadId) return;
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
 
-  const loadFranchiseData = async () => {
+    const loadFranchiseData = async () => {
+      try {
+        const response = await getLeadDetails(selectedLeadId, token);
+        const f = response.data?.franchise_data;
+        if (!f) return;
+
+        const countryId = f.frachise_country_id?.id?.toString() || "";
+        const stateId = f.franchise_state_id?.id?.toString() || "";
+        const cityId = f.franchise_city_id?.id?.toString() || "";
+        const cityData = f.franchise_city_id;
+
+        if (countryId) setStates(await getallStates(countryId));
+        if (stateId) setCities(await getallCities(stateId));
+
+        setForm({
+          ...form,
+          franchiseName: f.franchise_name || "",
+          email: f.franchise_email || "",
+          mobile: f.franchise_phone || "",
+          pincode: f.franchise_pincode || "",
+          firstAddress: f.franchise_address || "",
+          commission: f.commission || "",
+          latitude: f.latitude || "",
+          longitude: f.longitude || "",
+          country: countryId,
+          state: stateId,
+          city: cityId,
+        });
+
+        if (cityData && mapInstance.current) {
+          const lat = parseFloat(cityData.latitude || 20.5937);
+          const lng = parseFloat(cityData.longitude || 78.9629);
+          mapInstance.current.setCenter({ lat, lng });
+          mapInstance.current.setZoom(12);
+        }
+      } catch {
+        showPopup("Error loading franchise data", "error");
+      }
+    };
+    loadFranchiseData();
+  }, [selectedLeadId]);
+
+  // 🌐 Initialize Google Map
+  const initMap = () => {
+    if (!window.google || mapInstance.current) return;
+
+    const map = new window.google.maps.Map(mapRef.current, {
+      center: { lat: 20.5937, lng: 78.9629 },
+      zoom: 5,
+    });
+    mapInstance.current = map;
+
+    const drawingManager = new window.google.maps.drawing.DrawingManager({
+      drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
+      drawingControl: true,
+      drawingControlOptions: {
+        position: window.google.maps.ControlPosition.TOP_CENTER,
+        drawingModes: ["polygon"],
+      },
+      polygonOptions: {
+        fillColor: "#FF0000",
+        fillOpacity: 0.3,
+        strokeWeight: 2,
+        editable: true,
+      },
+    });
+    drawingManager.setMap(map);
+
+    window.google.maps.event.addListener(drawingManager, "overlaycomplete", (event) => {
+      if (event.type === window.google.maps.drawing.OverlayType.POLYGON) {
+        if (polygonRef.current) polygonRef.current.setMap(null);
+        polygonRef.current = event.overlay;
+      }
+    });
+  };
+
+  // 🌐 Load Points
+  const handleLoadPoints = async () => {
+    if (!polygonRef.current) return showPopup("Please draw a polygon first!", "error");
+
+    const path = polygonRef.current.getPath();
+    const polygonPoints = [];
+    for (let i = 0; i < path.getLength(); i++) {
+      const p = path.getAt(i);
+      polygonPoints.push({ latitude: p.lat(), longitude: p.lng() });
+    }
+
     try {
-      const response = await getLeadDetails(selectedLeadId, token);
-      if (!response.success || !response.data) return;
+      const points = await fetchGooglePoints(polygonPoints);
+      if (!points.length) return showPopup("⚠️ No points found.");
 
-      const f = response.data.franchise_data;
-      if (!f) return;
-
-      const countryId = f.franchise_country?.id?.toString() || "";
-      const stateId = f.franchise_state?.id?.toString() || "";
-      const cityId = f.franchise_city_id?.id?.toString() || "";
-      const cityName = f.franchise_city_id?.name?.toLowerCase() || "";
-
-      // Load states
-      let statesData = [];
-      if (countryId) {
-        statesData = await getallStates(countryId);
-        setStates(statesData || []);
-      }
-
-      // Load cities
-      let citiesData = [];
-      if (stateId) {
-        citiesData = await getallCities(stateId);
-        setCities(citiesData || []);
-      }
-
-      // Set form values
-      setForm({
-        franchiseName: f.franchise_name || "",
-        email: f.franchise_email || "",
-        mobile: f.franchise_phone || "",
-        pincode: f.franchise_pincode || "",
-        firstAddress: f.franchise_address || "",
-        secondAddress: "",
-        country: countryId,
-        state: stateId,
-        city: cityId,
-        commission: f.franchise_commission || "",
-        deliveryHours: f.delivery_hours || "",
-        deliveryMinutes: f.delivery_minutes || "",
-        latitude: f.latitude || "",
-        longitude: f.longitude || ""
+      points.forEach((p) => {
+        new window.google.maps.Marker({
+          position: { lat: p.latitude, lng: p.longitude },
+          map: mapInstance.current,
+        });
       });
-
-      // 🌟 Set workingCities for map drawing
-      if (cityName) {
-        setWorkingCities([{ label: f.franchise_city_id.name, value: cityName }]);
-      }
-
-    } catch (err) {
-      console.error("Error loading franchise data:", err);
-      showPopup("Error loading franchise data", "error");
+      showPopup("✅ Points loaded!");
+    } catch {
+      showPopup("❌ Failed to load points.", "error");
     }
   };
 
-  loadFranchiseData();
-}, [selectedLeadId]);
-
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    showPopup("✅ Franchise updated!");
+  };
 
   return (
     <Layout>
-          <PopupAlert message={popupMessage} type={popupType} />
-      
+      <PopupAlert message={popupMessage} type={popupType} />
+
+      <Script
+        src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAP_API_BASE_URL}&libraries=drawing`}
+        strategy="afterInteractive"
+        onLoad={initMap}
+      />
+
       <div className={styles.editcontainer}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}
-              style={{ cursor: "pointer"}}
-        onClick={goToManageCustomer}>Lead</span>
-               <span className={styles.separator}> | </span> 
-                 <SlHome
-                      style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
-                      onClick={goToDashboard}
-                      title="Go to Dashboard"
-                    />
-                       <span> &gt; </span>
+            <span className={styles.breadcrumb} onClick={() => router.push("/admin/lead")}>
+              Lead
+            </span>
+            <span className={styles.separator}> | </span>
+            <SlHome style={{ margin: "0 5px", cursor: "pointer" }} onClick={() => router.push("/admin/dashboard")} />
+            <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Add Franchise</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.addform}>
-          <div className={styles.titleRow}>
-  <h2 className={styles.edittitle}>Edit Franchise</h2>
-
-  <button
-    className={styles.ownerBtn}
-    onClick={() => router.push(`/admin/owner-details`)}
-  >
-    Owner Details
-  </button>
-</div>
+          <h2 className={styles.edittitle}>Edit Franchise</h2>
 
           <div className={styles.editgrid}>
             <div className={styles.editfull}>
               <label>SERVICES</label>
-<Select
+              <Select
   isMulti
   options={serviceOptions}
   value={selectedServices}
   onChange={setSelectedServices}
+  styles={{
+    control: (base) => ({
+      ...base,
+      minHeight: "32px",
+      height: "32px",
+      fontSize: "13px",
+    }),
+    menu: (base) => ({
+      ...base,
+      fontSize: "12px",      // 👉 dropdown text size
+      minHeight: "10px",
+      padding: "0",
+    }),
+    option: (base, state) => ({
+      ...base,
+      fontSize: "12px",      // 👉 single option text
+      padding: "4px 8px",    // 👉 reduce option height
+      backgroundColor: state.isFocused ? "#f1f1f1" : "white",
+      cursor: "pointer",
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      height: "32px",
+      padding: "0 6px",
+    }),
+    indicatorsContainer: (base) => ({
+      ...base,
+      height: "32px",
+    }),
+  }}
 />
 
             </div>
 
-<div>
-  <label>FRANCHISE COUNTRY</label>
-  <select
-    name="country"
-    value={form.country}
-    onChange={async (e) => {
-      const countryId = e.target.value;
+            {/* Country / State / City selects */}
+            <div>
+              <label>FRANCHISE COUNTRY</label>
+              <select
+                name="country"
+                value={form.country}
+                onChange={async (e) => {
+                  const c = e.target.value;
+                  setForm({ ...form, country: c, state: "", city: "" });
+                  if (c) setStates(await getallStates(c));
+                }}
+              >
+                <option value="">Select Country</option>
+                {countries.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
 
-      setForm({ ...form, country: countryId, state: "", city: "" });
+            <div>
+              <label>FRANCHISE STATE</label>
+              <select
+                name="state"
+                value={form.state}
+                onChange={async (e) => {
+                  const s = e.target.value;
+                  setForm({ ...form, state: s, city: "" });
+                  if (s) setCities(await getallCities(s));
+                }}
+              >
+                <option value="">Select State</option>
+                {states.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+            </div>
 
-      if (countryId) {
-        const stateList = await getallStates(countryId);
-        setStates(stateList || []);
-        setCities([]); // reset city list
-      }
-    }}
-  >
- 
-    {countries.map((c) => (
-      <option key={c.id} value={c.id}>
-        {c.name}
-      </option>
-    ))}
-  </select>
-</div>
+            <div>
+              <label>FRANCHISE CITY</label>
+              <select
+                name="city"
+                value={form.city}
+                onChange={(e) => setForm({ ...form, city: e.target.value })}
+              >
+                <option value="">Select City</option>
+                {cities.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            </div>
 
-
-<div>
-  <label>FRANCHISE STATE</label>
-  <select
-    name="state"
-    value={form.state}
-    onChange={async (e) => {
-      const stateId = e.target.value;
-
-      setForm({ ...form, state: stateId, city: "" });
-
-      if (stateId) {
-        const cityList = await getallCities(stateId);
-        setCities(cityList || []);
-      }
-    }}
-  >
-    <option value="">Select State</option>
-    {states.map((s) => (
-      <option key={s.id} value={s.id}>
-        {s.name}
-      </option>
-    ))}
-  </select>
-</div>
-
-
-<div>
-  <label>FRANCHISE CITY</label>
-  <select
-    name="city"
-    value={form.city}
-    onChange={(e) => setForm({ ...form, city: e.target.value })}
-  >
-    <option value="">Select City</option>
-    {cities.map((c) => (
-      <option key={c.id} value={c.id}>
-        {c.name}
-      </option>
-    ))}
-  </select>
-</div>
-
+            {/* Other fields */}
             <div><label>FRANCHISE PINCODE</label><input name="pincode" value={form.pincode} onChange={handleChange} /></div>
             <div className={styles.full}><label>FRANCHISE NAME</label><input name="franchiseName" value={form.franchiseName} onChange={handleChange} /></div>
             <div className={styles.full}><label>FIRST ADDRESS</label><input name="firstAddress" value={form.firstAddress} onChange={handleChange} /></div>
-           
             <div><label>FRANCHISE MOBILE</label><input name="mobile" value={form.mobile} onChange={handleChange} /></div>
             <div><label>FRANCHISE EMAIL</label><input name="email" value={form.email} onChange={handleChange} /></div>
             <div><label>COMMISSION(%)</label><input name="commission" value={form.commission} onChange={handleChange} /></div>
@@ -503,15 +318,23 @@ useEffect(() => {
             <div><label>LONGITUDE</label><input name="longitude" value={form.longitude} onChange={handleChange} /></div>
 
             <div className={styles.editfull}>
-             
-              <button type="button" className={styles.editresetBtn} onClick={handleReset}>Reset Area</button>
+              <button
+                type="button"
+                className={styles.editresetBtn}
+                onClick={() => {
+                  if (polygonRef.current) polygonRef.current.setMap(null);
+                  polygonRef.current = null;
+                }}
+              >
+                Reset Area
+              </button>
             </div>
           </div>
 
           <h3 className={styles.mapTitle}>Service Area (Draw Polygon)</h3>
-          <div ref={leafletRef} style={{ height: "400px", width: "100%", borderRadius: "8px", marginTop: "10px" }} />
+          <div ref={mapRef} style={{ height: "400px", width: "100%", borderRadius: "8px", marginTop: "10px" }} />
 
-          <button type="button" className={styles.submitBtn} style={{ marginTop: "10px" }} onClick={handleLoadPoints}>
+          <button type="button" className={styles.submitBtn} onClick={handleLoadPoints}>
             LOAD POINTS
           </button>
           <button type="submit" className={styles.submitBtn}>UPDATE</button>

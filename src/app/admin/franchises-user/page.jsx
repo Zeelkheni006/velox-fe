@@ -1,53 +1,46 @@
 "use client";
-
-import styles from "../styles/Franchises.module.css";
-import Layout from "../pages/page";
-import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import Layout from "../pages/page";
 import { SlHome } from "react-icons/sl";
-const franchisesdata = [
-  { name: "test FRANCHISE", email: "pinal@gmail.com", mobile: "1234567890" },
-  { name: "sanjana", email: "sonarana889@gmail.com", mobile: "4567891230" },
-  { name: "kruti Miyani", email: "krutimiyani14@gmail.com", mobile: "6352726445", createFranchise: true },
-  { name: "Mitbhai", email: "mitsachani7878@gmail.com", mobile: "7202030606" },
-  { name: "for testing", email: "rushitsutariyya999@gmail.com", mobile: "7410235685", createFranchise: true },
-  { name: "ravi vaghela", email: "sagathiyamanish008@gmail.com", mobile: "7859810498" },
-  { name: "Manisha Solanki", email: "manisha7006sol@gmail.com", mobile: "8141314127" },
-  { name: "HIREN D RATHOD", email: "hirenrathod738@gmail.com", mobile: "8160271457" },
-  { name: "MP ENTERPRISE", email: "mpenterprisesurat123@gmail.com", mobile: "8200048822" },
-  { name: "MITESH JADAV", email: "ravisagathiya2811@gmail.com", mobile: "8320326470" },
-  { name: "New Franchise", email: "newone@gmail.com", mobile: "9999999999" },
-];
-
-// 🔽 small helper component for up/down arrows
-  const SortArrow = ({ direction }) => (
-    <span style={{ marginLeft: "5px", fontSize: "12px" }}>
-      {direction === "asc" ? "▲" : direction === "desc" ? "▼" : "↕"}
-    </span>
-  );
-
+import styles from "../styles/Franchises.module.css";
+import { getFranchiseOwners } from "../../api/manage_users/franchise";
+import {fetchRequestedServices} from "../../api/manage_users/lead"
 export default function FranchisesPage() {
   const router = useRouter();
 
-  const [franchises, setFranchises] = useState(franchisesdata);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
+  const [franchises, setFranchises] = useState([]);
+  const [totalEntries, setTotalEntries] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-  // ✅ Sorting logic (works for any column)
+  // ✅ Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await getFranchiseOwners(currentPage, entriesPerPage);
+      if (res.success) {
+        setFranchises(res.data);
+        setTotalEntries(res.total);
+      } else {
+        setFranchises([]);
+        setTotalEntries(0);
+      }
+    };
+    fetchData();
+  }, [currentPage, entriesPerPage]);
+
+  // ✅ Sorting logic
   const handleSort = (key) => {
     let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
+    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
 
     const sorted = [...franchises].sort((a, b) => {
-      const valueA = a[key]?.toString().toLowerCase() || "";
-      const valueB = b[key]?.toString().toLowerCase() || "";
-      if (valueA < valueB) return direction === "asc" ? -1 : 1;
-      if (valueA > valueB) return direction === "asc" ? 1 : -1;
+      const valA = a[key]?.toString().toLowerCase() || "";
+      const valB = b[key]?.toString().toLowerCase() || "";
+      if (valA < valB) return direction === "asc" ? -1 : 1;
+      if (valA > valB) return direction === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -55,43 +48,45 @@ export default function FranchisesPage() {
     setFranchises(sorted);
   };
 
-  // ✅ Search filter
   const filtered = franchises.filter(
     (f) =>
       f.name.toLowerCase().includes(search.toLowerCase()) ||
       f.email.toLowerCase().includes(search.toLowerCase()) ||
-      f.mobile.includes(search)
+      f.phone.includes(search)
   );
 
-  // ✅ Pagination
+  const totalPages = Math.ceil(totalEntries / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, filtered.length);
-  const totalPages = Math.ceil(filtered.length / entriesPerPage);
-  const currentFranchises = filtered.slice(startIndex, endIndex);
+const handleCreateFranchise = async (leadId) => {
+  try {
+    // Call API with the correct leadId
+    const res = await fetchRequestedServices(leadId);
 
-  const handleEntriesChange = (e) => {
-    setEntriesPerPage(Number(e.target.value));
-    setCurrentPage(1);
-  };
+    if (res.success) {
+      router.push(`/admin/create-franchise?leadId=${leadId}`);
+    } else {
+      console.error("Lead not found or API error:", res.message);
+      // Optionally show a toast/popup to user
+    }
+  } catch (err) {
+    console.error("Error fetching requested services:", err);
+  }
+};
 
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
-  };
   return (
     <Layout>
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
-            <span className={styles.breadcrumb}   style={{ cursor: "pointer"}}>Franchise User</span>
-            <span className={styles.separator}> | </span> 
-               <SlHome
-                    style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
-                    onClick={goToDashboard}
-                    title="Go to Dashboard"
-                        /> 
-                                 <span> &gt; </span>
+            <span className={styles.breadcrumb} style={{ cursor: "pointer" }}>Franchise User</span>
+            <span className={styles.separator}> | </span>
+            <SlHome
+              style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+              onClick={() => router.push("/admin/dashboard")}
+              title="Go to Dashboard"
+            />
+            <span> &gt; </span>
             <span className={styles.breadcrumbActive}>Franchise User</span>
           </div>
         </div>
@@ -101,7 +96,11 @@ export default function FranchisesPage() {
 
           <div className={styles.showEntries}>
             Show{" "}
-            <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
+            <select
+              className={styles.select1}
+              value={entriesPerPage}
+              onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); }}
+            >
               <option value={10}>10</option>
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -125,51 +124,37 @@ export default function FranchisesPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>
-                  Name <SortArrow direction={sortConfig.key === "name" ? sortConfig.direction : null} />
-                </th>
-                <th onClick={() => handleSort("email")} style={{ cursor: "pointer" }}>
-                  Email <SortArrow direction={sortConfig.key === "email" ? sortConfig.direction : null} />
-                </th>
-                <th onClick={() => handleSort("mobile")} style={{ cursor: "pointer" }}>
-                  Mobile <SortArrow direction={sortConfig.key === "mobile" ? sortConfig.direction : null} />
-                </th>
+                <th onClick={() => handleSort("name")} style={{ cursor: "pointer" }}>Name</th>
+                <th onClick={() => handleSort("email")} style={{ cursor: "pointer" }}>Email</th>
+                <th onClick={() => handleSort("phone")} style={{ cursor: "pointer" }}>Mobile</th>
                 <th>ACTION</th>
               </tr>
             </thead>
-
             <tbody>
-              {currentFranchises.map((item, idx) => (
-                <tr key={idx}>
+              {filtered.map((item) => (
+                <tr key={item.id}>
                   <td>{item.name}</td>
                   <td>{item.email}</td>
-                  <td>{item.mobile}</td>
-                  <td className={styles.actionCell}>
+                  <td>{item.phone}</td>
+                  <td>
                     <button
                       className={styles.editButton}
                       onClick={() =>
                         router.push(
-                          `/admin/edit-franchise?name=${encodeURIComponent(item.name)}&email=${encodeURIComponent(
-                            item.email
-                          )}&mobile=${encodeURIComponent(item.mobile)}`
+                          `/admin/edit-franchise?id=${item.id}`
                         )
                       }
                     >
                       Edit
                     </button>
-                    {item.createFranchise && (
-                      <button
-                        className={styles.createButton}
-                        onClick={() =>
-                          router.push(
-                            `/admin/add-franchise?name=${encodeURIComponent(item.name)}&email=${encodeURIComponent(
-                              item.email
-                            )}&mobile=${encodeURIComponent(item.mobile)}`
-                            )
-                        }
-                      >
-                        Create Franchise
-                      </button>
+                    {item.make_franchise && (
+               <button
+  className={styles.createButton}
+  onClick={() => router.push(`/admin/create-franchise?leadId=${item.id}`)}
+>
+  Create Franchise
+</button>
+
                     )}
                   </td>
                 </tr>
@@ -177,29 +162,15 @@ export default function FranchisesPage() {
             </tbody>
           </table>
 
-          {/* ✅ Pagination Controls */}
           <div className={styles.pagination}>
             <span>
-              {filtered.length === 0 ? (
-                "No entries found"
-              ) : (
-                <>
-                  Showing {startIndex + 1} to {endIndex} of {filtered.length} entries
-                </>
-              )}
+              Showing {startIndex + 1} to {Math.min(startIndex + filtered.length, totalEntries)} of {totalEntries} entries
             </span>
-            <div className={styles.paginationControls}>
-              <button className={styles.paginationButton} onClick={handlePrevPage} disabled={currentPage === 1}>
-                Previous
-              </button>
+           
+             <div className={styles.paginationControls}>
+              <button   className={styles.paginationButton} onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1}>Previous</button>
               <span className={styles.pageNumber}>{currentPage}</span>
-              <button
-                className={styles.paginationButton}
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+              <button   className={styles.paginationButton} onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
             </div>
           </div>
         </div>
