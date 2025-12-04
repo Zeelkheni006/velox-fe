@@ -196,8 +196,8 @@ useEffect(() => {
     formData.append("owner_phone", form.owner_phone);
     formData.append("owner_pincode", form.owner_pincode);
     formData.append("owner_address", form.owner_address);
-    formData.append("owner_state_id", form.owner_state_id?.id);
-    formData.append("owner_city_id", form.owner_city_id?.id);
+formData.append("owner_state_id", form.owner_state_id);
+formData.append("owner_city_id", form.owner_city_id);
 
     // Franchise fields
     formData.append("franchise_name", form.franchise_name);
@@ -205,8 +205,8 @@ useEffect(() => {
     formData.append("franchise_phone", form.franchise_phone);
     formData.append("franchise_pincode", form.franchise_pincode);
     formData.append("franchise_address", form.franchise_address);
-    formData.append("franchise_state_id", form.franchise_state_id?.id);
-    formData.append("franchise_city_id", form.franchise_city_id?.id);
+formData.append("franchise_state_id", form.franchise_state_id);
+formData.append("franchise_city_id", form.franchise_city_id);
     formData.append("message", form.message);
 
     // Categories
