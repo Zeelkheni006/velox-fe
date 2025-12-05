@@ -184,7 +184,7 @@ const handleVerifyOtp = async () => {
           {/* Email input */}
           <label className="block mb-1 text-sm font-medium text-gray-700">EMAIL ADDRESS</label>
           <input type="email" placeholder="Type Email Address" value={email} onChange={handleEmailChange} className="w-full px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-400" />
-
+    
           {/* Links after email verification */}
           {emailStatus === "success" && step === "" && (
             <div className="login-password flex justify-between mb-4 px-2">
@@ -193,14 +193,7 @@ const handleVerifyOtp = async () => {
                 Login With Password
               </a>
               </div>
-              <div className='forgot-link'>
-           <Link 
-  href={`/admin/forgot-password?email=${encodeURIComponent(email)}`} 
-  className="login-password text-sm text-blue-600 hover:underline"
->
-  Forgot Password?
-</Link>
-            </div>
+       
             </div>
 
           )}
@@ -212,7 +205,7 @@ const handleVerifyOtp = async () => {
               <input type="password" placeholder="Enter Password" value={password} onChange={handlePasswordChange} className="w-full px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-400"/>
             </div>
           )}
-
+    
           {/* OTP input */}
           {step==="otpInput" && (
             <div className="mb-4">
@@ -220,7 +213,14 @@ const handleVerifyOtp = async () => {
               <input type="text" placeholder="Enter OTP" value={otp} onChange={handleOtpChange} className="w-full px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-400"/>
             </div>
           )}
-
+<div className='forgot-link'>
+           <Link 
+  href={`/admin/forgot-password?email=${encodeURIComponent(email)}`} 
+  className="login-password text-sm text-blue-600 hover:underline"
+>
+  Forgot Password?
+</Link>
+            </div> 
           {/* Main login button */}
           <button type="button" onClick={handleButtonClick} className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded flex justify-center items-center gap-2 transition"
             disabled={loading || (step==="password" && password==="") || (step==="otpInput" && otp==="") || (emailStatus!=="success")}

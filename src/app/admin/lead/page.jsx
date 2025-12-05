@@ -33,11 +33,11 @@ const [showKycPopup, setShowKycPopup] = useState(false);
 const [kycData, setKycData] = useState(null);
 const [franchiseStatus, setFranchiseStatus] = useState("");
 const [dropdownData, setDropdownData] = useState({
-  name: [],
-  email: [],
-  phone: [],
+  owner_name: [],
+  owner_email: [],
+  owner_phone: [],
   categories: [],
-  city: [],
+  franchise_city: [],
   status: [],
 });
 const [showLeadDetailsPopup, setShowLeadDetailsPopup] = useState(false);
@@ -67,7 +67,7 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
         : Object.values(categoryObj);
       return {
         ...l,
-        city: l.city || l.city_id || "",
+        franchise_city: l.franchise_city || l.city_id || "",
         state: l.state || l.state_id || "",
         country: l.country || l.country_id || "",
         categories: categoryNames,
@@ -85,9 +85,9 @@ useEffect(() => {
    setLoading(true);
   if (!initialized.current) return;
   fetchLeadsData(currentPage, entriesPerPage, {
-    name: selectedName,
-    email: selectedEmail,
-    phone: selectedPhone,
+    owner_name: selectedName,
+    owner_email: selectedEmail,
+    owner_phone: selectedPhone,
     city_id: selectedCity?.value,
     status: selectedStatus,
     category_list: selectedCategories.map(c => Number(c.value))
@@ -178,7 +178,7 @@ const handleAddToFranchise = async (lead) => {
 
   } catch (err) {
     setIsProcessing(false);
-    setFranchiseMessage("Something went wrong!");
+    setFranchiseMessage("Already an admin!");
     setFranchiseStatus("error");
   }
 };
@@ -190,7 +190,7 @@ const handleOkClick = async () => {
     await fetchRequestedServices(selectedLead.id);
 
     // 🔥 ID sathe navigate karo
-       router.push(`/admin/create-franchise?leadId=${selectedLead.id}`);
+      //  router.push(`/admin/create-franchise?leadId=${selectedLead.id}`);
   }
 };
 
@@ -338,8 +338,8 @@ useEffect(() => {
 
   // Fetch leads
   fetchLeadsData(currentPage, entriesPerPage);
-  const fetchDropdownData = async () => {
-    try {
+    const fetchDropdownData = async () => {
+      try {
       const res = await getFilterDropdownData();
 
       // If res.name is empty, fallback to unique names from leads
@@ -348,14 +348,14 @@ useEffect(() => {
         : [];
 
       setDropdownData({
-        name: Array.isArray(res?.name) && res.name.length > 0
-          ? res.name.map(n => ({ label: n.trim(), value: n.trim() }))
+        owner_name: Array.isArray(res?.owner_name) && res.owner_name.length > 0
+          ? res.owner_name.map(n => ({ label: n.trim(), value: n.trim() }))
           : namesFromLeads.map(n => ({ label: n, value: n })),
-        email: Array.isArray(res?.email) ? res.email.map(e => ({ label: e, value: e })) : [],
-        phone: Array.isArray(res?.phone) ? res.phone.map(p => ({ label: p, value: p })) : [],
+        owner_email: Array.isArray(res?.owner_email) ? res.owner_email.map(e => ({ label: e, value: e })) : [],
+        owner_phone: Array.isArray(res?.owner_phone) ? res.owner_phone.map(p => ({ label: p, value: p })) : [],
         categories: res?.categories ? Object.entries(res.categories).map(([id, title]) => ({ label: title, value: id })) : [],
-city: res?.city
-  ? Object.entries(res.city).map(([id, name]) => ({ label: name, value: Number(id) }))
+franchise_city: res?.franchise_city
+  ? Object.entries(res.franchise_city).map(([id, name]) => ({ label: name, value: Number(id) }))
   : [],
         status: [
           { label: "PENDING", value: "PENDING" },
@@ -419,7 +419,7 @@ const handleViewKyc = async (lead) => {
   setShowKycPopup(true);
   setLoadingKyc(true);
 
-  const id = lead.id;  // FIXED ID
+  const id = lead.lead_id || lead.id;  // ✔ FIX
 
   const data = await fetchKycDocuments(id);
 
@@ -432,7 +432,6 @@ const handleViewKyc = async (lead) => {
 
   setLoadingKyc(false);
 };
-
 
   return (
     <Layout>
@@ -469,7 +468,7 @@ const handleViewKyc = async (lead) => {
   <div className={styles.filterGroup}>
 <Select
   placeholder="Select Name"
-  options={dropdownData.name}
+  options={dropdownData.owner_name}
   value={selectedName ? { value: selectedName, label: selectedName } : null}
 onChange={opt => {
   const selected = opt?.value || null;
@@ -488,7 +487,7 @@ onChange={opt => {
 
 <Select
   placeholder="Select Email"
-  options={dropdownData.email}
+  options={dropdownData.owner_email}
   value={selectedEmail ? { value: selectedEmail, label: selectedEmail } : null}
 onChange={opt => {
   const selected = opt?.value || null;
@@ -496,7 +495,7 @@ onChange={opt => {
   setCurrentPage(1);
 
   if (selected) {
-    fetchLeadsData(1, entriesPerPage, { email: selected });
+    fetchLeadsData(1, entriesPerPage, {email: selected });
   } else {
     fetchLeadsData(1, entriesPerPage, {});
   }
@@ -507,7 +506,7 @@ onChange={opt => {
 
 <Select
   placeholder="Select Phone"
-  options={dropdownData.phone}
+  options={dropdownData.owner_phone}
   value={selectedPhone ? { value: selectedPhone, label: selectedPhone } : null}
  onChange={opt => {
   const selected = opt?.value || null;
@@ -543,12 +542,11 @@ if (values.length > 0) {
 
 <Select
   placeholder="Select City"
-  options={dropdownData.city} 
+  options={dropdownData.franchise_city} 
   value={selectedCity}
   onChange={opt => {
     setSelectedCity(opt); 
     setCurrentPage(1);
-
     if (opt) {
       fetchLeadsData(1, entriesPerPage, { city_id: opt.value });
     } else {
@@ -558,7 +556,6 @@ if (values.length > 0) {
   className={styles.select}
   isClearable 
 />
-
 <Select
   placeholder="Select Status"
   options={dropdownData.status}
@@ -567,9 +564,7 @@ if (values.length > 0) {
     const selected = opt?.value || null;
     setSelectedStatus(selected);
     setCurrentPage(1);
-
     if (selected) {
-      
       const statusMap = { "PENDING": 0, "ACCEPTED": 1, "DECLINE": 2 };
       fetchLeadsData(1, entriesPerPage, { status: statusMap[selected] });
     } else {
@@ -584,14 +579,10 @@ if (values.length > 0) {
 )}
 
   </div>
-
- 
   <div className={styles.middleRow}>
     <button className={styles.buttonPrimary} onClick={handlePdfClick}>PDF</button>
     <button className={styles.buttonSecondary} onClick={handlePrintClick}>Print</button>
   </div>
-
-
   <div className={styles.bottomRow}>
     Show{" "}
     <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
@@ -925,16 +916,34 @@ of {totalLeads} entries
 
       <p className={styles.p}>{franchiseMessage}</p>
 
-      {!isProcessing && (
-        <div className={styles.modalActions}>
-          <button
-            className={styles.acceptBtn}
-            onClick={handleOkClick}
-          >
-            OK
-          </button>
-        </div>
-      )}
+{!isProcessing && (
+  <div className={styles.modalActions}>
+    <button
+      className={styles.acceptBtn}
+      onClick={async () => {
+        // 1️⃣ Run existing logic
+        await handleOkClick(); // make sure this supports async if needed
+
+        // 2️⃣ If franchise was successfully created
+        if (franchiseStatus === "success") {
+          // Open franchises-user in a new tab and get reference
+          const newTab = window.open("/admin/franchises-user", "_blank");
+
+          // Redirect the new tab to create-franchise
+          if (newTab) {
+            newTab.location.href = "/admin/create-franchise";
+          }
+        }
+
+        // 3️⃣ Close the popup
+        setShowFranchisePopup(false);
+      }}
+    >
+      Make Franchise
+    </button>
+  </div>
+)}
+
     </div>
   </div>
 )}

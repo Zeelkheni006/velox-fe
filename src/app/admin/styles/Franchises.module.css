@@ -629,3 +629,65 @@
     font-size: 14px;
     color: black;
 }
+
+.mapTypeBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    transition: 0.2s ease;
+}
+
+.mapTypeBtn:hover {
+    transform: scale(1.1);
+    background: #f1f1f1;
+}
+
+.mapTypeBtn:active {
+    transform: scale(0.95);
+}
+
+.mapPolygonBar {
+    position: absolute;
+    top: 160px;
+    left: 490%;
+    transform: translateX(-50%);
+    display: flex;
+    background: rgba(70, 70, 70, 0.9);
+    border-radius: 6px;
+    padding: 2px 6px;
+    z-index: 10;
+    gap: 1px;
+}
+
+.mapPolygonBar button {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 11px;
+    padding: 1px 20px;
+    cursor: pointer;
+}
+
+.mapPolygonBar button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.mapTypeBtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+    background: white;
+    border-radius: 6px;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
