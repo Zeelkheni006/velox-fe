@@ -30,9 +30,9 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
       params.has("city_id") ||
       params.has("state_id") ||
       params.has("country_id") ||
-      params.has("name") ||
-      params.has("email") ||
-      params.has("phone") ||
+      params.has("owner_email") ||
+      params.has("owner_name") ||
+      params.has("owner_phone") ||
       params.has("status");
 
     const endpoint = hasFilters
