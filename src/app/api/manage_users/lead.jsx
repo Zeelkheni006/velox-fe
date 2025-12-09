@@ -1,5 +1,3 @@
-
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 export async function getLeads(page = 1, perPage = 10, filters = {}) {
@@ -9,15 +7,21 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
   const makeRequest = async () => {
     const params = new URLSearchParams({ page, per_page: perPage });
 
+    // Attach filters
     Object.entries(filters).forEach(([key, value]) => {
-      if (value === undefined || value === null || value === "" || (Array.isArray(value) && value.length === 0)) return;
+      if (
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        (Array.isArray(value) && value.length === 0)
+      ) return;
 
       if ((key === "categories" || key === "category_list") && Array.isArray(value)) {
         params.append("category_list", JSON.stringify(value.map(Number)));
-      } else if (["country_id", "state_id", "city_id"].includes(key)) {
+      } else if (["country_id", "state_id", "city_id", "franchise_city"].includes(key)) {
         params.append(key, Number(value));
       } else if (key === "status") {
-        params.append("status", Number(value));
+        params.append("status", Number(value)); // 🔥 Always number
       } else if (Array.isArray(value)) {
         value.forEach((v) => params.append(`${key}[]`, v));
       } else {
@@ -25,14 +29,16 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
       }
     });
 
+    // 🔥 Correct filters check
     const hasFilters =
       params.has("category_list") ||
+      params.has("franchise_city") ||
       params.has("city_id") ||
       params.has("state_id") ||
       params.has("country_id") ||
-      params.has("owner_email") ||
+      params.has("franchise_email") ||
+      params.has("franchise_phone") ||
       params.has("owner_name") ||
-      params.has("owner_phone") ||
       params.has("status");
 
     const endpoint = hasFilters
@@ -41,12 +47,11 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
 
     const url = `${API_BASE_URL}${endpoint}?${params.toString()}`;
 
-    // Make request with token
+    // API CALL
     let res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // If 401 (token expired), refresh and retry once
     if (res.status === 401) {
       token = await refreshAccessToken();
       res = await fetch(url, {
@@ -67,20 +72,15 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
         : Array.isArray(l.categories)
         ? l.categories
         : [],
-      city: l.city_id?.name || l.city || "",
-      state: l.state_id?.name || l.state || "",
-      country: l.country_id?.name || l.country || "",
-      city_id: l.city_id?.id || l.city_id || "",
-      state_id: l.state_id?.id || l.state_id || "",
-      country_id: l.country_id?.id || l.country_id || "",
+      city: l.franchise_city?.name || "",
+      state: l.franchise_state?.name || "",
+      country: l.country || "",
       status:
         Number(l.status) === 0
           ? "PENDING"
           : Number(l.status) === 1
           ? "ACCEPTED"
-          : Number(l.status) === 2
-          ? "DECLINED"
-          : "PENDING",
+          : "DECLINED",
     }));
 
     return {
@@ -91,6 +91,8 @@ export async function getLeads(page = 1, perPage = 10, filters = {}) {
 
   return makeRequest();
 }
+
+
 
 
 export async function updateLeadStatus(id, status) {
@@ -244,6 +246,26 @@ export const getLeadDetails = async (id, token) => {
 };
 
 // services/kyc.js
+export const fetchKycDocuments = async (leadId) => {
+  if (!leadId) throw new Error("Lead ID is required");
+
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Access token is missing");
+
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-users/leads/get/kyc-documents/${leadId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errData = await response.json();
+    throw new Error(errData.message || "Failed to fetch KYC documents");
+  }
+
+  const data = await response.json();
+  return data;
+};
 
 // Add this function
 export const addLeadToFranchise = async (leadId) => {

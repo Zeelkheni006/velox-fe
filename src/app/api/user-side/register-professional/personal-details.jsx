@@ -1,4 +1,5 @@
 // services/franchiseService.js
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 export const submitFranchiseRequest = async (formData) => {
   try {
@@ -16,3 +17,29 @@ export const submitFranchiseRequest = async (formData) => {
     throw err;
   }
 };
+
+export async function checkDuplicate(type, value) {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/franchise/onboarding/check-duplicate`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: type,      
+          value: value     
+        }),
+      }
+    );
+
+    const data = await res.json();
+    return data; 
+  } catch (error) {
+    console.error("Duplicate check error:", error);
+    return { success: false, message: "Server error, try again!" };
+  }
+}
+
+

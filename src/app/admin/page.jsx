@@ -48,7 +48,7 @@ export default function AdminLoginPage() {
       })
       .catch(()=> {
         setEmailStatus("error");
-        setPopupMessage("❌ Something went wrong!");
+        setPopupMessage("❌ email is Incorect!");
         setPopupType("error");
       })
       .finally(()=> setLoading(false));
