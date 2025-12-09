@@ -2,17 +2,20 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from '../styles/Sidebar.module.css';
-import { FaBell } from 'react-icons/fa';
 import { useRouter } from "next/navigation";
-
-// 🔵 Icons
+import { VscBell } from "react-icons/vsc";
+import { fetchNotifications,clearNotification} from "../../api/admin-dashboard/header"
 import { AiOutlineUser } from "react-icons/ai"; // Edit profile icon
 import { IoMdLock } from "react-icons/io";      // Change password icon
 import { SlPower } from "react-icons/sl";       // Logout icon
 
 const Header = ({ toggleMenu }) => {
   const [isMobile, setIsMobile] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const [notificationCount, setNotificationCount] = useState(0); 
+  const [notifications, setNotifications] = useState({});
 
   const router = useRouter();
 
@@ -23,9 +26,34 @@ const Header = ({ toggleMenu }) => {
 
     checkMobile();
     window.addEventListener('resize', checkMobile);
-
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      const data = await fetchNotifications();
+      setNotifications(data?.message || {});
+      const total = data?.message
+        ? Object.values(data.message).reduce((sum, val) => sum + val, 0)
+        : 0;
+      setNotificationCount(total);
+    };
+    loadNotifications();
+
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+const handleNotificationClick = async (type) => {
+  try {
+    await clearNotification(); // call API
+
+    // UI update
+    setNotificationCount(0);
+    setNotifications({});
+  } catch (error) {
+    console.error("Error clearing notification:", error);
+  }
+};
 
   return (
     <header className={styles.header}>
@@ -36,9 +64,35 @@ const Header = ({ toggleMenu }) => {
       )}
 
       <div className={styles.rightSection}>
-        <div className={styles.notification}>
-          <FaBell />
-          <span className={styles.badge}>0</span>
+
+        {/* Notification Bell */}
+        <div className={styles.notificationWrapper}>
+          <div
+            className={styles.animatedBell}
+            onClick={() => setShowNotifications(!showNotifications)}
+          >
+            <VscBell />
+           
+          </div>
+ <span className={styles.badge}>{notificationCount}</span>
+          {showNotifications && (
+            <div className={styles.notificationDropdown}>
+              {notificationCount > 0 ? (
+                Object.entries(notifications).map(([type, count]) => (
+ <p
+  key={type}
+  className={styles.notification}
+  onClick={() => handleNotificationClick(type)}
+>
+  {count} {type} notification{count > 1 ? "s" : ""}
+</p>
+
+                ))
+              ) : (
+                <p>No Notifications</p>
+              )}
+            </div>
+          )}
         </div>
 
         <span className={styles.adminText}>Admin</span>
@@ -46,7 +100,7 @@ const Header = ({ toggleMenu }) => {
         {/* Profile */}
         <div
           className={styles.profileWrapper}
-          onClick={() => setShowDropdown(!showDropdown)}
+          onClick={() => setShowProfileDropdown(!showProfileDropdown)}
         >
           <Image
             src="/icon/image-1.png"
@@ -57,11 +111,9 @@ const Header = ({ toggleMenu }) => {
           />
         </div>
 
-        {/* Dropdown */}
-        {showDropdown && (
+        {/* Profile Dropdown */}
+        {showProfileDropdown && (
           <div className={styles.dropdownMenu}>
-            
-            {/* EDIT PROFILE */}
             <div
               className={styles.dropdownItem}
               onClick={() => router.push("/admin/edit-profile")}
@@ -69,8 +121,6 @@ const Header = ({ toggleMenu }) => {
               <AiOutlineUser className={styles.dropdownIcon} />
               <span>EDIT PROFILE</span>
             </div>
-
-            {/* CHANGE PASSWORD */}
             <div
               className={styles.dropdownItem}
               onClick={() => router.push("/admin/change-password")}
@@ -78,8 +128,6 @@ const Header = ({ toggleMenu }) => {
               <IoMdLock className={styles.dropdownIcon} />
               <span>CHANGE PASSWORD</span>
             </div>
-
-            {/* LOGOUT */}
             <div
               className={styles.dropdownItem}
               onClick={() => router.push("/admin")}

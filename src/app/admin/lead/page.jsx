@@ -67,7 +67,7 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
         : Object.values(categoryObj);
       return {
         ...l,
-        franchise_city: l.franchise_city || l.city_id || "",
+        franchise_city: l.franchise_city || l.franchise_city || "",
         state: l.state || l.state_id || "",
         country: l.country || l.country_id || "",
         categories: categoryNames,
@@ -82,19 +82,30 @@ const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filt
 };
 const [showFranchisePopup, setShowFranchisePopup] = useState(false);
 useEffect(() => {
-   setLoading(true);
   if (!initialized.current) return;
-  fetchLeadsData(currentPage, entriesPerPage, {
+
+  const filters = {
     owner_name: selectedName,
-    owner_email: selectedEmail,
-    owner_phone: selectedPhone,
-    city_id: selectedCity?.value,
-    status: selectedStatus,
-    category_list: selectedCategories.map(c => Number(c.value))
-  });
-    setLoading(false);
-}, [currentPage, entriesPerPage, selectedName, selectedEmail, selectedPhone, selectedCity, selectedStatus, selectedCategories]);
-  
+    franchise_email: selectedEmail,
+    franchise_phone: selectedPhone,
+    franchise_city: selectedCity?.value,
+    status: selectedStatus !== "" ? Number(selectedStatus) : undefined,
+    category_list: selectedCategories.map(c => Number(c.value)),
+  };
+
+  fetchLeadsData(currentPage, entriesPerPage, filters);
+}, [
+  currentPage,
+  entriesPerPage,
+  selectedName,
+  selectedEmail,
+  selectedPhone,
+  selectedCity,
+  selectedStatus,
+  selectedCategories
+]);
+
+
 const handleNextPage = () => {
   if (currentPage < totalPages) {
     setCurrentPage(prev => prev + 1);
@@ -152,12 +163,12 @@ const sortedLeads = useMemo(() => {
   return sorted;
 }, [leads, sortConfig]);
 
-
+const [selectedOwnerEmail, setSelectedOwnerEmail] = useState(null);
 
 const handleAddToFranchise = async (lead) => {
   if (!lead?.id) return showPopup("Lead ID is missing!", "error");
 
-    setSelectedLead(lead);   // <-- FIXED (now valid)
+  setSelectedLead(lead);
   setShowFranchisePopup(true);
   setIsProcessing(true);
   setFranchiseMessage("Processing...");
@@ -165,17 +176,18 @@ const handleAddToFranchise = async (lead) => {
 
   try {
     const data = await addLeadToFranchise(lead.id);
-
     setIsProcessing(false);
 
     if (data.success) {
-      setFranchiseMessage("Lead added successfully!");
+      setFranchiseMessage("Admin added successfully!");
       setFranchiseStatus("success");
+
+      // ✅ Save owner_email for modal button
+      setSelectedOwnerEmail(data.data.owner_email);
     } else {
       setFranchiseMessage(data.message || "Already created or failed!");
       setFranchiseStatus("error");
     }
-
   } catch (err) {
     setIsProcessing(false);
     setFranchiseMessage("Already an admin!");
@@ -351,8 +363,8 @@ useEffect(() => {
         owner_name: Array.isArray(res?.owner_name) && res.owner_name.length > 0
           ? res.owner_name.map(n => ({ label: n.trim(), value: n.trim() }))
           : namesFromLeads.map(n => ({ label: n, value: n })),
-        owner_email: Array.isArray(res?.owner_email) ? res.owner_email.map(e => ({ label: e, value: e })) : [],
-        owner_phone: Array.isArray(res?.owner_phone) ? res.owner_phone.map(p => ({ label: p, value: p })) : [],
+        franchise_email: Array.isArray(res?.owner_email) ? res.owner_email.map(e => ({ label: e, value: e })) : [],
+        franchise_phone: Array.isArray(res?.owner_phone) ? res.owner_phone.map(p => ({ label: p, value: p })) : [],
         categories: res?.categories ? Object.entries(res.categories).map(([id, title]) => ({ label: title, value: id })) : [],
 franchise_city: res?.franchise_city
   ? Object.entries(res.franchise_city).map(([id, name]) => ({ label: name, value: Number(id) }))
@@ -419,18 +431,22 @@ const handleViewKyc = async (lead) => {
   setShowKycPopup(true);
   setLoadingKyc(true);
 
-  const id = lead.lead_id || lead.id;  // ✔ FIX
+  try {
+    const id = lead.lead_id || lead.id;  
+    const response = await fetchKycDocuments(id);
 
-  const data = await fetchKycDocuments(id);
-
-  if (data) {
-    setKycData(data);
-  } else {
+    if (response && response.data) {
+      setKycData(response.data); // ✅ ensure correct key
+    } else {
+      setKycData(null);
+      showPopup("Failed to fetch KYC documents", "error");
+    }
+  } catch (err) {
     setKycData(null);
-    showPopup("Failed to fetch KYC documents", "error");
+    showPopup("Something went wrong while fetching KYC documents", "error");
+  } finally {
+    setLoadingKyc(false);
   }
-
-  setLoadingKyc(false);
 };
 
   return (
@@ -487,7 +503,7 @@ onChange={opt => {
 
 <Select
   placeholder="Select Email"
-  options={dropdownData.owner_email}
+  options={dropdownData.franchise_email}
   value={selectedEmail ? { value: selectedEmail, label: selectedEmail } : null}
 onChange={opt => {
   const selected = opt?.value || null;
@@ -506,7 +522,7 @@ onChange={opt => {
 
 <Select
   placeholder="Select Phone"
-  options={dropdownData.owner_phone}
+  options={dropdownData.franchise_phone}
   value={selectedPhone ? { value: selectedPhone, label: selectedPhone } : null}
  onChange={opt => {
   const selected = opt?.value || null;
@@ -548,7 +564,7 @@ if (values.length > 0) {
     setSelectedCity(opt); 
     setCurrentPage(1);
     if (opt) {
-      fetchLeadsData(1, entriesPerPage, { city_id: opt.value });
+      fetchLeadsData(1, entriesPerPage, { franchise_city: opt.value });
     } else {
       fetchLeadsData(1, entriesPerPage, {});
     }
@@ -814,7 +830,7 @@ if (values.length > 0) {
               className={styles.franchiseBtn}
               onClick={() => handleAddToFranchise(lead)}
             >
-              Add To Franchises
+              Add To Admin
             </button>
           )}
         </td>
@@ -916,27 +932,22 @@ of {totalLeads} entries
 
       <p className={styles.p}>{franchiseMessage}</p>
 
-{!isProcessing && (
+{!isProcessing && franchiseStatus === "success" && selectedOwnerEmail && (
   <div className={styles.modalActions}>
     <button
       className={styles.acceptBtn}
-      onClick={async () => {
-        // 1️⃣ Run existing logic
-        await handleOkClick(); // make sure this supports async if needed
+      onClick={() => {
+        // 1️⃣ Open Franchise User page in new tab
+        const newTab = window.open("/admin/franchises-user", "_blank");
 
-        // 2️⃣ If franchise was successfully created
-        if (franchiseStatus === "success") {
-          // Open franchises-user in a new tab and get reference
-          const newTab = window.open("/admin/franchises-user", "_blank");
-
-          // Redirect the new tab to create-franchise
-          if (newTab) {
-            newTab.location.href = "/admin/create-franchise";
-          }
+        // 2️⃣ Redirect to create-franchise with owner_email
+        if (newTab) {
+          newTab.onload = () => {
+            newTab.location.href = `/admin/create-franchise?owner_email=${selectedOwnerEmail}`;
+          };
         }
 
-        // 3️⃣ Close the popup
-        setShowFranchisePopup(false);
+        setShowFranchisePopup(false); // Close popup
       }}
     >
       Make Franchise
@@ -947,9 +958,6 @@ of {totalLeads} entries
     </div>
   </div>
 )}
-
-
-
 
 {showLeadDetailsPopup && (
   <div className={styles.leadModalOverlay}>
@@ -1068,15 +1076,17 @@ of {totalLeads} entries
               {key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </label>
 
-            <div className={styles.leadPreviewBoxSmall}>
-              {kycData?.[key] ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${kycData[key]}`}
-                  alt={key}
-                  className={styles.leadPreviewImgSmall}
-                />
-              ) : (
-                <p>No File</p>
+          <div className={styles.leadPreviewBoxSmall}>
+  {loadingKyc ? (
+    <p>Loading...</p>
+  ) : kycData?.[key] ? (
+    <img
+      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${kycData[key]}`}
+      alt={key}
+      className={styles.leadPreviewImgSmall}
+    />
+  ) : (
+    <p>No File</p>
               )}
             </div>
           </div>
@@ -1086,8 +1096,6 @@ of {totalLeads} entries
     </div>
   </div>
 )}
-
-
 
       </div>
     </Layout>

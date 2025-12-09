@@ -271,16 +271,15 @@
 
 .badge {
     position: absolute;
-    top: -8px;
-    right: -10px;
+    top: -7px;
+    right: -5px;
     background-color: red;
     color: white;
-    font-size: 10px;
-    width: 16px;
-    height: 16px;
+    font-size: 12px;
+    width: 17px;
+    height: 15px;
     text-align: center;
     border-radius: 50%;
-    font-weight: bold;
 }
 
 .adminText {
@@ -476,4 +475,89 @@
     transform: translateY(-50%) translateX(0);
     opacity: 1;
     pointer-events: auto;
+}
+
+
+/* Bell wrapper for animation */
+
+.animatedBell {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    animation: bellSwing 1s infinite alternate;
+    /* swing back & forth */
+}
+
+
+/* Swing animation */
+
+@keyframes bellSwing {
+    0% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(15deg);
+    }
+    50% {
+        transform: rotate(-10deg);
+    }
+    75% {
+        transform: rotate(10deg);
+    }
+    100% {
+        transform: rotate(-5deg);
+    }
+}
+
+
+/* Badge */
+
+.notificationWrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+
+/* 🔔 Increase Bell Size */
+
+.animatedBell svg {
+    font-size: 22px;
+    /* CHANGE THIS SIZE */
+    color: #333;
+    /* OPTIONAL */
+}
+
+.notificationDropdown {
+    position: absolute;
+    top: 30px;
+    /* below the bell */
+    right: 0;
+    background: white;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    width: 200px;
+    padding: 10px;
+    z-index: 100;
+}
+
+.ring {
+    animation: ring 1s infinite;
+}
+
+.notification {
+    margin: 6px 12px;
+    /* spacing between lines */
+    padding: 6px 0;
+    /* vertical padding */
+    font-size: 15px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    /* line between notifications */
+}
+
+
+/* Remove last line */
+
+.notification:last-child {
+    border-bottom: none;
 }

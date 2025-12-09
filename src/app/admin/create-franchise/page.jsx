@@ -8,8 +8,9 @@
     import { SlHome } from "react-icons/sl";
     import { useRouter, useSearchParams } from "next/navigation";
   import { TbPolygon } from "react-icons/tb";  
-    import { fetchRequestedServices, getLeadDetails } from "../../api/manage_users/lead";
+    // import { fetchRequestedServices } from "../../api/manage_users/lead";
     import { getAllCountries, getallStates, getallCities } from "../../api/user-side/register-professional/location";
+    import {getFranchiseOwnersData} from "../../api/manage_users/franchise";
     import { fetchGooglePoints } from "../../api/admin-franchise/franchise";
     import styles from "../styles/Franchises.module.css";
 
@@ -26,7 +27,9 @@
       const [cities, setCities] = useState([]);
       const [serviceOptions, setServiceOptions] = useState([]);
       const [selectedServices, setSelectedServices] = useState([]);
+const ownerEmailParam = searchParams.get("owner_email");
 
+const [initialServices, setInitialServices] = useState([]);
       const mapRef = useRef(null);
       const mapInstance = useRef(null);
       const polygonRef = useRef(null);
@@ -65,14 +68,14 @@
         if (selectedLeadId) loadRequestedServices(selectedLeadId);
       }, [selectedLeadId]);
 
-      const loadRequestedServices = async (leadId) => {
-        const response = await fetchRequestedServices(leadId);
-        if (response?.success && Array.isArray(response.data)) {
-          const options = response.data.map((item) => ({ label: item.title, value: item.id }));
-          setServiceOptions(options);
-          setSelectedServices(options);
-        }
-      };
+      // const loadRequestedServices = async (leadId) => {
+      //   const response = await fetchRequestedServices(leadId);
+      //   if (response?.success && Array.isArray(response.data)) {
+      //     const options = response.data.map((item) => ({ label: item.title, value: item.id }));
+      //     setServiceOptions(options);
+      //     setSelectedServices(options);
+      //   }
+      // };
     // Get coordinates from Nominatim
     async function getCoordinatesByName(name) {
       if (!name) return null;
@@ -125,55 +128,7 @@
     }
   }
     // 📝 Load Existing Franchise Data
-    useEffect(() => {
-      if (!selectedLeadId) return;
-      const token = localStorage.getItem("access_token");
-      if (!token) return;
-
-      const loadFranchiseData = async () => {
-        try {
-          const response = await getLeadDetails(selectedLeadId, token);
-          const f = response.data?.franchise_data;
-          if (!f) return;
-
-          const countryId = f.frachise_country_id?.id?.toString() || "";
-          const stateId = f.franchise_state_id?.id?.toString() || "";
-          const cityId = f.franchise_city_id?.id?.toString() || "";
-
-          if (countryId) setStates(await getallStates(countryId));
-          if (stateId) setCities(await getallCities(stateId));
-
-          setForm({
-            ...form,
-            franchiseName: f.franchise_name || "",
-            email: f.franchise_email || "",
-            mobile: f.franchise_phone || "",
-            pincode: f.franchise_pincode || "",
-            firstAddress: f.franchise_address || "",
-            commission: f.commission || "",
-            latitude: f.latitude || "",
-            longitude: f.longitude || "",
-            country: countryId,
-            state: stateId,
-            city: cityId,
-          });
-
-          // 🔹 Auto-zoom map for city/state/country
-          if (f.franchise_city_id?.name) {
-            await zoomToLocation({ name: f.franchise_city_id.name });
-          } else if (f.franchise_state_id?.name) {
-            await zoomToLocation({ name: f.franchise_state_id.name });
-          } else if (f.frachise_country_id?.name) {
-            await zoomToLocation({ name: f.frachise_country_id.name });
-          }
-
-        } catch (err) {
-          showPopup("Error loading franchise data", "error");
-          console.error(err);
-        }
-      };
-      loadFranchiseData();
-    }, [selectedLeadId]);
+    
 
       // 🌐 Initialize Google Map
   let currentPolygon = null;
@@ -255,13 +210,79 @@
       showPopup("❌ Failed to load points.", "error");
     }
   };
-
-
       const handleSubmit = (e) => {
         e.preventDefault();
         showPopup("✅ Franchise updated!");
       };
 
+    const fetchFranchiseOwnerData = async (email) => {
+  const res = await getFranchiseOwnersData(email);
+
+  if (res?.success && res.data) {
+    const f = res.data.franchise_data;  // Franchise
+    const o = res.data.owner_data;      // Owner
+
+    // 🌟 service_list → only ids
+    const selected = Array.isArray(f?.service_list)
+      ? f.service_list.map((service) => ({
+          value: service.id,
+          label: service.title,
+        }))
+      : [];
+setSelectedServices(selected); // ✅ show in Select
+    // Optional: also set serviceOptions if you want to allow new selections
+    setServiceOptions(selected);
+setInitialServices(selected); 
+    setForm({
+      country: f?.frachise_country_id?.id || "",
+      state: f?.franchise_state_id?.id || "",
+      city: f?.franchise_city_id?.id || "",
+      franchiseName: f?.franchise_name || "",
+      firstAddress: f?.franchise_address || "",
+      secondAddress: "",
+      mobile: f?.franchise_phone || "",
+      commission: "",
+      pincode: f?.franchise_pincode || "",
+      email: f?.franchise_email || "",
+      latitude: "",
+      longitude: "",
+      deliveryHours: "",
+      deliveryMinutes: "",
+      services: f?.service_list || "", // 🎉 Auto select services here
+    });
+
+    showPopup("Franchise data loaded ✔", "success");
+
+    // Load States & Cities
+    if (f?.frachise_country_id?.id)
+      setStates(await getallStates(f.frachise_country_id.id));
+
+    if (f?.franchise_state_id?.id)
+      setCities(await getallCities(f.franchise_state_id.id));
+
+    // Map Auto Zoom
+    if (f?.franchise_city_id?.name) {
+      zoomToLocation({ name: f.franchise_city_id.name });
+    } else if (f?.franchise_state_id?.name) {
+      zoomToLocation({ name: f.franchise_state_id.name });
+    } else if (f?.frachise_country_id?.name) {
+      zoomToLocation({ name: f.frachise_country_id.name });
+    }
+
+  } else {
+    showPopup(res?.message || "Data not found!", "error");
+  }
+};
+
+useEffect(() => {
+  if (ownerEmailParam) fetchFranchiseOwnerData(ownerEmailParam);
+}, [ownerEmailParam]);
+
+useEffect(() => {
+  if (window?.location?.search.includes("from=franchises-user")) {
+    window.history.replaceState(null, "", "/admin/franchises-user");
+  }
+}, []);
       return (
         <Layout>
           <PopupAlert message={popupMessage} type={popupType} />
@@ -269,12 +290,8 @@
           <Script
             src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_MAP_API_BASE_URL}&libraries=drawing`}
             strategy="afterInteractive"
-            onLoad={initMap}
-
-            
+            onLoad={initMap} 
           />
-            
-
           <div className={styles.editcontainer}>
             <div className={styles.headerContainer}>
               <div>
@@ -292,47 +309,66 @@
               <h2 className={styles.edittitle}>Edit Franchise</h2>
 
               <div className={styles.editgrid}>
-                <div className={styles.editfull}>
-                  <label>SERVICES</label>
-                  <Select
-      isMulti
-      options={serviceOptions}
-      value={selectedServices}
-      onChange={setSelectedServices}
-      styles={{
-        control: (base) => ({
-          ...base,
-          minHeight: "32px",
-          height: "32px",
-          fontSize: "13px",
-        }),
-        menu: (base) => ({
-          ...base,
-          fontSize: "12px",      // 👉 dropdown text size
-          minHeight: "10px",
-          padding: "0",
-        }),
-        option: (base, state) => ({
-          ...base,
-          fontSize: "12px",      // 👉 single option text
-          padding: "4px 8px",    // 👉 reduce option height
-          backgroundColor: state.isFocused ? "#f1f1f1" : "white",
-          cursor: "pointer",
-        }),
-        valueContainer: (base) => ({
-          ...base,
-          height: "32px",
-          padding: "0 6px",
-        }),
-        indicatorsContainer: (base) => ({
-          ...base,
-          height: "32px",
-        }),
+             <div
+  className={styles.editfull}
+  style={{ display: "flex", flexDirection: "column", gap: "6px" }}
+>
+  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <label style={{ marginRight: "10px", fontSize: "13px" }}>SERVICES</label>
+
+    <button
+      type="button"
+      style={{
+        padding: "2px 6px",
+        fontSize: "12px",
+        cursor: "pointer",
+        border: "1px solid #ccc",
+        borderRadius: "4px",
+        background: "#f5f5f5"
       }}
-    />
+      onClick={() => setSelectedServices(initialServices)}
+    >
+      Reset
+    </button>
+  </div>
 
-                </div>
-
+  <Select
+    isMulti
+    options={serviceOptions}
+    value={selectedServices}
+    onChange={setSelectedServices}
+    styles={{
+      control: (base) => ({
+        ...base,
+        minHeight: "32px",
+        height: "35px",
+        fontSize: "13px",
+      }),
+      menu: (base) => ({
+        ...base,
+        fontSize: "12px",
+        minHeight: "15px",
+        padding: "0",
+      }),
+      option: (base, state) => ({
+        ...base,
+        fontSize: "12px",
+        padding: "4px 8px",
+        backgroundColor: state.isFocused ? "#f1f1f1" : "white",
+        cursor: "pointer",
+      }),
+      valueContainer: (base) => ({
+        ...base,
+        height: "32px",
+        padding: "0 6px",
+      }),
+      indicatorsContainer: (base) => ({
+        ...base,
+        height: "32px",
+      }),
+    }}
+  />
+</div>
                 {/* Country / State / City selects */}
                 <div>
                   <label>FRANCHISE COUNTRY</label>

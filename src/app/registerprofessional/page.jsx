@@ -8,7 +8,7 @@
   import usePopup from '../admin/components/popup';
   import PopupAlert from "../admin/components/PopupAlert";
   import { IoMdCloudUpload } from "react-icons/io";
-  import { submitFranchiseRequest } from "../api/user-side/register-professional/personal-details";
+  import { submitFranchiseRequest,checkDuplicate } from "../api/user-side/register-professional/personal-details";
 import Select from "react-select";
 
   const data = [
@@ -80,6 +80,8 @@ const [franchisePincode, setFranchisePincode] = useState("");
 const [franchiseState, setFranchiseState] = useState("");
 const [franchiseCity, setFranchiseCity] = useState("");
 const [franchiseMessage, setFranchiseMessage] = useState("");
+const [isValidPhone, setIsValidPhone] = useState(true);
+const [isValidEmail, setIsValidEmail] = useState(true);
 const [selectedCountry, setSelectedCountry] = useState(
   countries.length ? countries[0].id : ""
 );
@@ -442,21 +444,40 @@ const validateStep3 = () => {
 <div className="phone-field">
   <div className="phone-input-wrapper">
     <span className="prefix">{countryCode} |</span>
+
     <input
       type="text"
       id="phone"
-      maxLength={10}  
-      value={phone.replace(countryCode, "")} 
-      onChange={(e) => {
-        let numberPart = e.target.value.replace(/\D/g, ""); 
-        numberPart = numberPart.slice(0, 10); 
-        setPhone(countryCode + numberPart); 
+      maxLength={10}
+      value={phone.replace(countryCode, "")}
+      onChange={async (e) => {
+        let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
+        setPhone(countryCode + numberPart);
+
+        // clear message while typing
+        showPopup("");
+
+        // 👉 10 digits puri thay to auto API call
+       if (numberPart.length === 10) {
+  const res = await checkDuplicate("owner_phone", countryCode + numberPart);
+
+  if (res.success) {
+    setIsValidPhone(true);
+    showPopup("Phone number is available ✔", "success");
+  } else {
+    setIsValidPhone(false);
+    showPopup(res.message, "error");
+  }
+}
+
       }}
       required
     />
+
     <label htmlFor="phone">Phonenumber (will be use admin login)</label>
   </div>
 </div>
+
 </div>
           <div className="row">
            <input
@@ -468,13 +489,37 @@ const validateStep3 = () => {
 />
           </div>  
        <div className="row">   
-  <input
-    type="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    required
-  />
-  <label>Email (will be use admin login)</label>
+<input
+  type="email"
+  value={email}
+  onChange={async (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    showPopup(""); // typing દરમિયાન clear
+
+    // ⛔ જો field ખાલી હોય તો skip
+    if (!value) return;
+
+    // ✔ Valid full email only (with .com, .in, .org, .co etc…)
+    const fullEmailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+
+  if (fullEmailRegex.test(value)) {
+  const res = await checkDuplicate("owner_email", value);
+
+  if (res.success) {
+    setIsValidEmail(true);
+    showPopup("Email is available ✔", "success");
+  } else {
+    setIsValidEmail(false);
+    showPopup(res.message, "error");
+  }
+}
+  }}
+  required
+/>
+<label>Email (will be use admin login)</label>
+
+
 <input
   type='text'
   placeholder='Pincode'
@@ -507,11 +552,16 @@ const validateStep3 = () => {
   type="button"
   className="nextBtn"
   onClick={() => {
+    if (!isValidEmail || !isValidPhone) {
+      showPopup("Please enter unique phone & email!", "error");
+      return;
+    }
     if (validateStep1()) setStep(step + 1);
   }}
 >
   Next →
 </button>
+
   </div>  
 
         </form>
@@ -567,15 +617,31 @@ const validateStep3 = () => {
         <input type="text" placeholder="Enter Name" value={franchiseName} onChange={(e) => setFranchiseName(e.target.value)} required />
   <div className="phone-input-wrapper">
     <span className="prefix">{countryCode} |</span>
-    <input
+  <input
       type="text"
       id="phone"
-      maxLength={10}  
-      value={franchisePhone.replace(countryCode, "")} 
-      onChange={(e) => {
-        let numberPart = e.target.value.replace(/\D/g, ""); 
-        numberPart = numberPart.slice(0, 10); 
-        setFranchisePhone(countryCode + numberPart); 
+      maxLength={10}
+      value={phone.replace(countryCode, "")}
+      onChange={async (e) => {
+        let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
+        setPhone(countryCode + numberPart);
+
+        // clear message while typing
+        showPopup("");
+
+        // 👉 10 digits puri thay to auto API call
+       if (numberPart.length === 10) {
+  const res = await checkDuplicate("franchise_phone", countryCode + numberPart);
+
+  if (res.success) {
+    setIsValidPhone(true);
+    showPopup("Phone number is available ✔", "success");
+  } else {
+    setIsValidPhone(false);
+    showPopup(res.message, "error");
+  }
+}
+
       }}
       required
     />
@@ -593,7 +659,34 @@ const validateStep3 = () => {
 </div>
   {/* Address & Pincode */}
         <div className="row">
-                 <input type="email" placeholder="Enter Email" value={franchiseEmail} onChange={(e) => setFranchiseEmail(e.target.value)} required />
+<input
+  type="email"
+  value={email}
+  onChange={async (e) => {
+    const value = e.target.value;
+    setEmail(value);
+    showPopup(""); // typing દરમિયાન clear
+
+    // ⛔ જો field ખાલી હોય તો skip
+    if (!value) return;
+
+    // ✔ Valid full email only (with .com, .in, .org, .co etc…)
+    const fullEmailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+
+  if (fullEmailRegex.test(value)) {
+  const res = await checkDuplicate("franchise_email", value);
+
+  if (res.success) {
+    setIsValidEmail(true);
+    showPopup("Email is available ✔", "success");
+  } else {
+    setIsValidEmail(false);
+    showPopup(res.message, "error");
+  }
+}
+  }}
+  required
+/>
          <input type="text" placeholder="Pincode" value={franchisePincode} onChange={(e) => setFranchisePincode(e.target.value)} required />
         </div>
         {/* Country & State */}
@@ -651,14 +744,19 @@ const validateStep3 = () => {
     </button>
     {/* Next button on the right */}
     <button
-      type="button"
-      className="nextBtn"
-      onClick={() =>{
-        if (validateStep2())
-       setStep(step + 1);}}
-    >
-      Next →
-    </button>
+  type="button"
+  className="nextBtn"
+  onClick={() => {
+    if (!isValidEmail || !isValidPhone) {
+      showPopup("Please enter unique phone & email!", "error");
+      return;
+    }
+    if (validateStep1()) setStep(step + 1);
+  }}
+>
+  Next →
+</button>
+
   </div>
 
       </form>

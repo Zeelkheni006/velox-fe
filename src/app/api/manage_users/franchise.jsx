@@ -41,3 +41,38 @@ export const getFranchiseOwners = async (page = 1, perPage = 10) => {
     return { success: false, data: [], total: 0, pages: 0, page: 1 };
   }
 };
+
+export const getFranchiseOwnersData = async (ownerEmail) => {
+  try {
+    const token = localStorage.getItem("token");
+    const url = `http://192.168.29.69:5000/api/v1/admin/manage-franchise/franchise-owners/get/franchise-owners-data`;
+
+    const response = await fetch(url, {
+      method: "POST", // IMPORTANT
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify({ owner_email: ownerEmail }), // JSON body
+    });
+
+    const json = await response.json();
+    return json;
+  } catch (err) {
+    return { success: false, message: "Network error" };
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+

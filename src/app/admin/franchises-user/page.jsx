@@ -4,11 +4,14 @@ import { useRouter } from "next/navigation";
 import Layout from "../pages/page";
 import { SlHome } from "react-icons/sl";
 import styles from "../styles/Franchises.module.css";
-import { getFranchiseOwners } from "../../api/manage_users/franchise";
-import {fetchRequestedServices} from "../../api/manage_users/lead"
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
+import { handleCopy } from "../components/popup";
+import { getFranchiseOwners ,getFranchiseOwnersData} from "../../api/manage_users/franchise";
+
 export default function FranchisesPage() {
   const router = useRouter();
-
+const { popupMessage, popupType, showPopup } = usePopup();
   const [franchises, setFranchises] = useState([]);
   const [totalEntries, setTotalEntries] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,32 +53,20 @@ export default function FranchisesPage() {
 
   const filtered = franchises.filter(
     (f) =>
-      f.name.toLowerCase().includes(search.toLowerCase()) ||
-      f.email.toLowerCase().includes(search.toLowerCase()) ||
-      f.phone.includes(search)
+      f.owner_name.toLowerCase().includes(search.toLowerCase()) ||
+      f.owner_email.toLowerCase().includes(search.toLowerCase()) ||
+      f.owner_phone.includes(search)
   );
 
   const totalPages = Math.ceil(totalEntries / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, filtered.length);
-const handleCreateFranchise = async (leadId) => {
-  try {
-    // Call API with the correct leadId
-    const res = await fetchRequestedServices(leadId);
+  
 
-    if (res.success) {
-      router.push(`/admin/create-franchise?leadId=${leadId}`);
-    } else {
-      console.error("Lead not found or API error:", res.message);
-      // Optionally show a toast/popup to user
-    }
-  } catch (err) {
-    console.error("Error fetching requested services:", err);
-  }
-};
 
   return (
     <Layout>
+            <PopupAlert message={popupMessage} type={popupType} />
       <div className={styles.container}>
         <div className={styles.headerContainer}>
           <div>
@@ -133,9 +124,9 @@ const handleCreateFranchise = async (leadId) => {
             <tbody>
               {filtered.map((item) => (
                 <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td>{item.email}</td>
-                  <td>{item.phone}</td>
+                  <td onClick={(e)=> handleCopy(e,item.owner_email,"name",showPopup)}>{item.owner_name}</td>
+                  <td onClick={(e)=> handleCopy(e,item.owner_email,"email",showPopup)}>{item.owner_email}</td>
+                  <td onClick={(e)=>handleCopy(e,item.owner_phone,"phone" , showPopup)}>{item.owner_phone}</td>
                   <td>
                     <button
                       className={styles.editButton}
@@ -148,12 +139,28 @@ const handleCreateFranchise = async (leadId) => {
                       Edit
                     </button>
                     {item.make_franchise && (
-               <button
+<button
   className={styles.createButton}
-  onClick={() => router.push(`/admin/create-franchise?leadId=${item.id}`)}
+  onClick={async () => {
+    try {
+      const res = await getFranchiseOwnersData(item.owner_email);
+
+      if (res.success) {
+        localStorage.setItem("franchiseOwnersData", JSON.stringify(res.data));
+        router.push(`/admin/create-franchise?owner_email=${item.owner_email}`);
+        showPopup("Franchise owner data fetched successfully ✔", "success");
+      } else {
+        showPopup(res.message || "Failed to fetch data", "error");
+      }
+    } catch (err) {
+      console.error("Error fetching franchise owner data:", err);
+      showPopup("Something went wrong! Try again.", "error");
+    }
+  }}
 >
   Create Franchise
 </button>
+
 
                     )}
                   </td>
