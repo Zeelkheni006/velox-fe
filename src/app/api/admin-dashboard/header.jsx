@@ -35,7 +35,7 @@ export const clearNotification = async () => {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/dashboard/notifications/clear`,
       {
-        method: "PUT",
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },

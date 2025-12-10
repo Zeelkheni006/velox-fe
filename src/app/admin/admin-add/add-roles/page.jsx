@@ -8,283 +8,377 @@ import { FaLayerGroup, FaNetworkWired, FaCogs, FaList,FaProjectDiagram,FaStore,
 import styles from "../../styles/roles.module.css";
 import { SlHome } from "react-icons/sl";
 import { useRouter } from "next/navigation";
+import { addRole } from "../../../api/manage_users/role";
 export default function ServiceDashboard() {
   const [expanded, setExpanded] = useState("categories");
   const [roleName, setRoleName] = useState("");
   const router = useRouter();
   // ===== Category lists =====
   const [categories, setCategories] = useState([
-    { name: "Category", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Category", enabled: false, key:"category_get" },
+    { name: "Add", enabled: false , key: "category_create"},
+    { name: "Edit", enabled: false,key:"category_update" },
+    { name: "Delete", enabled: false,key:"category_delete" },
+    { name: "Status", enabled: false, key:"category_update_status"},
   ]);
+ const [expandedPanel, setExpandedPanel] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleToggle = (name) => {
+    const updated = categories.map((c) =>
+      c.name === name ? { ...c, enabled: !c.enabled } : c
+    );
+    setCategories(updated);
+
+    if (name === "Add") {
+      setExpandedPanel("categories");
+    } else {
+      setExpandedPanel(null);
+    }
+  };
+
+ const submitRole = async () => {
+  if (!roleName.trim()) {
+    alert("Please enter role name!");
+    return;
+  }
+
+const mapPermissions = (items, prefix) =>
+  items.filter(item => item.enabled && item.key)
+       .map(item => item.key);
+
+  let permissions = [
+    ...mapPermissions(categories, "category"),
+    ...mapPermissions(subCategories, "sub_category"),
+    ...mapPermissions(services, "service"),
+    ...mapPermissions(bestServices, "best_service"),
+    ...mapPermissions(serviceSpecs, "service_spec"),
+    ...mapPermissions(serviceFaq, "service_faq"),
+    ...mapPermissions(packages, "package"),
+    ...mapPermissions(Leads, "leads"),
+    ...mapPermissions(Franchises, "franchise"),
+    ...mapPermissions(Franchisesuser, "franchise_user"),
+    ...mapPermissions(offers, "offers"),
+    ...mapPermissions(bestoffers, "best_offers"),
+    ...mapPermissions(gifts, "gifts"),
+    ...mapPermissions(orders, "orders"),
+    ...mapPermissions(unallocatedorders, "unallocated_orders"),
+    ...mapPermissions(Accounts, "accounts"),
+    ...mapPermissions(Payments, "payments"),
+    ...mapPermissions(CreditPlans, "credit_plans"),
+    ...mapPermissions(CustomePlans, "custome_plans"),
+    ...mapPermissions(ServiceRatings, "service_ratings"),
+    ...mapPermissions(PackageRatings, "package_ratings"),
+    ...mapPermissions(OrderReview, "order_review"),
+    ...mapPermissions(Testimonial, "testimonial"),
+    ...mapPermissions(Slider, "slider_image"),
+    ...mapPermissions(AboutUs, "about_us"),
+    ...mapPermissions(Blog, "blog"),
+    ...mapPermissions(NewsLetter, "news_letter"),
+    ...mapPermissions(ReferralProgram, "referral_program"),
+    ...mapPermissions(RequestQuotes, "request_quotes"),
+    ...mapPermissions(Followups, "followups"),
+    ...mapPermissions(Contact, "contact"),
+    ...mapPermissions(FranchiseService, "franchise_service"),
+    ...mapPermissions(FranchiseOrders, "franchise_orders"),
+    ...mapPermissions(FranchiseTiming, "franchise_timing"),
+    ...mapPermissions(FranchiseWorker, "franchise_worker"),
+    ...mapPermissions(ManageCredit, "manage_credit"),
+    ...mapPermissions(Request, "request"),
+    ...mapPermissions(FranchiseProfile, "franchise_profile"),
+    ...mapPermissions(Account, "account"),
+  ];
+
+    const payload = {
+    name: roleName.trim(),
+    permissions,
+  };
+
+   const token = localStorage.getItem("access_token");  // 👈 fetch here
+
+  if (!token) {
+    alert("Session expired, login again!");
+    return;
+  }
+
+  try {
+    const res = await addRole(payload, token);
+    if (res?.success) {
+      alert("Role created successfully!");
+    } else {
+      alert(res?.message || "Failed to create role.");
+    }
+  } catch (err) {
+    console.error("Add role API error:", err);
+    alert("Something went wrong!");
+  }
+};
+
 
   const [subCategories, setSubCategories] = useState([
-    { name: "Sub Category", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Sub Category", enabled: false ,key:"sub_category_get" },
+    { name: "Add", enabled: false ,key:"sub_category_create"},
+    { name: "Edit", enabled: false ,key:"sub_category_update"},
+    { name: "Delete", enabled: false,key:"sub_category_delete" },
+    { name: "Status", enabled: false,key:"sub_category_update_status" },
   ]);
 
   const [services, setServices] = useState([
-    { name: "Service", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Service", enabled: false ,key:"service_get"},
+    { name: "Add", enabled: false ,key:"service_create"},
+    { name: "Edit", enabled: false ,key:"service_update"},
+    { name: "Delete", enabled: false ,key:"service_delete"},
+    { name: "Status", enabled: false ,key:"service_update_status"},
     { name: "Manage Media", enabled: false },
   ]);
 
   const [bestServices, setBestServices] = useState([
-    { name: "Best Service", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Best Service", enabled: false, key:"best_service_get" },
+    { name: "Add", enabled: false,key:"best_service_create"},
+    { name: "Edit", enabled: false,key:"best_update" },
+    { name: "Delete", enabled: false,key:"best_delete" },
+    { name: "Status", enabled: false,key:"best_service_status" },
   ]);
 
   const [serviceSpecs, setServiceSpecs] = useState([
-    { name: "Service Specification", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Service Specification", enabled: false ,key:"service_specs_get"},
+    { name: "Add", enabled: false,key:"service_specs_create" },
+    { name: "Edit", enabled: false ,key:"service_specs_update"},
+    { name: "Delete", enabled: false,key:"service_specs_delete" },
+    { name: "Status", enabled: false,key:"service_specs_status" },
   ]);
 
   const [serviceFaq, setServiceFaq] = useState([
-    { name: "Service FAQ", enabled: false },
-    { name: "Add", enabled: false },
-    { name: "Edit", enabled: false },
-    { name: "Delete", enabled: false },
-    { name: "Status", enabled: false },
+    { name: "Service FAQ", enabled: false,key:"service_faq_get" },
+    { name: "Add", enabled: false, key:"service_faq_create"},
+    { name: "Edit", enabled: false ,key:"service_faq_update"},
+    { name: "Delete", enabled: false,key:"service_faq_delete" },
+    { name: "Status", enabled: false,key:"service_faq_status" },
   ]);
 
-  const [packages, setPackages] = useState([
-  { name: "Package", enabled: false },
-  { name: "Add", enabled: false },
-  { name: "Edit", enabled: false },
-  { name: "Delete", enabled: false },
-  { name: "Status", enabled: false },
-  { name: "Manage Media", enabled: false },
+ const [packages, setPackages] = useState([
+  { name: "Package", enabled: false, key: "package_get" },
+  { name: "Add", enabled: false, key: "package_create" },
+  { name: "Edit", enabled: false, key: "package_update" },
+  { name: "Delete", enabled: false, key: "package_delete" },
+  { name: "Status", enabled: false, key: "package_update_status" },
+  { name: "Manage Media", enabled: false, key: "package_manage_media" },
 ]);
 
 const [Leads,setleads]=useState([
-  {name:"leads",enabled:false},
-  {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+  {name:"leads",enabled:false,key:"leads_get"},
+  {name:"Add",enabled:false,key:"leads_create"},
+  {name:"Edit",enabled:false,key:"leads_update"},
+  {name:"Delete",enabled:false,key:"leads_delete"},
+  {name:"Status",enabled:false,key:"leads_update_status"},
   {name:"Adduser",enabled:false},
 ]);
 
-const [Franchises,setFranchises]=useState([
-  {name:"franchises",enabled:false},
-  {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+const [Franchises, setFranchises] = useState([
+  { name: "franchises", enabled: false, key: "franchise_get" },
+  { name: "Add", enabled: false, key: "franchise_create" },
+  { name: "Edit", enabled: false, key: "franchise_update" },
+  { name: "Delete", enabled: false, key: "franchise_delete" },
+  { name: "Status", enabled: false, key: "franchise_update_status" },
 ]);
 
-const [Franchisesuser,setFranchisesuser]=useState([
-  {name:"Franchises User",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
+const [Franchisesuser, setFranchisesuser] = useState([
+  { name: "Franchises User", enabled: false, key: "franchise_user_get" },
+  { name: "Edit", enabled: false, key: "franchise_user_update" },
+  { name: "Delete", enabled: false, key: "franchise_user_delete" },
+]);
+const [offers, setoffers] = useState([
+  { name: "offers", enabled: false, key: "offers_get" },
+  { name: "Add", enabled: false, key: "offers_create" },
+  { name: "Edit", enabled: false, key: "offers_update" },
+  { name: "Delete", enabled: false, key: "offers_delete" },
+  { name: "Status", enabled: false, key: "offers_update_status" },
 ]);
 
-const [offers,setoffers]=useState([
- {name:"offers",enabled:false},
-  {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+const [bestoffers, setbestoffers] = useState([
+  { name: "Best offers", enabled: false, key: "best_offers_get" },
+  { name: "Add", enabled: false, key: "best_offers_create" },
+  { name: "Edit", enabled: false, key: "best_offers_update" },
+  { name: "Delete", enabled: false, key: "best_offers_delete" },
+  { name: "Status", enabled: false, key: "best_offers_update_status" },
 ]);
 
-const [bestoffers,setbestoffers]=useState([
- {name:"Best offers",enabled:false},
-  {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+const [gifts, setgifts] = useState([
+  { name: "Gifts", enabled: false, key: "gifts_get" },
+  { name: "Add", enabled: false, key: "gifts_create" },
+  { name: "Edit", enabled: false, key: "gifts_update" },
+  { name: "Delete", enabled: false, key: "gifts_delete" },
+  { name: "Status", enabled: false, key: "gifts_update_status" },
+  { name: "Send Gift", enabled: false, key: "gifts_send" },
 ]);
 
-const [gifts,setgifts]=useState([
- {name:"Gifts",enabled:false},
-  {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
-  {name:"Send Gift",enabled:false},
+const [orders, setorders] = useState([
+  { name: "Orders", enabled: false, key: "orders_get" },
+  { name: "View", enabled: false, key: "orders_view" },
+  { name: "Delete", enabled: false, key: "orders_delete" },
+  { name: "Status", enabled: false, key: "orders_update_status" },
+  { name: "Invoice", enabled: false, key: "orders_invoice" },
+  { name: "Franchise Assigned", enabled: false, key: "orders_franchise_assign" },
 ]);
 
-const [orders,setorders]=useState([
- {name:"Orders",enabled:false},
-  {name:"View ",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
-  {name:"Invoice ",enabled:false},
-    {name:"Franchise Assigned  ",enabled:false},
+const [unallocatedorders, setunallocatedorders] = useState([
+  { name: "Unallocated Orders", enabled: false, key: "unallocated_orders_get" },
+  { name: "View", enabled: false, key: "unallocated_orders_view" },
+  { name: "Delete", enabled: false, key: "unallocated_orders_delete" },
+  { name: "Status", enabled: false, key: "unallocated_orders_update_status" },
+  { name: "Franchise Assigned", enabled: false, key: "unallocated_orders_franchise_assign" },
 ]);
 
-const [unallocatedorders,setunallocatedorders]=useState([
- {name:"unallocated Orders",enabled:false},
-  {name:"View ",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
-    {name:"Franchise Assigned  ",enabled:false},
+const [Accounts, setAccounts] = useState([
+  { name: "Accounts", enabled: false, key: "accounts_get" },
+  { name: "Income", enabled: false, key: "accounts_income" },
+  { name: "Franchise Fees", enabled: false, key: "accounts_franchise_fees" },
+  { name: "Franchise Outstandings", enabled: false, key: "accounts_franchise_outstandings" },
 ]);
 
-const [Accounts,setAccounts]=useState([
- {name:"Accounts",enabled:false},
-  {name:"Income ",enabled:false},
-  {name:"Franchise Fees",enabled:false},
-  {name:"Franchise Outstandings ",enabled:false},
-]);
 
 const [Payments,setPayments]=useState([
-  {name:"Payment",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
+  {name:"Payment",enabled:false,key:"payment_get"},
+ {name:"Add",enabled:false ,key:"payment_create"},
+  {name:"Edit",enabled:false,key:"payment_update"},
+  {name:"Delete",enabled:false,key:"payment_delete"},
 ]);
 
 const [CreditPlans,setCreditPlans]=useState([
- {name:"Credit Plans",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
-  {name:"Edit Credit Price",enabled:false},
+ {name:"Credit Plans",enabled:false,key:"create_plans_get"},
+ {name:"Add",enabled:false,key:"create_plans_create"},
+  {name:"Edit",enabled:false,key:"create_plans_update"},
+  {name:"Delete",enabled:false,key:"create_plans_delete"},
+  {name:"Status",enabled:false,key:"create_plans_status"},
+  {name:"Edit Credit Price",enabled:false,key:"create_plans_price"},
 ]);
 
 const [CustomePlans,setCustomePlans]=useState([
- {name:"Custome Plans",enabled:false},
+ {name:"Custome Plans",enabled:false,key:"custome_plans_get"},
 ]);
 
 const [ServiceRatings,setServiceRatings]=useState([
- {name:"Service Ratings",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Service Ratings",enabled:false,key:"service_rating_get"},
+ {name:"Add",enabled:false,key:"service_rating_create"},
+  {name:"Edit",enabled:false,key:"service_rating_update"},
+  {name:"Delete",enabled:false,key:"service_rating_delete"},
+  {name:"Status",enabled:false,key:"service_rating_status"},
 ]);
 
 const [PackageRatings,setPackageRatings]=useState([
- {name:"Package Ratings",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Package Ratings",enabled:false,key:"package_rating_get"},
+ {name:"Add",enabled:false,key:"package_rating_create"},
+  {name:"Edit",enabled:false,key:"package_rating_update"},
+  {name:"Delete",enabled:false,key:"package_rating_delete"},
+  {name:"Status",enabled:false,key:"package_rating_status"},
 ]);
 
 const [OrderReview,setOrderReview]=useState([
- {name:"Order Review",enabled:false},
+ {name:"Order Review",enabled:false,key:"order_review_get"},
 ]);
 
 const [Testimonial,setTestimonial]=useState([
- {name:"Testimonial",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Testimonial",enabled:false,key:"testimonial_get"},
+ {name:"Add",enabled:false,key:"testimonial_create"},
+  {name:"Edit",enabled:false,key:"testimonial_update"},
+  {name:"Status",enabled:false,key:"testimonial_status"},
 ]);
 
 const [Slider,setSlider]=useState([
- {name:"Slider",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Slider",enabled:false,key:"slide_image_get"},
+ {name:"Add",enabled:false,key:"slide_image_add"},
+  {name:"Edit",enabled:false,key:"slide_image_update"},
+  {name:"Delete",enabled:false,key:"slide_image_delete"},
+  {name:"Status",enabled:false,key:"slide_image_update_status"},
 ]);
 
 const [AboutUs,setAboutUs]=useState([
- {name:"About Us",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
+ {name:"About Us",enabled:false,key:"about_us_get"},
+ {name:"Add",enabled:false,key:"about_us_create"},
+  {name:"Edit",enabled:false,key:"about_us_update"},
+  {name:"Delete",enabled:false,key:"about_us_delete"},
 ]);
 
 const [Blog,setBlog]=useState([
- {name:"Blog",enabled:false},
- {name:"Add",enabled:false},
-  {name:"Edit",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Blog",enabled:false,key:"blog_get"},
+ {name:"Add",enabled:false,key:"blog_create"},
+  {name:"Edit",enabled:false,key:"blog_update"},
+  {name:"Delete",enabled:false,key:"blog_delete"},
+  {name:"Status",enabled:false,key:"blog_status"},
 ]);
 
 const [NewsLetter,setNewsLetter]=useState([
- {name:"News Letter",enabled:false},
- {name:"Send News Letter",enabled:false},
-  {name:"Delete",enabled:false},
+ {name:"News Letter",enabled:false,key:"newsletter_get"},
+ {name:"Send News Letter",enabled:false,key:"newsletter_send"},
+  {name:"Delete",enabled:false,key:"newsletter_delete"},
 ]);
 
 const [ReferralProgram,setReferralProgram]=useState([
- {name:"ReferralProgram",enabled:false},
+ {name:"ReferralProgram",enabled:false,key:"referral_program_get"},
 ]);
 
 const [RequestQuotes,setRequestQuotes]=useState([
- {name:"Request Quotes",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Request Quotes",enabled:false,key:"request_quotes_get"},
+  {name:"Delete",enabled:false, key:"request_quotes_delete"},
+  {name:"Status",enabled:false,key:"request_quotes_status"},
 ]);
 
 const [Followups,setFollowups]=useState([
- {name:"Followups  ",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Followups  ",enabled:false,key:"followups_get"},
+  {name:"Delete",enabled:false, key:"followups_delete"},
+  {name:"Status",enabled:false,key:"folloeups_status"},
 ]);
 
 const [Contact,setContact]=useState([
- {name:"Contact",enabled:false},
-  {name:"Delete",enabled:false},
-  {name:"Status",enabled:false},
+ {name:"Contact",enabled:false,key:"contact_get"},
+  {name:"Delete",enabled:false,key:"contact_delete"},
+  {name:"Status",enabled:false,key:"contact_status"},
 ]);
 
 const [FranchiseService, setFranchiseService] = useState([
-  { name: "Franchise Service", enabled: false },
-  { name: "Edit", enabled: false },
+  { name: "Franchise Service", enabled: false,key:"franchise_service_get" },
+  { name: "Edit", enabled: false ,key:"franchise_service_update"},
 ]);
 
 const [FranchiseOrders, setFranchiseOrders] = useState([
-  { name: "Franchise Orders", enabled: false },
-  { name: "View", enabled: false },
-  { name: "Status", enabled: false },
-  { name: "Invoice", enabled: false },
+  { name: "Franchise Orders", enabled: false,key:"franchise_orders_get" },
+  { name: "View", enabled: false, key:"franchise_orders_view"},
+  { name: "Status", enabled: false,key:"franchise_orders_status" },
+  { name: "Invoice", enabled: false,key:"franchise_orders_invoice" },
 ]);
 
 const [FranchiseTiming, setFranchiseTiming] = useState([
-  { name: "Franchise Timing", enabled: false },
-  { name: "Add", enabled: false },
-  { name: "Edit", enabled: false },
-  { name: "Delete", enabled: false },
+  { name: "Franchise Timing", enabled: false,key:"franchise_timing_get" },
+  { name: "Add", enabled: false,key:"franchise_timing_create"},
+  { name: "Edit", enabled: false ,key:"franchise_timing_update"},
+  { name: "Delete", enabled: false,key:"franchise_timing_delete"},
 ]);
 
 const [FranchiseWorker, setFranchiseWorker] = useState([
-  { name: "Franchise Worker", enabled: false },
-  { name: "Add", enabled: false },
-  { name: "Edit", enabled: false },
-  { name: "Delete", enabled: false },
-  { name: "Status", enabled: false },
+  { name: "Franchise Worker", enabled: false ,key:"franchise_worker_get"},
+  { name: "Add", enabled: false ,key:"franchise_worker_create"},
+  { name: "Edit", enabled: false ,key:"franchise_worker_update"},
+  { name: "Delete", enabled: false,key:"franchise_worker_delete" },
+  { name: "Status", enabled: false,key:"franchise_worker_status" },
 ]);
 
 const [ManageCredit, setManageCredit] = useState([
-  { name: "Manage Credit", enabled: false },
-  { name: "Add", enabled: false },
+  { name: "Manage Credit", enabled: false ,key:"manage_credit_get"},
+  { name: "Add", enabled: false,key:"manage_credit_create" },
 ]);
 
 const [Request, setRequest] = useState([
-  { name: "Request", enabled: false },
-  { name: "Delete", enabled: false },
-  { name: "Status", enabled: false },
+  { name: "Request", enabled: false ,key:"request_get"},
+  { name: "Delete", enabled: false ,key:"request_delete"},
+  { name: "Status", enabled: false,key:"request_status" },
 ]);
 
 const [FranchiseProfile, setFranchiseProfile] = useState([
-  { name: "Franchise Profile", enabled: false },
+  { name: "Franchise Profile", enabled: false ,key:"franchise_profile_get"},
 ]);
 
 const [Account, setAccount] = useState([
-  { name: "Account", enabled: false },
+  { name: "Account", enabled: false ,key:"account_get"},
 ]);
   // ===== Toggle Functions =====
   const toggleItem = (index, type) => {
@@ -696,7 +790,7 @@ if (type === "categories") setCategories(updated);
 )}
             </div>
           ))}
-   <button className={styles.btncreate}>Create Role</button>
+   <button className={styles.btncreate}  onClick={submitRole} disabled={loading}>   {loading ? "Saving..." : "Create Role"}</button>
         </div>
       </div>
     </Layout>

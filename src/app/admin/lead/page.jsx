@@ -89,7 +89,8 @@ useEffect(() => {
     franchise_email: selectedEmail,
     franchise_phone: selectedPhone,
     franchise_city: selectedCity?.value,
-    status: selectedStatus !== "" ? Number(selectedStatus) : undefined,
+    status: selectedStatus ? Number(selectedStatus === "PENDING" ? 0 :
+                                   selectedStatus === "ACCEPTED" ? 1 : 2) : undefined,
     category_list: selectedCategories.map(c => Number(c.value)),
   };
 
@@ -592,7 +593,7 @@ if (values.length > 0) {
 />
 
   </div>
-)}
+)}  
 
   </div>
   <div className={styles.middleRow}>
@@ -603,8 +604,8 @@ if (values.length > 0) {
     Show{" "}
     <select className={styles.select1} value={entriesPerPage} onChange={handleEntriesChange}>
       <option value={10}>10</option>
-      <option value={25}>25</option>
       <option value={50}>50</option>
+      <option value={100}>100</option>
     </select>{" "}
     entries
   </div>

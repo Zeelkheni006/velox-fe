@@ -10,7 +10,7 @@
   import { TbPolygon } from "react-icons/tb";  
     // import { fetchRequestedServices } from "../../api/manage_users/lead";
     import { getAllCountries, getallStates, getallCities } from "../../api/user-side/register-professional/location";
-    import {getFranchiseOwnersData} from "../../api/manage_users/franchise";
+    import {getFranchiseOwnersData,makeFranchise} from "../../api/manage_users/franchise";
     import { fetchGooglePoints } from "../../api/admin-franchise/franchise";
     import styles from "../styles/Franchises.module.css";
 
@@ -210,10 +210,65 @@ const [initialServices, setInitialServices] = useState([]);
       showPopup("❌ Failed to load points.", "error");
     }
   };
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        showPopup("✅ Franchise updated!");
-      };
+  // submit button code 
+   const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    // Prepare services
+    const serviceIds = selectedServices.map((s) => s.value);
+
+    // Prepare polygon points
+    let rawPolygonPoints = [];
+    if (polygonRef.current) {
+      const path = polygonRef.current.getPath();
+      for (let i = 0; i < path.getLength(); i++) {
+        const p = path.getAt(i);
+        rawPolygonPoints.push({ latitude: p.lat(), longitude: p.lng() });
+      }
+      // Close polygon
+      if (rawPolygonPoints.length > 0) {
+        rawPolygonPoints.push({
+          latitude: rawPolygonPoints[0].latitude,
+          longitude: rawPolygonPoints[0].longitude,
+        });
+      }
+    }
+
+    const payload = {
+      franchise_name: form.franchiseName,
+      franchise_email: form.email,
+      franchise_phone: form.mobile,
+      franchise_address: form.firstAddress,
+      franchise_country_id: Number(form.country) || null,
+      franchise_state_id: Number(form.state) || null,
+      franchise_city_id: Number(form.city) || null,
+      franchise_pincode: form.pincode,
+      latitude: Number(form.latitude) || 0,
+      longitude: Number(form.longitude) || 0,
+      commission: form.commission || 0,
+      delivery_hours: form.deliveryHours || 0,
+      delivery_minutes: form.deliveryMinutes || 0,
+      service_ids: serviceIds,
+      raw_polygon_points: rawPolygonPoints,
+      owner_email: ownerEmailParam,
+    };
+
+    showPopup("⏳ Submitting franchise...", "info");
+
+    const res = await makeFranchise(payload);
+
+    if (res.success) {
+      showPopup("✅ Franchise updated successfully!", "success");
+      router.push("/admin/franchises-user");
+    } else {
+      showPopup(res.message || "❌ Submission failed", "error");
+    }
+  } catch (err) {
+    console.error("Submit Error:", err);
+    showPopup(err.message || "❌ Something went wrong", "error");
+  }
+};
+
 
     const fetchFranchiseOwnerData = async (email) => {
   const res = await getFranchiseOwnersData(email);
@@ -283,6 +338,7 @@ useEffect(() => {
     window.history.replaceState(null, "", "/admin/franchises-user");
   }
 }, []);
+
       return (
         <Layout>
           <PopupAlert message={popupMessage} type={popupType} />
@@ -630,7 +686,7 @@ useEffect(() => {
               <button type="button" className={styles.submitBtn} onClick={handleLoadPoints}>
                 LOAD POINTS
               </button>
-              <button type="submit" className={styles.submitBtn}>UPDATE</button>
+              <button type="submit" className={styles.submitBtn}>SUBMIT</button>
             </form>
           </div>
         </Layout>
