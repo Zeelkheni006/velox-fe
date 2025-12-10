@@ -45,9 +45,10 @@ export const getFranchiseOwners = async (page = 1, perPage = 10) => {
 export const getFranchiseOwnersData = async (ownerEmail) => {
   try {
     const token = localStorage.getItem("token");
-    const url = `http://192.168.29.69:5000/api/v1/admin/manage-franchise/franchise-owners/get/franchise-owners-data`;
+    
 
-    const response = await fetch(url, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/get/franchise-owners-data`,
+       {
       method: "POST", // IMPORTANT
       headers: {
         "Content-Type": "application/json",
@@ -61,6 +62,41 @@ export const getFranchiseOwnersData = async (ownerEmail) => {
   } catch (err) {
     return { success: false, message: "Network error" };
   }
+};
+
+export const makeFranchise = async (payload) => {
+  const token = localStorage.getItem("access_token");
+  if (!token) throw new Error("Token missing");
+
+  // 📦 FormData setup
+  const formData = new FormData();
+
+  // Loop through payload keys
+  Object.keys(payload).forEach((key) => {
+    const value = payload[key];
+    // Array values (service_ids, raw_polygon_points) → JSON stringify
+    if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, value);
+    }
+  });
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/make-franchise`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // ❌ Don't set Content-Type when using FormData; browser sets it automatically
+      },
+      body: formData,
+    }
+  );
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to submit");
+  return data;
 };
 
 
