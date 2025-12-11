@@ -1,5 +1,5 @@
     "use client";
-    import React, { useState, useEffect, useRef } from "react";
+    import React, { useState, useEffect, useRef ,useMemo } from "react";
     import Layout from "../pages/page";
     import dynamic from "next/dynamic";
     import Script from "next/script";
@@ -12,8 +12,9 @@
     import { getAllCountries, getallStates, getallCities } from "../../api/user-side/register-professional/location";
     import {getFranchiseOwnersData,makeFranchise} from "../../api/manage_users/franchise";
     import { fetchGooglePoints } from "../../api/admin-franchise/franchise";
+    import {getServiceTitleIds } from "../../api/admin-service/category-list"
     import styles from "../styles/Franchises.module.css";
-
+const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
     export default function EditFranchise() {
       const router = useRouter();
       const searchParams = useSearchParams();
@@ -28,11 +29,14 @@
       const [serviceOptions, setServiceOptions] = useState([]);
       const [selectedServices, setSelectedServices] = useState([]);
 const ownerEmailParam = searchParams.get("owner_email");
-
+const [countryCode, setCountryCode] = useState("");
 const [initialServices, setInitialServices] = useState([]);
       const mapRef = useRef(null);
       const mapInstance = useRef(null);
       const polygonRef = useRef(null);
+const handleServiceChange = (selected) => {
+  setSelectedServices(selected || []);  // Avoid undefined
+};
 
       const [form, setForm] = useState({
         country: "",
@@ -211,61 +215,54 @@ const [initialServices, setInitialServices] = useState([]);
     }
   };
   // submit button code 
-   const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-  try {
-    // Prepare services
-    const serviceIds = selectedServices.map((s) => s.value);
 
-    // Prepare polygon points
-    let rawPolygonPoints = [];
-    if (polygonRef.current) {
-      const path = polygonRef.current.getPath();
-      for (let i = 0; i < path.getLength(); i++) {
-        const p = path.getAt(i);
-        rawPolygonPoints.push({ latitude: p.lat(), longitude: p.lng() });
-      }
-      // Close polygon
-      if (rawPolygonPoints.length > 0) {
-        rawPolygonPoints.push({
-          latitude: rawPolygonPoints[0].latitude,
-          longitude: rawPolygonPoints[0].longitude,
-        });
-      }
-    }
+  if (!polygonRef.current) return showPopup("Please draw polygon!", "error");
 
-    const payload = {
-      franchise_name: form.franchiseName,
-      franchise_email: form.email,
-      franchise_phone: form.mobile,
-      franchise_address: form.firstAddress,
-      franchise_country_id: Number(form.country) || null,
-      franchise_state_id: Number(form.state) || null,
-      franchise_city_id: Number(form.city) || null,
-      franchise_pincode: form.pincode,
-      latitude: Number(form.latitude) || 0,
-      longitude: Number(form.longitude) || 0,
-      commission: form.commission || 0,
-      delivery_hours: form.deliveryHours || 0,
-      delivery_minutes: form.deliveryMinutes || 0,
-      service_ids: serviceIds,
-      raw_polygon_points: rawPolygonPoints,
-      owner_email: ownerEmailParam,
-    };
+  // Collect polygon points
+  let rawPolygonPoints = [];
+  const path = polygonRef.current.getPath();
+  for (let i = 0; i < path.getLength(); i++) {
+    rawPolygonPoints.push({
+      latitude: path.getAt(i).lat(),
+      longitude: path.getAt(i).lng(),
+    });
+  }
 
-    showPopup("⏳ Submitting franchise...", "info");
+  if (rawPolygonPoints.length > 0) {
+    rawPolygonPoints.push({
+      latitude: rawPolygonPoints[0].latitude,
+      longitude: rawPolygonPoints[0].longitude,
+    });
+  }
 
-    const res = await makeFranchise(payload);
+  // Prepare FormData
+  const formData = new FormData();
+  formData.append("franchise_name", form.franchiseName);
+  formData.append("franchise_email", form.email);
+  formData.append("franchise_phone", form.mobile);
+  formData.append("franchise_address", form.firstAddress);
+  formData.append("franchise_country_id", form.country);
+  formData.append("franchise_state_id", form.state);
+  formData.append("franchise_city_id", form.city);
+  formData.append("franchise_pincode", form.pincode);
+  formData.append("worker_count", Number(form.workerCount) || 0); // number
+  formData.append("raw_polygon_points", JSON.stringify(rawPolygonPoints));
 
-    if (res.success) {
-      showPopup("✅ Franchise updated successfully!", "success");
-      router.push("/admin/franchises-user");
-    } else {
-      showPopup(res.message || "❌ Submission failed", "error");
-    }
-  } catch (err) {
-    console.error("Submit Error:", err);
-    showPopup(err.message || "❌ Something went wrong", "error");
+  // ✅ Send service_ids properly
+ formData.append(
+  "service_ids",
+  JSON.stringify(selectedServices.map(s => Number(s.value)))
+);
+  // Submit
+  const res = await makeFranchise(formData);
+
+  if (res.success) {
+    showPopup("✔ Franchise Updated Successfully", "success");
+    router.push("/admin/franchises-user");
+  } else {
+    showPopup(res.message || "Failed", "error");
   }
 };
 
@@ -286,7 +283,7 @@ const [initialServices, setInitialServices] = useState([]);
       : [];
 setSelectedServices(selected); // ✅ show in Select
     // Optional: also set serviceOptions if you want to allow new selections
-    setServiceOptions(selected);
+
 setInitialServices(selected); 
     setForm({
       country: f?.frachise_country_id?.id || "",
@@ -294,15 +291,10 @@ setInitialServices(selected);
       city: f?.franchise_city_id?.id || "",
       franchiseName: f?.franchise_name || "",
       firstAddress: f?.franchise_address || "",
-      secondAddress: "",
       mobile: f?.franchise_phone || "",
       commission: "",
       pincode: f?.franchise_pincode || "",
-      email: f?.franchise_email || "",
-      latitude: "",
-      longitude: "",
-      deliveryHours: "",
-      deliveryMinutes: "",
+      email: f?.franchise_email || "", 
       services: f?.service_list || "", // 🎉 Auto select services here
     });
 
@@ -338,6 +330,23 @@ useEffect(() => {
     window.history.replaceState(null, "", "/admin/franchises-user");
   }
 }, []);
+useEffect(() => {
+  loadServices();
+}, []);
+
+const loadServices = async () => {
+  try {
+    const services = await getServiceTitleIds();  // call API
+    setServiceOptions(services);                  // set dropdown options
+  } catch (err) {
+    console.error("Failed to load services:", err);
+  }
+};
+// const memoServiceOptions = useMemo(() => serviceOptions, [serviceOptions]);
+
+// const memoSelectedServices = useMemo(() => selectedServices, [selectedServices]);
+
+
 
       return (
         <Layout>
@@ -388,65 +397,65 @@ useEffect(() => {
     </button>
   </div>
 
-  <Select
+
+  <ReactSelect
     isMulti
-    options={serviceOptions}
-    value={selectedServices}
-    onChange={setSelectedServices}
+    options={serviceOptions}      // static
+    value={selectedServices}      // static
+    onChange={handleServiceChange}
+    closeMenuOnSelect={false}
+    hideSelectedOptions={false}
+    placeholder="Select services"
     styles={{
-      control: (base) => ({
-        ...base,
-        minHeight: "32px",
-        height: "35px",
-        fontSize: "13px",
-      }),
-      menu: (base) => ({
-        ...base,
-        fontSize: "12px",
-        minHeight: "15px",
-        padding: "0",
-      }),
+      control: (base) => ({ ...base, minHeight: "32px", height: "35px", fontSize: "13px" }),
       option: (base, state) => ({
         ...base,
         fontSize: "12px",
         padding: "4px 8px",
         backgroundColor: state.isFocused ? "#f1f1f1" : "white",
-        cursor: "pointer",
-      }),
-      valueContainer: (base) => ({
-        ...base,
-        height: "32px",
-        padding: "0 6px",
-      }),
-      indicatorsContainer: (base) => ({
-        ...base,
-        height: "32px",
+        color: "black",
       }),
     }}
   />
+
+
+
+
+
 </div>
                 {/* Country / State / City selects */}
                 <div>
                   <label>FRANCHISE COUNTRY</label>
-                <select
-      name="country"
-      value={form.country}
-      onChange={async (e) => {
-        const c = e.target.value;
-        const selectedCountry = countries.find(ct => ct.id.toString() === c.toString());
-        setForm({ ...form, country: c, state: "", city: "" });
-        if (selectedCountry) {
-          zoomToLocation({ name: selectedCountry.name });
-        }
-        if (c) setStates(await getallStates(c));
-      }}
-    >
+    <select
+  name="country"
+  value={form.country}
+  onChange={async (e) => {
+    const c = e.target.value;
+    const selectedCountry = countries.find(ct => ct.id.toString() === c.toString());
 
-                    <option value="">Select Country</option>
-                    {countries.map((c) => (
-                      <option key={c.id} value={c.id}>{c.name}</option>
-                    ))}
-                  </select>
+    setForm({
+      ...form,
+      country: c,
+      state: "",
+      city: "",
+      mobile: selectedCountry?.phonecode || "",
+      phoneCode: selectedCountry?.phonecode || "",
+    });
+
+    setCountryCode(selectedCountry?.phonecode || "");
+
+    if (selectedCountry) zoomToLocation({ name: selectedCountry.name });
+    if (c) setStates(await getallStates(c));
+  }}
+>
+  <option value="">Select Country</option>
+  {countries.map((c) => (
+    <option key={c.id} value={c.id}>{c.name}</option>
+  ))}
+</select>
+
+
+
                 </div>
 
                 <div>
@@ -494,8 +503,45 @@ useEffect(() => {
                 <div><label>FRANCHISE PINCODE</label><input name="pincode" value={form.pincode} onChange={handleChange} /></div>
                 <div className={styles.full}><label>FRANCHISE NAME</label><input name="franchiseName" value={form.franchiseName} onChange={handleChange} /></div>
                 <div className={styles.full}><label>FIRST ADDRESS</label><input name="firstAddress" value={form.firstAddress} onChange={handleChange} /></div>
-                <div><label>FRANCHISE MOBILE</label><input name="mobile" value={form.mobile} onChange={handleChange} /></div>
+<div>
+  <label>FRANCHISE MOBILE</label>
+  <input
+    type="text"
+    placeholder={countryCode}          // shows phone code inside
+    value={form.mobile.replace(countryCode, "")} // show only number part
+    onChange={async (e) => {
+      let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
+      const fullNumber = countryCode + numberPart;
+
+      setForm({ ...form, mobile: fullNumber });
+
+      showPopup("");
+
+      if (numberPart.length === 10) {
+        const res = await checkDuplicate("owner_phone", fullNumber);
+        if (res.success) {
+          showPopup("Phone number is available ✔", "success");
+        } else {
+          showPopup(res.message, "error");
+        }
+      }
+    }}
+    required
+  />
+</div>
+
+
+
                 <div><label>FRANCHISE EMAIL</label><input name="email" value={form.email} onChange={handleChange} /></div>
+               <div>
+  <label>WORKER COUNT</label>
+  <input
+    type="number"
+    name="workerCount"
+    value={form.workerCount || ""}
+    onChange={handleChange}
+  />
+</div>
                 <div><label>COMMISSION(%)</label><input name="commission" value={form.commission} onChange={handleChange} /></div>
                 <div><label>LATITUDE</label><input name="latitude" value={form.latitude} onChange={handleChange} /></div>
                 <div><label>LONGITUDE</label><input name="longitude" value={form.longitude} onChange={handleChange} /></div>
@@ -683,10 +729,8 @@ useEffect(() => {
   </div>
  
   </div>
-              <button type="button" className={styles.submitBtn} onClick={handleLoadPoints}>
-                LOAD POINTS
-              </button>
-              <button type="submit" className={styles.submitBtn}>SUBMIT</button>
+                <button type="submit" className={styles.submitBtn} onClick={handleLoadPoints}>SUBMit point</button>
+              <button type="submit" className={styles.submitBtn}  >SUBMIT</button>
             </form>
           </div>
         </Layout>

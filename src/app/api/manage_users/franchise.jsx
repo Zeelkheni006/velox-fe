@@ -64,23 +64,9 @@ export const getFranchiseOwnersData = async (ownerEmail) => {
   }
 };
 
-export const makeFranchise = async (payload) => {
+export const makeFranchise = async (formData) => {
   const token = localStorage.getItem("access_token");
   if (!token) throw new Error("Token missing");
-
-  // 📦 FormData setup
-  const formData = new FormData();
-
-  // Loop through payload keys
-  Object.keys(payload).forEach((key) => {
-    const value = payload[key];
-    // Array values (service_ids, raw_polygon_points) → JSON stringify
-    if (Array.isArray(value)) {
-      formData.append(key, JSON.stringify(value));
-    } else if (value !== undefined && value !== null) {
-      formData.append(key, value);
-    }
-  });
 
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/make-franchise`,
@@ -88,16 +74,17 @@ export const makeFranchise = async (payload) => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
-        // ❌ Don't set Content-Type when using FormData; browser sets it automatically
       },
-      body: formData,
+      body: formData,   // <-- use directly
     }
   );
 
   const data = await res.json();
-  if (!res.ok) throw new Error(data.message || "Failed to submit");
   return data;
 };
+
+
+
 
 
 
