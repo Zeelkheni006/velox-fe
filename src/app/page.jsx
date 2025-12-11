@@ -1,13 +1,13 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState  ,useEffect, useRef} from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectFade } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./main.css";
-import { useEffect } from 'react';
+import Script from "next/script";
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
 import { getSliders , getFullLocation , getCategories} from "./api/add-image/add-slider"; 
@@ -120,53 +120,6 @@ export default function Home() {
     const [fullLocation, setFullLocation] = useState("");
     const { popupMessage, popupType, showPopup } = usePopup();
     const [suggestions, setSuggestions] = useState([]);
-const fetchSuggestions = async (value) => {
-  if (!value) {
-    setSuggestions([]);
-    return;
-  }
-
-  try {
-    const res = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=8&q=${value}`,
-      {
-        headers: {
-          "User-Agent": "YourApp/1.0", // 🔥 Important for Nominatim
-        },
-      }
-    );
-
-    const data = await res.json();
-
-    // Convert raw data into city list
-    const cities = data.map((item) => {
-      const city =
-        item.address.city ||
-        item.address.town ||
-        item.address.village ||
-        item.address.hamlet ||
-        "";
-
-      const state = item.address.state || "";
-      const country = item.address.country || "";
-
-      return {
-        display: `${city}, ${state}, ${country}`,
-        city,
-        state,
-        country,
-        lat: item.lat,
-        lon: item.lon,
-      };
-    });
-
-    setSuggestions(cities);
-  } catch (err) {
-    console.error("Nominatim Error:", err);
-  }
-};
-
-
 
 
  useEffect(() => {
@@ -260,113 +213,164 @@ const fetchSuggestions = async (value) => {
     fetchStats();
   }, []);
 
-  return (
-    <main>
-<PopupAlert message={popupMessage} type={popupType} />
-      <section id="hero" className="heroSection">
+    const inputRef = useRef(null);
 
-        {loading ? (
-         <div className="spinnerWrapper">
-          <div className="spinner"></div>
+  useEffect(() => {
+    // Wait for Google script load
+    const interval = setInterval(() => {
+      if (window.google && window.google.maps) {
+        clearInterval(interval);
+        initGoogleAutocomplete();
+      }
+    }, 300);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const initGoogleAutocomplete = () => {
+    if (!inputRef.current) return;
+
+    const autocomplete = new window.google.maps.places.Autocomplete(
+      inputRef.current,
+      {
+        types: ["(cities)"], // only city search
+      }
+    );
+
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+
+      const city =
+        place.address_components?.find((ac) =>
+          ac.types.includes("locality")
+        )?.long_name || "";
+
+      const state =
+        place.address_components?.find((ac) =>
+          ac.types.includes("administrative_area_level_1")
+        )?.long_name || "";
+
+      const country =
+        place.address_components?.find((ac) =>
+          ac.types.includes("country")
+        )?.long_name || "";
+
+      const full = `${city}, ${state}, ${country}`;
+
+      setQuery(full);
+      setFullLocation(full);
+    });
+  };
+
+    return (
+      <main>
+  <PopupAlert message={popupMessage} type={popupType} />
+        <section id="hero" className="heroSection">
+
+          {loading ? (
+          <div className="spinnerWrapper">
+            <div className="spinner"></div>
+          </div>
+          ) : slides.length > 0 ? (
+          <Swiper
+    modules={[Navigation, Pagination, Autoplay, EffectFade]}
+    navigation
+    pagination={{ clickable: true }}
+    autoplay={{ delay: 5000, disableOnInteraction: false }}
+    effect="fade"
+    fadeEffect={{ crossFade: true }}
+    allowTouchMove={false} // Disable swipe
+    loop
+    className="absolute inset-0 w-full h-full -z-10"
+  >
+    {slides.map((slide, index) => (
+      <SwiperSlide key={slide.id || index}>
+        <div className="heroSlide">
+          <img
+            src={slide.image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}` : "https://via.placeholder.com/800x500"}
+            alt={slide.title || "Slide"}
+            className="heroSlide max-w-full max-h-full object-contain"
+          />
+          <div className="heroOverlay"></div>
+          <div className="heroContent">
+            <h1 className="heroTitle">{slide.title}</h1>
+            <div className="heroDesc" dangerouslySetInnerHTML={{ __html: slide.description || "" }} />
+          </div>
         </div>
-        ) : slides.length > 0 ? (
-         <Swiper
-  modules={[Navigation, Pagination, Autoplay, EffectFade]}
-  navigation
-  pagination={{ clickable: true }}
-  autoplay={{ delay: 5000, disableOnInteraction: false }}
-  effect="fade"
-  fadeEffect={{ crossFade: true }}
-  allowTouchMove={false} // Disable swipe
-  loop
-  className="absolute inset-0 w-full h-full -z-10"
->
-  {slides.map((slide, index) => (
-    <SwiperSlide key={slide.id || index}>
-      <div className="heroSlide">
-        <img
-          src={slide.image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}` : "https://via.placeholder.com/800x500"}
-          alt={slide.title || "Slide"}
-          className="heroSlide max-w-full max-h-full object-contain"
-        />
-        <div className="heroOverlay"></div>
-        <div className="heroContent">
-          <h1 className="heroTitle">{slide.title}</h1>
-          <div className="heroDesc" dangerouslySetInnerHTML={{ __html: slide.description || "" }} />
-        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+
+          ) : (
+            <p className="noSliders">No sliders available</p>
+        )}
+
+        {/* 🔥 Static Search Box */}
+        <div className="searchBox">
+    <form className="searchForm" >
+      <div className="searchInputWrapper">
+        
+        <span className="searchIcon"><FaSearch /></span>
+  <input
+    ref={inputRef}
+    type="text"
+    placeholder="Search City / State / Country"
+    className="searchInput"
+    value={query}
+    onChange={(e) => setQuery(e.target.value)}
+  />
+
+ <Script
+  src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
+  strategy="afterInteractive"
+/>
+
+        {/* 🔥 AUTOCOMPLETE DROPDOWN */}
+        {suggestions.length > 0 && (
+          <ul className="suggestionList">
+            {suggestions.map((item, index) => (
+              <li
+                key={index}
+                className="suggestionItem"
+                onClick={() => {
+                  setQuery(item.display);
+                  setSuggestions([]);
+                }}
+              >
+                {item.display}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <span className="locationIcon"><FaMapMarkerAlt /></span>
+
+        {query && (
+          <span
+            className="clearIcon"
+            onClick={() => {
+              setQuery("");
+              setFullLocation("");
+              setSuggestions([]);
+            }}
+          >
+            <FaTimesCircle />
+          </span>
+        )}
+
       </div>
-    </SwiperSlide>
-  ))}
-</Swiper>
 
-        ) : (
-          <p className="noSliders">No sliders available</p>
-      )}
+      <button type="submit" className="searchButton">
+        {loading ? "Loading..." : "Go"}
+      </button>
+    </form>
 
-      {/* 🔥 Static Search Box */}
-      <div className="searchBox">
-  <form className="searchForm" onSubmit={fetchSuggestions}>
-    <div className="searchInputWrapper">
-      
-      <span className="searchIcon"><FaSearch /></span>
+    {fullLocation && (
+      <p className="searchResult">📍 {fullLocation}</p>
+    )}
+  </div>
 
-      <input
-        type="text"
-        placeholder="Enter a location"
-        className="searchInput"
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          fetchSuggestions(e.target.value);
-        }}
-      />
-
-      {/* 🔥 AUTOCOMPLETE DROPDOWN */}
-      {suggestions.length > 0 && (
-        <ul className="suggestionList">
-          {suggestions.map((item, index) => (
-            <li
-              key={index}
-              className="suggestionItem"
-              onClick={() => {
-                setQuery(item.display);
-                setSuggestions([]);
-              }}
-            >
-              {item.display}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <span className="locationIcon"><FaMapMarkerAlt /></span>
-
-      {query && (
-        <span
-          className="clearIcon"
-          onClick={() => {
-            setQuery("");
-            setFullLocation("");
-            setSuggestions([]);
-          }}
-        >
-          <FaTimesCircle />
-        </span>
-      )}
-
-    </div>
-
-    <button type="submit" className="searchButton">
-      {loading ? "Loading..." : "Go"}
-    </button>
-  </form>
-
-  {fullLocation && (
-    <p className="searchResult">📍 {fullLocation}</p>
-  )}
-</div>
-
-    </section>
+      </section>
 
 <section className="services-section">
   {loading ? (

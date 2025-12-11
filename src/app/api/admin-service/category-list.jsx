@@ -111,6 +111,35 @@ export const updateService = async (id, data) => {
   return await response.json();
 };
 
+// /api/manage_users/service.js
+export const getServiceTitleIds = async () => {
+  try {
+    const token = localStorage.getItem("access_token"); // Or wherever you store it
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/service/get/title-ids`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || "Failed to fetch services");
+    }
+
+    // Map services to React-Select format
+    return Array.isArray(data.data.services)
+      ? data.data.services.map((s) => ({ label: s.title.trim(), value: s.id }))
+      : [];
+  } catch (err) {
+    console.error("Service fetch error:", err);
+    throw err;
+  }
+};
+
+
 
 
 

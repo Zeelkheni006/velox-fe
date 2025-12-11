@@ -449,34 +449,44 @@ const validateStep3 = () => {
       type="text"
       id="phone"
       maxLength={10}
+      className={
+        isValidPhone === false
+          ? "error"
+          : isValidPhone === true
+          ? "success"
+          : ""
+      }
       value={phone.replace(countryCode, "")}
       onChange={async (e) => {
         let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
         setPhone(countryCode + numberPart);
 
-        // clear message while typing
+        // Remove message while typing
         showPopup("");
 
-        // 👉 10 digits puri thay to auto API call
-       if (numberPart.length === 10) {
-  const res = await checkDuplicate("owner_phone", countryCode + numberPart);
+        // Check only when 10 digits are entered
+        if (numberPart.length === 10) {
+          const fullNumber = countryCode + numberPart;
+          const res = await checkDuplicate("owner_phone", fullNumber);
 
-  if (res.success) {
-    setIsValidPhone(true);
-    showPopup("Phone number is available ✔", "success");
-  } else {
-    setIsValidPhone(false);
-    showPopup(res.message, "error");
-  }
-}
-
+          if (res.success) {
+            setIsValidPhone(true); // success = green border
+            showPopup("Phone number is available ✔", "success");
+          } else {
+            setIsValidPhone(false); // error = red border
+            showPopup(res.message, "error");
+          }
+        } else {
+          setIsValidPhone(null); // reset border
+        }
       }}
       required
     />
 
-    <label htmlFor="phone">Phonenumber (will be use admin login)</label>
+    <label htmlFor="phone">Phone number (will be used for admin login)</label>
   </div>
 </div>
+
 
 </div>
           <div className="row">
@@ -492,31 +502,33 @@ const validateStep3 = () => {
 <input
   type="email"
   value={email}
+  className={isValidEmail === false ? "error-border" : ""}
   onChange={async (e) => {
     const value = e.target.value;
     setEmail(value);
     showPopup(""); // typing દરમિયાન clear
 
-    // ⛔ જો field ખાલી હોય તો skip
     if (!value) return;
 
-    // ✔ Valid full email only (with .com, .in, .org, .co etc…)
     const fullEmailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
 
-  if (fullEmailRegex.test(value)) {
-  const res = await checkDuplicate("owner_email", value);
+    if (fullEmailRegex.test(value)) {
+      const res = await checkDuplicate("owner_email", value);
 
-  if (res.success) {
-    setIsValidEmail(true);
-    showPopup("Email is available ✔", "success");
-  } else {
-    setIsValidEmail(false);
-    showPopup(res.message, "error");
-  }
-}
+      if (res.success) {
+        setIsValidEmail(true);
+        showPopup("Email is available ✔", "success");
+      } else {
+        setIsValidEmail(false);
+        showPopup(res.message, "error");
+      }
+    } else {
+      setIsValidEmail(null); // invalid format case
+    }
   }}
   required
 />
+
 <label>Email (will be use admin login)</label>
 
 
@@ -621,10 +633,17 @@ const validateStep3 = () => {
       type="text"
       id="phone"
       maxLength={10}
-      value={phone.replace(countryCode, "")}
+      className={
+        isValidPhone === false
+          ? "error"
+          : isValidPhone === true
+          ? "success"
+          : ""
+      }
+      value={franchisePhone.replace(countryCode, "")}
       onChange={async (e) => {
         let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
-        setPhone(countryCode + numberPart);
+        setFranchisePhone(countryCode + numberPart);
 
         // clear message while typing
         showPopup("");
@@ -661,10 +680,12 @@ const validateStep3 = () => {
         <div className="row">
 <input
   type="email"
-  value={email}
+  placeholder="Enter email"
+    className={isValidEmail === false ? "error-border" : ""}
+  value={franchiseEmail}
   onChange={async (e) => {
     const value = e.target.value;
-    setEmail(value);
+    setFranchiseEmail(value);
     showPopup(""); // typing દરમિયાન clear
 
     // ⛔ જો field ખાલી હોય તો skip
