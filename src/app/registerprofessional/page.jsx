@@ -82,6 +82,8 @@ const [franchiseCity, setFranchiseCity] = useState("");
 const [franchiseMessage, setFranchiseMessage] = useState("");
 const [isValidPhone, setIsValidPhone] = useState(true);
 const [isValidEmail, setIsValidEmail] = useState(true);
+const [clicked, setClicked] = useState(false);
+
 const [selectedCountry, setSelectedCountry] = useState(
   countries.length ? countries[0].id : ""
 );
@@ -924,11 +926,17 @@ const validateStep3 = () => {
         {/* Navigation buttons */}
         <div className="btnRow">
           <button type="button" className="nextBtn" onClick={() => setStep(2)}>← Back</button>
-     <button
+  <button
   type="button"
   className="nextBtn"
-  onClick={() => {
+  onClick={(e) => {
+    if (clicked) {
+      e.currentTarget.blur(); // 👈 second click → blur
+      return;
+    }
+
     if (validateStep3()) {
+      setClicked(true);
       handleFinalSubmit();
     }
   }}

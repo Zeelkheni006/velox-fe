@@ -161,7 +161,6 @@ const { popupMessage, popupType, showPopup } = usePopup();
   Create Franchise
 </button>
 
-
                     )}
                   </td>
                 </tr>

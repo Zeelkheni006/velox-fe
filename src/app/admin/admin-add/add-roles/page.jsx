@@ -114,7 +114,6 @@ const mapPermissions = (items, prefix) =>
   }
 };
 
-
   const [subCategories, setSubCategories] = useState([
     { name: "Sub Category", enabled: false ,key:"sub_category_get" },
     { name: "Add", enabled: false ,key:"sub_category_create"},
@@ -632,7 +631,7 @@ if (type === "categories") setCategories(updated);
                 title="Go to Dashboard"
               />
               <span> &gt; </span>
-              <span className={styles.active}>Edit Roles</span>
+              <span className={styles.active}>Add Roles</span>
             </div>
         </div>
 

@@ -69,7 +69,6 @@ export default function AdminAbout() {
     
   };
 
-  // ---------- Team Search & Pagination ----------
   const filteredTeam = useMemo(() => {
     return team.filter(t => t.name.toLowerCase().includes(teamSearch.toLowerCase()));
   }, [team, teamSearch]);
@@ -92,7 +91,7 @@ const SortArrow = ({ direction }) => (
   </span>
 );
 
-// Sorting handler
+
 const handleSort = (key) => {
   let direction = "asc";
   if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
@@ -100,10 +99,10 @@ const handleSort = (key) => {
   setSortConfig({ key: direction ? key : null, direction });
 };
 
-// Sorted & filtered team
+
 const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 
-// 🔹 Sorted & filtered team
+
 const sortedTeam = useMemo(() => {
   let filtered = team.filter(t =>
     t.name.toLowerCase().includes(teamSearch.toLowerCase()) ||
@@ -123,7 +122,7 @@ const sortedTeam = useMemo(() => {
 }, [team, teamSearch, sortConfig]);
 
   const goToDashboard = () => {
-    router.push("/admin/dashboard"); // Replace with your dashboard route
+    router.push("/admin/dashboard");
   };
   return (
     <Layout>
@@ -141,8 +140,7 @@ const sortedTeam = useMemo(() => {
                     <span className={styles.breadcrumbActive}>About</span>
                   </div>
                 </div>
-        {/* About Section */}
-
+   
         <section className={styles.section}>
           <h2>About Section</h2>
           <label>Title:</label>
@@ -180,7 +178,6 @@ const sortedTeam = useMemo(() => {
           </button>
         </section>
 
-        {/* Mission Section */}
         <section className={styles.section}>
           <h2>Mission Section</h2>
           <label>Title:</label>
@@ -218,7 +215,6 @@ const sortedTeam = useMemo(() => {
           </button>
         </section>
 
-        {/* Vision Section */}
         <section className={styles.section}>
           <h2>Vision Section</h2>
           <label>Title:</label>

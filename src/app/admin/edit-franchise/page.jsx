@@ -94,13 +94,13 @@ export default function EditFranchiseUser() {
             onChange={handleChange}
           />
 
-          <label>Profile Pic</label>
+          {/* <label>Profile Pic</label>
           <input
             type="file"
             name="file"
             accept="image/*"
             onChange={handleChange}
-          />
+          /> */}
 
           <label>Role</label>
           <select name="role" value={formData.role} onChange={handleChange}>

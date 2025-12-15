@@ -14,7 +14,7 @@ export const getStats = async () => {
     const json = await res.json();
     if (!json.success) return {};
 
-    return json.data[0]; // {City:11, Franchises:0, Happy Customer:10, Services:7}
+    return json.data[0]; 
   } catch (error) {
     console.error("Error fetching stats:", error);
     return {};

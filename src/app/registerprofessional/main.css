@@ -1066,3 +1066,7 @@ button:hover {
 .error-border {
     border: 1px solid red !important;
 }
+
+.nextBtn:focus {
+    outline: none;
+}

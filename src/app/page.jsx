@@ -103,12 +103,12 @@ const order = [
 const reviews = [
     {
       name: 'divya sagathiya',
-      image: '/images/user1.png', // replace with real image
+      image: '/images/profile.png', // replace with real image
       rating: 5,
     },
     {
       name: 'HIMAT VADHER',
-      image: '/images/user2.png',
+      image: '/images/profile.png',
       rating: 5,
     },
   ];
@@ -458,15 +458,34 @@ export default function Home() {
             </div>
 
             <div className="stat-card">
-              <div className="flex justify-center mb-3 stat-icon">
-                <Image
-                  src={stat.icon}
-                  alt={stat.label}
-                  width={50}
-                  height={50}
-                  unoptimized
-                />
-              </div>
+            <div className="stat-icon-wrapper">
+  <div className="flip-container">
+    <div className="flip-inner">
+      {/* FRONT */}
+      <div className="flip-face flip-front">
+        <Image
+          src={stat.icon}
+          alt={stat.label}
+          width={50}
+          height={50}
+          unoptimized
+        />
+      </div>
+
+      {/* BACK */}
+      <div className="flip-face flip-back">
+        <Image
+          src={stat.icon}
+          alt={stat.label}
+          width={50}
+          height={50}
+          unoptimized
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
               <h3 className="text-3xl font-bold text-orange-500 stat-value">{stat.value}</h3>
               <p className="text-gray-600 font-medium stat-label">{stat.label}</p>
             </div>

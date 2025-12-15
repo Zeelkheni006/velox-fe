@@ -16,11 +16,12 @@ export default function CustomerLogin() {
   const [showResetModal, setShowResetModal] = useState(false);
   const router = useRouter();
   const { popupMessage, popupType, showPopup } = usePopup();
-
+const isPhoneOnly = (v) => /^\d{0,10}$/.test(v);
+const isEmail = (v) => /\S+@\S+\.\S+/.test(v);
   const handleClose = () => router.push('/');
 
   // Helper: detect email vs phone
-  const isEmail = (value) => /\S+@\S+\.\S+/.test(value);
+ 
 
   // Step 1: Initiate login
   const handleContinue = async () => {
@@ -94,13 +95,42 @@ export default function CustomerLogin() {
 
           <h2 className="text-center text-xl font-medium mb-4">Login to your account</h2>
 
-          <input
-            type="text"
-            placeholder="Enter your phone or email"
-            className="w-full border border-gray-300 rounded px-3 py-2 mb-3"
-            value={loginValue}
-            onChange={(e) => setLoginValue(e.target.value)}
-          />
+        <input
+  type="text"
+  placeholder="Enter your phone or email"
+  className="w-full border border-gray-300 rounded px-3 py-2 mb-3"
+  value={loginValue}
+  onChange={(e) => {
+    let value = e.target.value;
+
+    // 🟢 If starts with letter OR contains '@' → EMAIL MODE
+    if (/^[a-zA-Z]/.test(value) || value.includes('@')) {
+      setLoginValue(value.replace(/^(\+91)/, '')); // ensure no +91
+      return;
+    }
+
+    // 🟢 PHONE MODE
+
+    // remove +91 if pasted
+    const rawNumber = value.replace(/^(\+91)/, '');
+
+    // allow only digits
+    if (!/^\d*$/.test(rawNumber)) return;
+
+    // limit 10 digits
+    if (rawNumber.length > 10) return;
+
+    // auto add +91
+    if (rawNumber.length > 0) {
+      setLoginValue(`+91${rawNumber}`);
+    } else {
+      setLoginValue('');
+    }
+  }}
+/>
+
+
+
 
           {showSuccess && mode === 'password' && (
             <input
@@ -112,13 +142,25 @@ export default function CustomerLogin() {
             />
           )}
 
-          {showSuccess && (
+          {showSuccess && ( 
             <div className="link-row">
               {mode === 'otp' && (
-                <a href="#" className="link-left" onClick={(e) => { e.preventDefault(); setMode('password'); }}>
-                  Login with password
-                </a>
+                // <a href="#" className="link-left" onClick={(e) => { e.preventDefault(); setMode('password'); }}>
+                //   Login with password
+                // </a>
+                 <a
+    href="#"
+    className="link-left"
+    onClick={(e) => {
+      e.preventDefault();
+      handleOtpLogin(); // same function
+    }}
+  >
+    Login with OTP
+  </a>
               )}
+
+               
               <a href="#" className="link-right" onClick={(e) => { e.preventDefault(); setShowResetModal(true); }}>
                 Forgot Password?
               </a>
@@ -131,7 +173,13 @@ export default function CustomerLogin() {
           ) : mode === 'password' ? (
             <button className="otp-btn" onClick={handlePasswordLogin}>Login</button>
           ) : (
-            <button className="otp-btn" onClick={handleOtpLogin}>Login with OTP</button>
+            <button
+    type="button"
+  className="otp-btn"
+    onClick={() => setMode('password')}
+  >
+    Login with password
+  </button>
           )}
         </div>
       </div>

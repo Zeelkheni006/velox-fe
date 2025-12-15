@@ -51,7 +51,7 @@ export default function ChangePasswordPage() {
   return (
     <Layout>
       <div className={styles.pageWrapper}>
-        {/* Breadcrumb */}
+      
         <div className={styles.headerContainer}>
           <div className={styles.breadcrumbWrapper}>
             <span className={styles.breadcrumb} style={{ cursor: "pointer" }}>

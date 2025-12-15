@@ -1,1750 +1,798 @@
 "use client";
 
-import React from "react";
-import styles from "../styles/roles.module.css";
 import Layout from "../pages/page";
-import ScrollToTopButton from "../components/ScrollToTopButton";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from 'react';
+import { useState } from "react";
+import { FaLayerGroup, FaNetworkWired, FaCogs, FaList,FaProjectDiagram,FaStore,
+  FaGift,FaTags,FaChartBar,FaCreditCard,FaStar,FaImage,FaGlobe,FaUserCog
+ } from "react-icons/fa";
+import styles from "../styles/roles.module.css";
+import { SlHome } from "react-icons/sl";
+import { useRouter } from "next/navigation";
+// import { addRole } from "../../api/manage_users/role";
+export default function ServiceDashboard() {
+  const [expanded, setExpanded] = useState("categories");
+  const [roleName, setRoleName] = useState("");
+  const router = useRouter();
+  // ===== Category lists =====
+  const [categories, setCategories] = useState([
+    { name: "Category", enabled: false, key:"category_get" },
+    { name: "Add", enabled: false , key: "category_create"},
+    { name: "Edit", enabled: false,key:"category_update" },
+    { name: "Delete", enabled: false,key:"category_delete" },
+    { name: "Status", enabled: false, key:"category_update_status"},
+  ]);
+ const [expandedPanel, setExpandedPanel] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-const AddRole = () => {
- 
- const searchParams = useSearchParams();
- const [roleName, setRoleName] = useState('');
+  const handleToggle = (name) => {
+    const updated = categories.map((c) =>
+      c.name === name ? { ...c, enabled: !c.enabled } : c
+    );
+    setCategories(updated);
 
-  const isEditMode = Boolean(roleName);
-
-  const [formData, setFormData] = useState({
-    name: '',
-    permissions: '',
-  });
-
-  // Dummy role data (same as in rolesData)
-  const rolesData = [
-    // ...paste your rolesData array here or import it
-  ];
-
-  useEffect(() => {
-    if (isEditMode) {
-      const roleToEdit = rolesData.find(role => role.name === roleName);
-      if (roleToEdit) {
-        setFormData({
-          name: roleToEdit.name,
-          permissions: roleToEdit.permissions.join(', '),
-        });
-      }
-    }
-  }, [roleName]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEditMode) {
-      // Call your "update" API
-      console.log("Saving updated role:", formData);
+    if (name === "Add") {
+      setExpandedPanel("categories");
     } else {
-      // Call your "create" API
-      console.log("Creating new role:", formData);
+      setExpandedPanel(null);
     }
   };
 
-const [sections, setSections] = useState({
-  category: { main: false, add: false, edit: false, delete: false, status: false },
-  subCategory: { main: false, add: false, edit: false, delete: false, status: false },
-  services: { main: false, add: false, edit: false, delete: false, status: false, manageMedia: false,   serviceFAQ: false },
-  bestServices:{main:false, add:false,edit:false,delete:false,status:false },
-  serviceSpecs:{main:false,add:false,edit:false,delete:false,status:false},
-  serviceFAQ:{main:false,add:false,edit:false,delete:false,status:false},
-  packages: { main: false, add: false, edit: false, delete: false, status: false, manageMedia: false },
-  leads: { main: false, add: false, edit: false, delete: false, status: false, addUser: false },
-  franchises: { main: false, add: false, edit: false, delete: false, status: false },
-  franchisesuser: { main: false, edit: false, delete: false },
-  offers: { main: false, add: false, edit: false, delete: false, status: false},
-  bestOffers:{ main: false, add: false, edit: false, delete: false, status: false },
-  gifts: { main: false, add: false, edit: false, delete: false, status: false, addUser: false},
-  sendGifts:{main:false},
-  orders: { main: false, view: false, delete: false, status: false, invoice: false, franchiseAssigned: false },
-  UnallocatedOrders:{ main: false, view: false, delete: false, status: false,  franchiseAssigned: false },
-  accounts: { main: false, income: false, franchiseFees: false, franchiseOutstandings: false },
-  payments: { main: false, add: false, edit: false, delete: false},
-  creditPlans:{main: false, add: false, edit: false, delete: false, status: false,editCreditPrice: false},
-  customPlans:{main: false},
-  serviceRating: {main : false,add: false, edit: false, delete: false, status: false},
-  packageRating:{main:false,add: false, edit: false, delete: false, status: false},
-  orderReview:{main:false},
-  testimonial:{main:false,add: false, edit: false, status: false},
-  slider: { main: false, add: false, edit: false, delete: false, status: false },
-  aboutUs: { main:false, add: false, edit: false, delete: false, },
-  blog:{main:false,add: false, edit: false, delete: false, status: false},
-  newsletter:{main:false ,SendNewsLetter:false,delete: false},
-  ReferralProgram :{main:false},
-  requestQuotes:{main:false,delete: false, status: false},
-  followUps:{main:false ,delete: false, status: false},
-  contact:{main:false ,delete: false, status: false},
-  franchiseservice: {main:false, edit: false },
-  franchiseorders:{main:false,view: false, status: false, invoice: false},
-  franchiseTiming:{main:false,add: false,edit:false,delete: false},
-  franchiseworker:{main:false,add: false,edit:false,delete: false,status:false},
-  manageCredit:{main:false,add: false},
-  request:{main:false,delete:false, status:false},
-  franchiseprofile:{main:false},
-account:{main:false},
-});
+//  const submitRole = async () => {
+//   if (!roleName.trim()) {
+//     alert("Please enter role name!");
+//     return;
+//   }
 
-  // Handle checkbox changes
- const handleSectionToggle = (sectionName, key) => {
-  setSections((prev) => {
-    const section = { ...prev[sectionName] };
-    section[key] = !section[key];
+// const mapPermissions = (items, prefix) =>
+//   items.filter(item => item.enabled && item.key)
+//        .map(item => item.key);
 
-    // ✅ If a dependent checkbox is turned ON → auto-enable parent
-    if (key !== "main" && section[key]) {
-      if ('main' in section) section.main = true;
-    }
+//   let permissions = [
+//     ...mapPermissions(categories, "category"),
+//     ...mapPermissions(subCategories, "sub_category"),
+//     ...mapPermissions(services, "service"),
+//     ...mapPermissions(bestServices, "best_service"),
+//     ...mapPermissions(serviceSpecs, "service_spec"),
+//     ...mapPermissions(serviceFaq, "service_faq"),
+//     ...mapPermissions(packages, "package"),
+//     ...mapPermissions(Leads, "leads"),
+//     ...mapPermissions(Franchises, "franchise"),
+//     ...mapPermissions(Franchisesuser, "franchise_user"),
+//     ...mapPermissions(offers, "offers"),
+//     ...mapPermissions(bestoffers, "best_offers"),
+//     ...mapPermissions(gifts, "gifts"),
+//     ...mapPermissions(orders, "orders"),
+//     ...mapPermissions(unallocatedorders, "unallocated_orders"),
+//     ...mapPermissions(Accounts, "accounts"),
+//     ...mapPermissions(Payments, "payments"),
+//     ...mapPermissions(CreditPlans, "credit_plans"),
+//     ...mapPermissions(CustomePlans, "custome_plans"),
+//     ...mapPermissions(ServiceRatings, "service_ratings"),
+//     ...mapPermissions(PackageRatings, "package_ratings"),
+//     ...mapPermissions(OrderReview, "order_review"),
+//     ...mapPermissions(Testimonial, "testimonial"),
+//     ...mapPermissions(Slider, "slider_image"),
+//     ...mapPermissions(AboutUs, "about_us"),
+//     ...mapPermissions(Blog, "blog"),
+//     ...mapPermissions(NewsLetter, "news_letter"),
+//     ...mapPermissions(ReferralProgram, "referral_program"),
+//     ...mapPermissions(RequestQuotes, "request_quotes"),
+//     ...mapPermissions(Followups, "followups"),
+//     ...mapPermissions(Contact, "contact"),
+//     ...mapPermissions(FranchiseService, "franchise_service"),
+//     ...mapPermissions(FranchiseOrders, "franchise_orders"),
+//     ...mapPermissions(FranchiseTiming, "franchise_timing"),
+//     ...mapPermissions(FranchiseWorker, "franchise_worker"),
+//     ...mapPermissions(ManageCredit, "manage_credit"),
+//     ...mapPermissions(Request, "request"),
+//     ...mapPermissions(FranchiseProfile, "franchise_profile"),
+//     ...mapPermissions(Account, "account"),
+//   ];
 
-    // ✅ If parent is turned OFF → turn OFF all dependents
-    if (key === "main" && !section[key]) {
-      Object.keys(section).forEach(k => section[k] = false);
-    }
+//     const payload = {
+//     name: roleName.trim(),
+//     permissions,
+//   };
 
-    return { ...prev, [sectionName]: section };
-  });
-};
+//    const token = localStorage.getItem("access_token");  // 👈 fetch here
+
+//   if (!token) {
+//     alert("Session expired, login again!");
+//     return;
+//   }
+
+//   try {
+//     const res = await addRole(payload, token);
+//     if (res?.success) {
+//       alert("Role created successfully!");
+//     } else {
+//       alert(res?.message || "Failed to create role.");
+//     }
+//   } catch (err) {
+//     console.error("Add role API error:", err);
+//     alert("Something went wrong!");
+//   }
+// };
+
+
+  const [subCategories, setSubCategories] = useState([
+    { name: "Sub Category", enabled: false ,key:"sub_category_get" },
+    { name: "Add", enabled: false ,key:"sub_category_create"},
+    { name: "Edit", enabled: false ,key:"sub_category_update"},
+    { name: "Delete", enabled: false,key:"sub_category_delete" },
+    { name: "Status", enabled: false,key:"sub_category_update_status" },
+  ]);
+
+  const [services, setServices] = useState([
+    { name: "Service", enabled: false ,key:"service_get"},
+    { name: "Add", enabled: false ,key:"service_create"},
+    { name: "Edit", enabled: false ,key:"service_update"},
+    { name: "Delete", enabled: false ,key:"service_delete"},
+    { name: "Status", enabled: false ,key:"service_update_status"},
+    { name: "Manage Media", enabled: false },
+  ]);
+
+  const [bestServices, setBestServices] = useState([
+    { name: "Best Service", enabled: false, key:"best_service_get" },
+    { name: "Add", enabled: false,key:"best_service_create"},
+    { name: "Edit", enabled: false,key:"best_update" },
+    { name: "Delete", enabled: false,key:"best_delete" },
+    { name: "Status", enabled: false,key:"best_service_status" },
+  ]);
+
+  const [serviceSpecs, setServiceSpecs] = useState([
+    { name: "Service Specification", enabled: false ,key:"service_specs_get"},
+    { name: "Add", enabled: false,key:"service_specs_create" },
+    { name: "Edit", enabled: false ,key:"service_specs_update"},
+    { name: "Delete", enabled: false,key:"service_specs_delete" },
+    { name: "Status", enabled: false,key:"service_specs_status" },
+  ]);
+
+  const [serviceFaq, setServiceFaq] = useState([
+    { name: "Service FAQ", enabled: false,key:"service_faq_get" },
+    { name: "Add", enabled: false, key:"service_faq_create"},
+    { name: "Edit", enabled: false ,key:"service_faq_update"},
+    { name: "Delete", enabled: false,key:"service_faq_delete" },
+    { name: "Status", enabled: false,key:"service_faq_status" },
+  ]);
+
+ const [packages, setPackages] = useState([
+  { name: "Package", enabled: false, key: "package_get" },
+  { name: "Add", enabled: false, key: "package_create" },
+  { name: "Edit", enabled: false, key: "package_update" },
+  { name: "Delete", enabled: false, key: "package_delete" },
+  { name: "Status", enabled: false, key: "package_update_status" },
+  { name: "Manage Media", enabled: false, key: "package_manage_media" },
+]);
+
+const [Leads,setleads]=useState([
+  {name:"leads",enabled:false,key:"leads_get"},
+  {name:"Add",enabled:false,key:"leads_create"},
+  {name:"Edit",enabled:false,key:"leads_update"},
+  {name:"Delete",enabled:false,key:"leads_delete"},
+  {name:"Status",enabled:false,key:"leads_update_status"},
+  {name:"Adduser",enabled:false},
+]);
+
+const [Franchises, setFranchises] = useState([
+  { name: "franchises", enabled: false, key: "franchise_get" },
+  { name: "Add", enabled: false, key: "franchise_create" },
+  { name: "Edit", enabled: false, key: "franchise_update" },
+  { name: "Delete", enabled: false, key: "franchise_delete" },
+  { name: "Status", enabled: false, key: "franchise_update_status" },
+]);
+
+const [Franchisesuser, setFranchisesuser] = useState([
+  { name: "Franchises User", enabled: false, key: "franchise_user_get" },
+  { name: "Edit", enabled: false, key: "franchise_user_update" },
+  { name: "Delete", enabled: false, key: "franchise_user_delete" },
+]);
+const [offers, setoffers] = useState([
+  { name: "offers", enabled: false, key: "offers_get" },
+  { name: "Add", enabled: false, key: "offers_create" },
+  { name: "Edit", enabled: false, key: "offers_update" },
+  { name: "Delete", enabled: false, key: "offers_delete" },
+  { name: "Status", enabled: false, key: "offers_update_status" },
+]);
+
+const [bestoffers, setbestoffers] = useState([
+  { name: "Best offers", enabled: false, key: "best_offers_get" },
+  { name: "Add", enabled: false, key: "best_offers_create" },
+  { name: "Edit", enabled: false, key: "best_offers_update" },
+  { name: "Delete", enabled: false, key: "best_offers_delete" },
+  { name: "Status", enabled: false, key: "best_offers_update_status" },
+]);
+
+const [gifts, setgifts] = useState([
+  { name: "Gifts", enabled: false, key: "gifts_get" },
+  { name: "Add", enabled: false, key: "gifts_create" },
+  { name: "Edit", enabled: false, key: "gifts_update" },
+  { name: "Delete", enabled: false, key: "gifts_delete" },
+  { name: "Status", enabled: false, key: "gifts_update_status" },
+  { name: "Send Gift", enabled: false, key: "gifts_send" },
+]);
+
+const [orders, setorders] = useState([
+  { name: "Orders", enabled: false, key: "orders_get" },
+  { name: "View", enabled: false, key: "orders_view" },
+  { name: "Delete", enabled: false, key: "orders_delete" },
+  { name: "Status", enabled: false, key: "orders_update_status" },
+  { name: "Invoice", enabled: false, key: "orders_invoice" },
+  { name: "Franchise Assigned", enabled: false, key: "orders_franchise_assign" },
+]);
+
+const [unallocatedorders, setunallocatedorders] = useState([
+  { name: "Unallocated Orders", enabled: false, key: "unallocated_orders_get" },
+  { name: "View", enabled: false, key: "unallocated_orders_view" },
+  { name: "Delete", enabled: false, key: "unallocated_orders_delete" },
+  { name: "Status", enabled: false, key: "unallocated_orders_update_status" },
+  { name: "Franchise Assigned", enabled: false, key: "unallocated_orders_franchise_assign" },
+]);
+
+const [Accounts, setAccounts] = useState([
+  { name: "Accounts", enabled: false, key: "accounts_get" },
+  { name: "Income", enabled: false, key: "accounts_income" },
+  { name: "Franchise Fees", enabled: false, key: "accounts_franchise_fees" },
+  { name: "Franchise Outstandings", enabled: false, key: "accounts_franchise_outstandings" },
+]);
+
+
+const [Payments,setPayments]=useState([
+  {name:"Payment",enabled:false,key:"payment_get"},
+ {name:"Add",enabled:false ,key:"payment_create"},
+  {name:"Edit",enabled:false,key:"payment_update"},
+  {name:"Delete",enabled:false,key:"payment_delete"},
+]);
+
+const [CreditPlans,setCreditPlans]=useState([
+ {name:"Credit Plans",enabled:false,key:"create_plans_get"},
+ {name:"Add",enabled:false,key:"create_plans_create"},
+  {name:"Edit",enabled:false,key:"create_plans_update"},
+  {name:"Delete",enabled:false,key:"create_plans_delete"},
+  {name:"Status",enabled:false,key:"create_plans_status"},
+  {name:"Edit Credit Price",enabled:false,key:"create_plans_price"},
+]);
+
+const [CustomePlans,setCustomePlans]=useState([
+ {name:"Custome Plans",enabled:false,key:"custome_plans_get"},
+]);
+
+const [ServiceRatings,setServiceRatings]=useState([
+ {name:"Service Ratings",enabled:false,key:"service_rating_get"},
+ {name:"Add",enabled:false,key:"service_rating_create"},
+  {name:"Edit",enabled:false,key:"service_rating_update"},
+  {name:"Delete",enabled:false,key:"service_rating_delete"},
+  {name:"Status",enabled:false,key:"service_rating_status"},
+]);
+
+const [PackageRatings,setPackageRatings]=useState([
+ {name:"Package Ratings",enabled:false,key:"package_rating_get"},
+ {name:"Add",enabled:false,key:"package_rating_create"},
+  {name:"Edit",enabled:false,key:"package_rating_update"},
+  {name:"Delete",enabled:false,key:"package_rating_delete"},
+  {name:"Status",enabled:false,key:"package_rating_status"},
+]);
+
+const [OrderReview,setOrderReview]=useState([
+ {name:"Order Review",enabled:false,key:"order_review_get"},
+]);
+
+const [Testimonial,setTestimonial]=useState([
+ {name:"Testimonial",enabled:false,key:"testimonial_get"},
+ {name:"Add",enabled:false,key:"testimonial_create"},
+  {name:"Edit",enabled:false,key:"testimonial_update"},
+  {name:"Status",enabled:false,key:"testimonial_status"},
+]);
+
+const [Slider,setSlider]=useState([
+ {name:"Slider",enabled:false,key:"slide_image_get"},
+ {name:"Add",enabled:false,key:"slide_image_add"},
+  {name:"Edit",enabled:false,key:"slide_image_update"},
+  {name:"Delete",enabled:false,key:"slide_image_delete"},
+  {name:"Status",enabled:false,key:"slide_image_update_status"},
+]);
+
+const [AboutUs,setAboutUs]=useState([
+ {name:"About Us",enabled:false,key:"about_us_get"},
+ {name:"Add",enabled:false,key:"about_us_create"},
+  {name:"Edit",enabled:false,key:"about_us_update"},
+  {name:"Delete",enabled:false,key:"about_us_delete"},
+]);
+
+const [Blog,setBlog]=useState([
+ {name:"Blog",enabled:false,key:"blog_get"},
+ {name:"Add",enabled:false,key:"blog_create"},
+  {name:"Edit",enabled:false,key:"blog_update"},
+  {name:"Delete",enabled:false,key:"blog_delete"},
+  {name:"Status",enabled:false,key:"blog_status"},
+]);
+
+const [NewsLetter,setNewsLetter]=useState([
+ {name:"News Letter",enabled:false,key:"newsletter_get"},
+ {name:"Send News Letter",enabled:false,key:"newsletter_send"},
+  {name:"Delete",enabled:false,key:"newsletter_delete"},
+]);
+
+const [ReferralProgram,setReferralProgram]=useState([
+ {name:"ReferralProgram",enabled:false,key:"referral_program_get"},
+]);
+
+const [RequestQuotes,setRequestQuotes]=useState([
+ {name:"Request Quotes",enabled:false,key:"request_quotes_get"},
+  {name:"Delete",enabled:false, key:"request_quotes_delete"},
+  {name:"Status",enabled:false,key:"request_quotes_status"},
+]);
+
+const [Followups,setFollowups]=useState([
+ {name:"Followups  ",enabled:false,key:"followups_get"},
+  {name:"Delete",enabled:false, key:"followups_delete"},
+  {name:"Status",enabled:false,key:"folloeups_status"},
+]);
+
+const [Contact,setContact]=useState([
+ {name:"Contact",enabled:false,key:"contact_get"},
+  {name:"Delete",enabled:false,key:"contact_delete"},
+  {name:"Status",enabled:false,key:"contact_status"},
+]);
+
+const [FranchiseService, setFranchiseService] = useState([
+  { name: "Franchise Service", enabled: false,key:"franchise_service_get" },
+  { name: "Edit", enabled: false ,key:"franchise_service_update"},
+]);
+
+const [FranchiseOrders, setFranchiseOrders] = useState([
+  { name: "Franchise Orders", enabled: false,key:"franchise_orders_get" },
+  { name: "View", enabled: false, key:"franchise_orders_view"},
+  { name: "Status", enabled: false,key:"franchise_orders_status" },
+  { name: "Invoice", enabled: false,key:"franchise_orders_invoice" },
+]);
+
+const [FranchiseTiming, setFranchiseTiming] = useState([
+  { name: "Franchise Timing", enabled: false,key:"franchise_timing_get" },
+  { name: "Add", enabled: false,key:"franchise_timing_create"},
+  { name: "Edit", enabled: false ,key:"franchise_timing_update"},
+  { name: "Delete", enabled: false,key:"franchise_timing_delete"},
+]);
+
+const [FranchiseWorker, setFranchiseWorker] = useState([
+  { name: "Franchise Worker", enabled: false ,key:"franchise_worker_get"},
+  { name: "Add", enabled: false ,key:"franchise_worker_create"},
+  { name: "Edit", enabled: false ,key:"franchise_worker_update"},
+  { name: "Delete", enabled: false,key:"franchise_worker_delete" },
+  { name: "Status", enabled: false,key:"franchise_worker_status" },
+]);
+
+const [ManageCredit, setManageCredit] = useState([
+  { name: "Manage Credit", enabled: false ,key:"manage_credit_get"},
+  { name: "Add", enabled: false,key:"manage_credit_create" },
+]);
+
+const [Request, setRequest] = useState([
+  { name: "Request", enabled: false ,key:"request_get"},
+  { name: "Delete", enabled: false ,key:"request_delete"},
+  { name: "Status", enabled: false,key:"request_status" },
+]);
+
+const [FranchiseProfile, setFranchiseProfile] = useState([
+  { name: "Franchise Profile", enabled: false ,key:"franchise_profile_get"},
+]);
+
+const [Account, setAccount] = useState([
+  { name: "Account", enabled: false ,key:"account_get"},
+]);
+  // ===== Toggle Functions =====
+  const toggleItem = (index, type) => {
+    let data;
+    if (type === "categories") data = [...categories];
+    else if (type === "subcategories") data = [...subCategories];
+    else if (type === "services") data = [...services];
+    else if (type === "bestservices") data = [...bestServices];
+    else if (type === "serviceSpecs") data = [...serviceSpecs];
+    else if (type === "serviceFaq") data = [...serviceFaq];
+    else if (type === "packages") data = [...packages];
+    else if(type === "Leads")data=[...Leads];
+    else if(type === "Franchises")data=[...Franchises];
+    else if(type === "Franchisesuser")data=[...Franchisesuser];
+    else if(type === "offers")data=[...offers];
+    else if(type === "bestoffers")data=[...bestoffers];
+    else if(type === "gifts")data=[...gifts];
+    else if(type === "orders")data=[...orders];
+    else if(type === "unallocatedorders")data=[...unallocatedorders];
+    else if(type === "Accounts")data=[...Accounts];
+    else if(type === "Payments")data=[...Payments];
+    else if(type === "CreditPlans")data=[...CreditPlans];
+     else if(type === "CustomePlans")data=[...CustomePlans];
+     else if(type === "ServiceRatings")data=[...ServiceRatings];
+     else if(type === "PackageRatings")data=[...PackageRatings ];
+     else if(type === "OrderReview")data=[...OrderReview];
+     else if(type === "Testimonial")data=[...Testimonial ];
+     else if(type === "Slider")data=[...Slider ];
+     else if(type === "AboutUs")data=[...AboutUs ];
+    else if(type === "Blog")data=[...Blog  ];
+     else if(type === "NewsLetter")data=[...NewsLetter];
+     else if(type === "ReferralProgram")data=[...ReferralProgram ];
+     else if(type === "RequestQuotes")data=[...RequestQuotes];
+     else if(type === "Followups")data=[...Followups];
+    else if(type === "Contact")data=[...Contact];
+     else if(type === "FranchiseService")data=[...FranchiseService];
+     else if(type === "FranchiseOrders")data=[...FranchiseOrders];
+     else if(type === "FranchiseTiming")data=[...FranchiseTiming];
+     else if(type === "FranchiseWorker")data=[...FranchiseWorker];
+     else if(type === "ManageCredit")data=[...ManageCredit];
+     else if(type === "Request")data=[...Request   ];
+     else if(type === "FranchiseProfile")data=[...FranchiseProfile];
+     else if(type === "Account")data=[...Account    ];
+
+    data[index].enabled = !data[index].enabled;
+
+    // Child ON → enable parent
+    if (index > 0 && data[index].enabled) data[0].enabled = true;
+
+    // All children OFF → disable parent
+    if (index > 0 && !data.slice(1).some((item) => item.enabled)) data[0].enabled = false;
+
+    // Parent OFF → disable all
+    if (index === 0 && !data[0].enabled) data.forEach((item) => (item.enabled = false));
+
+    if (type === "categories") setCategories(data);
+    else if (type === "subcategories") setSubCategories(data);
+    else if (type === "services") setServices(data);
+    else if (type === "bestservices") setBestServices(data);
+    else if (type === "serviceSpecs") setServiceSpecs(data);
+    else if (type === "serviceFaq") setServiceFaq(data);
+    else if (type === "packages") setPackages(data);
+    else if(type === "Leads")setleads(data);
+    else if(type === "Franchises")setFranchises(data);
+    else if(type === "Franchisesuser")setFranchisesuser(data);
+    else if(type === "offers")setoffers(data);
+    else if(type === "bestoffers")setbestoffers(data);
+    else if(type === "gifts")setgifts(data);
+    else if(type === "orders")setorders(data);
+    else if(type === "unallocatedorders")setunallocatedorders(data);
+    else if(type === "Accounts")setAccounts(data);
+    else if(type === "Payments")setPayments(data);
+    else if(type === "CreditPlans")setCreditPlans(data);
+    else if(type === "CustomePlans")setCustomePlans(data);
+    else if(type === "ServiceRatings ")setServiceRatings (data);
+    else if(type === "PackageRatings ")setPackageRatings (data);
+    else if(type === "OrderReview")setOrderReview(data);
+    else if(type === "Testimonial ")setTestimonial (data);
+    else if(type === "Slider")setSlider (data);
+    else if(type === "AboutUs")setAboutUs  (data);
+    else if(type === "Blog")setBlog(data);
+    else if(type === "NewsLetter")setNewsLetter (data);
+    else if(type === "ReferralProgram")setReferralProgram (data);
+    else if(type === "RequestQuotes")setRequestQuotes  (data);
+    else if(type === "Followups")setFollowups (data);
+    else if(type === "Contact")setContact  (data);
+    else if(type === "FranchiseService")setFranchiseService (data);
+    else if(type === "FranchiseOrders")setFranchiseOrders  (data);
+    else if(type === "FranchiseTiming")setFranchiseTiming  (data);
+    else if(type === "FranchiseWorker")setFranchiseWorker  (data);
+    else if(type === "ManageCredit")setManageCredit  (data);
+    else if(type === "Request")setRequest   (data);
+    else if(type === "FranchiseProfile")setFranchiseProfile   (data);
+    else if(type === "Account")setAccount  (data);
+         
+    else setServiceFaq(data);
+  };
+
+  const toggleAll = (checked, type) => {
+    let updated;
+      if (type === "categories") updated = categories.map((c) => ({ ...c, enabled: checked }));
+else if (type === "subcategories") updated = subCategories.map((c) => ({ ...c, enabled: checked }));
+else if (type === "services") updated = services.map((c) => ({ ...c, enabled: checked }));
+else if (type === "bestservices") updated = bestServices.map((c) => ({ ...c, enabled: checked }));
+else if (type === "serviceSpecs") updated = serviceSpecs.map((c) => ({ ...c, enabled: checked }));
+else if (type === "serviceFaq") updated = serviceFaq.map((c) => ({ ...c, enabled: checked }));
+else if (type === "packages") updated = packages.map((c) => ({ ...c, enabled: checked }));
+else if (type === "Leads")updated=Leads.map((c)=>({...c, enabled:checked}));
+else if (type ==="Franchises")updated=Franchises.map((c)=>({...c,enabled:checked}));
+else if(type ==="Franchisesuser")updated=Franchisesuser.map((c)=>({...c,enabled:checked}));
+else if(type === "offers")updated=offers.map((c)=>({...c,enabled:checked}));
+else if(type === "bestoffers")updated=bestoffers.map((c)=>({...c,enabled:checked}));
+else if(type === "gifts")updated=gifts.map((c)=>({...c,enabled:checked})); 
+else if(type === "orders")updated=orders.map((c)=>({...c,enabled:checked})); 
+else if(type === "unallocatedorders")updated=unallocatedorders.map((c)=>({...c,enabled:checked})); 
+else if(type === "Payments")updated=Payments.map((c)=>({...c, enabled:checked}));
+else if(type === "CreditPlans")updated=CreditPlans.map((c)=>({...c, enabled:checked}));
+else if(type === "CustomePlans")updated=CustomePlans.map((c)=>({...c, enabled:checked}));
+else if(type === "ServiceRatings ")updated=ServiceRatings .map((c)=>({...c, enabled:checked}));
+else if(type === "PackageRatings ")updated=PackageRatings .map((c)=>({...c, enabled:checked}));
+else if(type === "OrderReview")updated=OrderReview.map((c)=>({...c, enabled:checked}));
+else if(type === "Testimonial")updated=Testimonial .map((c)=>({...c, enabled:checked}));
+else if(type === "Slider")updated=Slider .map((c)=>({...c, enabled:checked}));
+else if(type === "AboutUs ")updated=AboutUs  .map((c)=>({...c, enabled:checked}));
+else if(type === "Blog ")updated=Blog  .map((c)=>({...c, enabled:checked}));
+else if(type === "NewsLetter")updated=NewsLetter .map((c)=>({...c, enabled:checked}));
+else if(type === "ReferralProgram")updated=ReferralProgram .map((c)=>({...c, enabled:checked}));
+else if(type === "RequestQuotes")updated=RequestQuotes .map((c)=>({...c, enabled:checked}));
+else if(type === "Followups")updated=Followups  .map((c)=>({...c, enabled:checked}));
+else if(type === "Contact")updated=Contact  .map((c)=>({...c, enabled:checked}));
+else if(type === "FranchiseService")updated=FranchiseService  .map((c)=>({...c, enabled:checked}));
+else if(type === "FranchiseOrders")updated=FranchiseOrders  .map((c)=>({...c, enabled:checked}));
+else if(type === "FranchiseTiming")updated=FranchiseTiming .map((c)=>({...c, enabled:checked}));
+else if(type === "FranchiseWorker")updated=FranchiseWorker  .map((c)=>({...c, enabled:checked}));
+else if(type === "ManageCredit")updated=ManageCredit  .map((c)=>({...c, enabled:checked}));
+else if(type === "Request")updated=Request  .map((c)=>({...c, enabled:checked}));
+else if(type === "FranchiseProfile")updated=FranchiseProfile  .map((c)=>({...c, enabled:checked}));
+else if(type === "Account")updated=Account   .map((c)=>({...c, enabled:checked}));
+
+
+
+
+   
+if (type === "categories") setCategories(updated);
+    else if (type === "subcategories") setSubCategories(updated);
+    else if (type === "services") setServices(updated);
+    else if (type === "bestservices") setBestServices(updated);
+    else if (type === "serviceSpecs") setServiceSpecs(updated);
+    else if (type === "serviceFaq") setServiceFaq(updated);
+    else if (type === "packages") setPackages(updated);
+    else if(type==="Leads")setleads(updated);
+    else if(type === "Franchises")setFranchises(updated);
+    else if(type === "Franchisesuser")setFranchisesuser(updated);
+    else if(type === "offers")setoffers(updated);
+    else if(type === "bestoffers")setbestoffers(updated);
+    else if(type === "gifts")setgifts(updated);
+    else if(type === "orders")setorders(updated);
+    else if(type === "unallocatedorders")setunallocatedorders(updated);
+    else if(type === "Accounts")setAccounts(updated);
+    else if(type === "Payments")setPayments(updated);
+    else if(type === "CreditPlans")setCreditPlans(updated);
+    else if(type === "CustomePlans")setCustomePlans(updated);
+    else if(type === "ServiceRatings")setServiceRatings(updated);
+    else if(type === "PackageRatings")setPackageRatings(updated);
+    else if(type === "OrderReview")setOrderReview(updated);
+    else if(type === "Testimonial")setTestimonial(updated);
+    else if(type === "Slider")setSlider(updated);
+    else if(type === "AboutUs")setAboutUs (updated);
+    else if(type === "Blog")setBlog (updated);
+    else if(type === "NewsLetter")setNewsLetter(updated);
+    else if(type === "ReferralProgram")setReferralProgram(updated);
+    else if(type === "RequestQuotes")setRequestQuotes(updated);
+    else if(type === "Followups")setFollowups(updated);
+    else if(type === "Contact")setContact (updated);
+    else if(type === "FranchiseService")setFranchiseService (updated);
+    else if(type === "FranchiseOrders")setFranchiseOrders (updated);
+    else if(type === "FranchiseTiming")setFranchiseTiming (updated);
+    else if(type === "FranchiseWorker")setFranchiseWorker (updated);
+    else if(type === "ManageCredit")setManageCredit (updated);
+    else if(type === "Request")setRequest (updated);
+    else if(type === "FranchiseProfile")setFranchiseProfile (updated);
+    else if(type === "Account")setAccount (updated);
+
+
+  };
+
+  // ===== Panels =====
+  const panels = [
+    {id: "categories", title: "Categories", icon: <FaLayerGroup /> },
+    {id: "subcategories", title: "Sub Categories", icon: <FaNetworkWired /> },
+    {id: "services", title: "Services", icon: <FaCogs /> },
+    {id: "packages", title: "Packages", icon: <FaList /> },
+    {id:"Leads",title:"Leads",icon:<FaProjectDiagram/>},
+    {id:"Franchises",title:"Franchises",icon:<FaStore/>},
+    {id:"offers",title:"Offers",icon:<FaGift/>},
+    {id:"gifts",title:"Gifts",icon:<FaGift/>},
+    {id:"orders",title:"Orders",icon:<FaTags/>},
+    {id:"Accounts",title:"Accounts",icon:<FaChartBar/>},
+    {id:"Payments",title:"Payments",icon:<FaCreditCard/>},
+    {id:"Ratings",title:"Ratings",icon:<FaStar/>},
+    {id:"Slider",title:"Slider",icon:<FaImage/>},
+     {id:"Manage Pages",title:"Manage Pages",icon:<FaGlobe/>},
+    {id: "franchiseOnly", title: "Franchise (Only For Franchise Role)", icon: <FaUserCog />}
+  ];
+
+  // ===== Render panel body =====
+  const renderPanelBody = (items, type) => (
+    <div className={styles.panelBody}>
+      <div className={styles.actionsRow}>
+        <label className={styles.selectAll}>
+          <input type="checkbox" onChange={(e) => toggleAll(e.target.checked, type)} />
+          Select All {type}
+        </label>
+      </div>
+
+      <div className={styles.grid}>
+        {items.map((item, i) => (
+          <div key={i} className={styles.categoryItem}>
+            <label className={styles.categoryLabel}>{item.name}</label>
+            <label className={styles.switch}>
+              <input type="checkbox" checked={item.enabled} onChange={() => toggleItem(i, type)} />
+              <span className={styles.slider}></span>
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+       const goToDashboard = () => {
+    router.push("/admin/dashboard"); // Replace with your dashboard route
+  };
+
+    const goToRoles = () => {
+    router.push("/admin/roles"); // roles page
+  };
+  // ===== Render page =====
   return (
     <Layout>
-       <div className={styles.container1}>
-                   <div className={styles.header}>
-               <div className={styles.breadcrumb}>
-                 <span>Roles</span> &gt; <span className={styles.active}>Add Roles</span>
-               </div>
-     
-             </div>
-     
-             <div className={styles.card1}>
-               <h2 className={styles.name}>NAME *</h2>
-               <input
-                 type="text"
-                 value={roleName}
-                 onChange={(e) => setRoleName(e.target.value)}
-                 placeholder="Enter role name"
-                 className={styles.input}
-                 // optional: prevent changing role name during edit
-               />
-     
-               <h2 className={styles.cardTitle1}>Permissions</h2>
-     
-               {/* Category Permission Row */}
-             <div className={styles.permissionSection}>
-             <h3 className={styles.sectionHeading}>
-         Category
-         {/* Master toggle button for the entire category */}
-         <input
-           type="checkbox"
-           className={styles.toggle1}
-           checked={
-             sections.category.main &&
-             sections.category.add &&
-             sections.category.edit &&
-             sections.category.delete &&
-             sections.category.status
-           }
-           onChange={(e) => {
-             const checked = e.target.checked;
-             setSections((prev) => ({
-               ...prev,
-               category: {
-                 main: checked,
-                 add: checked,
-                 edit: checked,
-                 delete: checked,
-                 status: checked,
-               },
-             }));
-           }}
-         />
-       </h3>
-      
-           <div className={styles.permissionRow}>
-        <div className={styles.permissionGroup}>
-       <label className={styles.permissionLabel}>CATEGORIES *</label>
-       <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.category.main}
-         onChange={() => handleSectionToggle("category", "main")}
-       />
-     </div>
-     
-        <div className={styles.permissionGroup}>
-       <label className={styles.permissionLabel}>ADD *</label>
-       <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.category.add}
-         onChange={() => handleSectionToggle("category", "add")}
-       />
-     </div>
-     
-          <div className={styles.permissionGroup}>
-       <label className={styles.permissionLabel}>EDIT *</label>
-       <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.category.edit}
-         onChange={() => handleSectionToggle("category", "edit")}
-       />
-     </div>
-     
-             <div className={styles.permissionGroup}>
-               <label className={styles.permissionLabel}>DELETE *</label>
-               <input
-                 type="checkbox"
-                 className={styles.toggle}
-                 checked={sections.category.delete}
-                 onChange={() => handleSectionToggle("category","delete")}
-               />
-             </div>
-     
-             <div className={styles.permissionGroup}>
-               <label className={styles.permissionLabel}>STATUS *</label>
-               <input
-                 type="checkbox"
-                 className={styles.toggle}
-                 checked={sections.category.status}
-                 onChange={() => handleSectionToggle("category","status")}
-               />
-             </div>
-           </div>
-         </div>
-                 <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Sub Category
-                       <input
-           type="checkbox"
-           className={styles.toggle1}
-           checked={
-             sections.subCategory.main &&
-             sections.subCategory.add &&
-             sections.subCategory.edit &&
-             sections.subCategory.delete &&
-             sections.subCategory.status
-           }
-           onChange={(e) => {
-             const checked = e.target.checked;
-             setSections((prev) => ({
-               ...prev,
-               subCategory: {
-                 main: checked,
-                 add: checked,
-                 edit: checked,
-                 delete: checked,
-                 status: checked,
-               },
-             }));
-           }}
-         />
-                 </h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SUB CATEGORY *</label>
-                     <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.subCategory.main}
-         onChange={() => handleSectionToggle("subCategory", "main")}
-       />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.subCategory.add}
-         onChange={() => handleSectionToggle("subCategory", "add")}
-       />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                   <input
-         type="checkbox"
-         className={styles.toggle}
-         checked={sections.subCategory.edit}
-         onChange={() => handleSectionToggle("subCategory", "edit")}
-       />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.subCategory.delete}
-             onChange={() => handleSectionToggle("subCategory", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.subCategory.status}
-             onChange={() => handleSectionToggle("subCategory", "status")}
-           />
-                   </div>
-                 </div>
-               </div>  
-                <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Services</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SERVICES *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.main}
-             onChange={() => handleSectionToggle("services", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.add}
-             onChange={() => handleSectionToggle("services", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.edit}
-             onChange={() => handleSectionToggle("services", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.delete}
-             onChange={() => handleSectionToggle("services", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.status}
-             onChange={() => handleSectionToggle("services", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>MANAGE MEDIA *</label>
-                                 <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.services.manageMedia}
-             onChange={() => handleSectionToggle("services", "manageMedia")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>BEST SERVICES  *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestServices.main}
-             onChange={() => handleSectionToggle("bestServices", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestServices.add}
-             onChange={() => handleSectionToggle("bestServices", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestServices.edit}
-             onChange={() => handleSectionToggle("bestServices", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestServices.delete}
-             onChange={() => handleSectionToggle("bestServices", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestServices.status}
-             onChange={() => handleSectionToggle("bestServices", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SERVICE SPECIFICATIONS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceSpecs.main}
-             onChange={() => handleSectionToggle("serviceSpecs", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceSpecs.add}
-             onChange={() => handleSectionToggle("serviceSpecs", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceSpecs.edit}
-             onChange={() => handleSectionToggle("serviceSpecs", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceSpecs.delete}
-             onChange={() => handleSectionToggle("serviceSpecs", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceSpecs.status}
-             onChange={() => handleSectionToggle("serviceSpecs", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SERVICE FAQ *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceFAQ.main}
-             onChange={() => handleSectionToggle("serviceFAQ", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceFAQ.add}
-             onChange={() => handleSectionToggle("serviceFAQ", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceFAQ.edit}
-             onChange={() => handleSectionToggle("serviceFAQ", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceFAQ.delete}
-             onChange={() => handleSectionToggle("serviceFAQ", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceFAQ.status}
-             onChange={() => handleSectionToggle("serviceFAQ", "status")}
-           />
-                   </div>
-                 </div>
-               </div>
-                    <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Packages</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>PACKAGES *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.main}
-             onChange={() => handleSectionToggle("packages", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                   <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.add}
-             onChange={() => handleSectionToggle("packages", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.edit}
-             onChange={() => handleSectionToggle("packages", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.delete}
-             onChange={() => handleSectionToggle("packages", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.status}
-             onChange={() => handleSectionToggle("packages", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>MANAGE MEDIA *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packages.manageMedia}
-             onChange={() => handleSectionToggle("packages", "manageMedia")}
-           />
-                   </div>
-                 </div>
-               </div>
-                      <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Leads</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>LEADS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.main}
-             onChange={() => handleSectionToggle("leads", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.add}
-             onChange={() => handleSectionToggle("leads", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.edit}
-             onChange={() => handleSectionToggle("leads", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.delete}
-             onChange={() => handleSectionToggle("leads", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.status}
-             onChange={() => handleSectionToggle("leads", "status")}
-           />
-                   </div>
-                    <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD USER *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.leads.addUser }
-             onChange={() => handleSectionToggle("leads", "addUser ")}
-           />
-                   </div>
-                 </div>
-               </div>
-                     <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Franchises</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISES *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchises.main}
-             onChange={() => handleSectionToggle("franchises", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchises.add}
-             onChange={() => handleSectionToggle("franchises", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchises.edit}
-             onChange={() => handleSectionToggle("franchises", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchises.delete}
-             onChange={() => handleSectionToggle("franchises", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchises.status}
-             onChange={() => handleSectionToggle("franchises", "status")}
-           />
-                   </div>
-                 </div>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISES USER*</label>
-                           <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchisesuser.main}
-             onChange={() => handleSectionToggle("franchisesuser", "main")}
-           />
-                   </div>
-                   
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchisesuser.edit}
-             onChange={() => handleSectionToggle("franchisesuser", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchisesuser.delete}
-             onChange={() => handleSectionToggle("franchisesuser", "delete")}
-           />
-                   </div>
-                 </div>
-               </div>
-                 <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Offers</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>OFFERS *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.offers.main}
-             onChange={() => handleSectionToggle("offers", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.offers.add}
-             onChange={() => handleSectionToggle("offers", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.offers.edit}
-             onChange={() => handleSectionToggle("offers", "edit")}
-           />  
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.offers.delete}
-             onChange={() => handleSectionToggle("offers", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.offers.status}
-             onChange={() => handleSectionToggle("offers", "status")}
-           />
-                   </div>
-                 </div>
-                   <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>BEST OFFERS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestOffers .main}
-             onChange={() => handleSectionToggle("bestOffers", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestOffers.add}
-             onChange={() => handleSectionToggle("bestOffers", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestOffers.edit}
-             onChange={() => handleSectionToggle("bestOffers", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestOffers.delete}
-             onChange={() => handleSectionToggle("bestOffers", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.bestOffers.status}
-             onChange={() => handleSectionToggle("bestOffers", "status")}
-           />
-                   </div>
-                 </div>
-               </div>
-                     <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Gifts</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>GIFTS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.main}
-             onChange={() => handleSectionToggle("gifts", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.add}
-             onChange={() => handleSectionToggle("gifts", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.edit}
-             onChange={() => handleSectionToggle("gifts", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.delete}
-             onChange={() => handleSectionToggle("gifts", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                           <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.status}
-             onChange={() => handleSectionToggle("gifts", "status")}
-           />
-                   </div>
-                    <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD USER *</label>
-                           <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.gifts.status}
-             onChange={() => handleSectionToggle("gifts", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SEND GIFTS *</label>
-                                  <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.sendGifts.main}
-             onChange={() => handleSectionToggle("sendGifts", "main")}
-           />
-                   </div>
-                 </div>
-               </div>
-               <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Orders</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ORDERS *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.main}
-             onChange={() => handleSectionToggle("orders", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>VIEW *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.view}
-             onChange={() => handleSectionToggle("orders", "view")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.delete}
-             onChange={() => handleSectionToggle("orders", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.status}
-             onChange={() => handleSectionToggle("orders", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>INVOICE *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.invoice}
-             onChange={() => handleSectionToggle("orders", "invoice")}
-           />
-                   </div>
-                    <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE ASSIGNED *</label>
-                                   <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orders.franchiseAssigned}
-             onChange={() => handleSectionToggle("orders", "franchiseAssigned")}
-           />
-                   </div>
-                 </div>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>UNALLOCATED ORDERS *</label>
-                                   <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.UnallocatedOrders.main}
-             onChange={() => handleSectionToggle("UnallocatedOrders", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>VIEW *</label>
-                                <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.UnallocatedOrders.view}
-             onChange={() => handleSectionToggle("UnallocatedOrders", "view")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.UnallocatedOrders.delete}
-             onChange={() => handleSectionToggle("UnallocatedOrders", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.UnallocatedOrders.status}
-             onChange={() => handleSectionToggle("UnallocatedOrders", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE ASSIGNED *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.UnallocatedOrders.franchiseAssigned}
-             onChange={() => handleSectionToggle("UnallocatedOrders", "franchiseAssigned")}
-           />
-                   </div>
-                 </div>
-               </div>
-                <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Accounts</h3>
-                 <div className={styles.permissionRow1}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ACCOUNTS *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.accounts.main}
-             onChange={() => handleSectionToggle("accounts", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>INCOME *</label>
-                                  <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.accounts.invoice}
-             onChange={() => handleSectionToggle("accounts", "invoice")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE FEES *</label>
-                                 <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.accounts.franchiseFees}
-             onChange={() => handleSectionToggle("accounts", "franchiseFees")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE OUTSTANDINGS *</label>
-                                <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.accounts.franchiseOutstandings}
-             onChange={() => handleSectionToggle("accounts", "franchiseOutstandings")}
-           />
-                   </div>
-                 </div>
-               </div>
-               <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Payments</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>PAYMENTS *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.payments.main}
-             onChange={() => handleSectionToggle("payments", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.payments.add}
-             onChange={() => handleSectionToggle("payments", "add")}
-           />
-     
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.payments.edit}
-             onChange={() => handleSectionToggle("payments", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.payments.delete}
-             onChange={() => handleSectionToggle("payments", "delete")}
-           />
-                   </div>
-                 </div>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>CREDIT PLANS  *</label>
-                             <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.main}
-             onChange={() => handleSectionToggle("creditPlans", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.add}
-             onChange={() => handleSectionToggle("creditPlans", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.edit}
-             onChange={() => handleSectionToggle("creditPlans", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                     <nput
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.delete}
-             onChange={() => handleSectionToggle("creditPlans", "delete")}
-           />
-                   </div>
-                    <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.status}
-             onChange={() => handleSectionToggle("creditPlans", "status")}
-           />
-                   </div>
-                    <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT CREDIT PRICE *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.creditPlans.editCreditPrice}
-             onChange={() => handleSectionToggle("creditPlans", "editCreditPrice")}
-           />
-                   </div>
-                 </div>
-                 <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>CUSTOME PLANS  *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.customPlans.main}
-             onChange={() => handleSectionToggle("customPlans", "main")}
-           />
-                   </div>
-               </div>
-                <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Ratings</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SERVICE RATINGS *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceRating.main}
-             onChange={() => handleSectionToggle("serviceRating", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceRating.add}
-             onChange={() => handleSectionToggle("serviceRating", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceRating.edit}
-             onChange={() => handleSectionToggle("serviceRating", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceRating.delete}
-             onChange={() => handleSectionToggle("serviceRating", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.serviceRating.status}
-             onChange={() => handleSectionToggle("serviceRating", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>PACKAGE RATING  *</label>
-                           <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packageRating.main}
-             onChange={() => handleSectionToggle("packageRating", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packageRating.add}
-             onChange={() => handleSectionToggle("packageRating", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packageRating.edit}
-             onChange={() => handleSectionToggle("packageRating", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packageRating.delete}
-             onChange={() => handleSectionToggle("packageRating", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.packageRating.status}
-             onChange={() => handleSectionToggle("packageRating", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ORDER REVIEW   *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.orderReview.main}
-             onChange={() => handleSectionToggle("orderReview", "main")}
-           />
-                   </div>
-                 </div>
-                    <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>TESTIMONIAL  *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.testimonial.main}
-             onChange={() => handleSectionToggle("testimonial", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.testimonial.add}
-             onChange={() => handleSectionToggle("testimonial", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.testimonial.edit}
-             onChange={() => handleSectionToggle("testimonial", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.testimonial.status}
-             onChange={() => handleSectionToggle("testimonial", "status")}
-           />
-                   </div>
-                 </div>
-               </div>
-                <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Slider</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SLIDER *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.slider.main}
-             onChange={() => handleSectionToggle("slider", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.slider.add}
-             onChange={() => handleSectionToggle("slider", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.slider.edit}
-             onChange={() => handleSectionToggle("slider", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.slider.delete}
-             onChange={() => handleSectionToggle("slider", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                           <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.slider.status}
-             onChange={() => handleSectionToggle("slider", "status")}
-           />
-                   </div>
-                 </div>
-               </div>
-                <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Manage Pages</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ABOUT US *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.aboutUs.main}
-             onChange={() => handleSectionToggle("aboutUs", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.aboutUs.add}
-             onChange={() => handleSectionToggle("aboutUs", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.aboutUs.edit}
-             onChange={() => handleSectionToggle("aboutUs", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.aboutUs.delete}
-             onChange={() => handleSectionToggle("aboutUs", "delete")}
-           />
-                   </div>
-                 </div>
-               </div>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>BLOG *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.blog.main}
-             onChange={() => handleSectionToggle("blog", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                    <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.blog.add}
-             onChange={() => handleSectionToggle("blog", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.blog.edit}
-             onChange={() => handleSectionToggle("blog", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.blog.delete}
-             onChange={() => handleSectionToggle("blog", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.blog.status}
-             onChange={() => handleSectionToggle("blog", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>NEWS LETTER *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.newsletter.main}
-             onChange={() => handleSectionToggle("newsletter", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>SEND NEWS LETTER *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.newsletter.SendNewsLetter}
-             onChange={() => handleSectionToggle("newsletter", "SendNewsLetter")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.newsletter.delete}
-             onChange={() => handleSectionToggle("newsletter", "delete")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>REFERRAL PROGRAM *</label>
-                               <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.ReferralProgram.main}
-             onChange={() => handleSectionToggle("ReferralProgram", "main")}
-           />
-                   </div>
-                 </div>
-                        <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>REQUESET QUOTES *</label>
-                            <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.requestQuotes.main}
-             onChange={() => handleSectionToggle("requestQuotes", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                                <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.requestQuotes.delete}
-             onChange={() => handleSectionToggle("requestQuotes", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                      <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.requestQuotes.status}
-             onChange={() => handleSectionToggle("requestQuotes", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FOLLOWUPS *</label>
-                               <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.followUps.main}
-             onChange={() => handleSectionToggle("followUps", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.followUps.delete}
-             onChange={() => handleSectionToggle("followUps", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.followUps.status}
-             onChange={() => handleSectionToggle("followUps", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>CONTACT *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.contact.main}
-             onChange={() => handleSectionToggle("contact", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                     <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.contact.delete}
-             onChange={() => handleSectionToggle("contact", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.contact.status}
-             onChange={() => handleSectionToggle("contact", "status")}
-           />
-                   </div>
-                 </div>
-                  <div className={styles.permissionSection}>
-                 <h3 className={styles.sectionHeading}>Franchise (Only For Franchise Role)</h3>
-                 <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE SERVICE *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseservice.main}
-             onChange={() => handleSectionToggle("franchiseservice", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseservice.edit}
-             onChange={() => handleSectionToggle("franchiseservice", "edit")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE ORDERS *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseorders.main}
-             onChange={() => handleSectionToggle("franchiseorders", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>VIEW *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseorders.add}
-             onChange={() => handleSectionToggle("franchiseorders", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseorders.status}
-             onChange={() => handleSectionToggle("franchiseorders", "status")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>INVOICE *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseorders.invoice}
-             onChange={() => handleSectionToggle("franchiseorders", "invoice")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE TIMING *</label>
-                                 <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseTiming.main}
-             onChange={() => handleSectionToggle("franchiseTiming", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseTiming.add}
-             onChange={() => handleSectionToggle("franchiseTiming", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseTiming.edit}
-             onChange={() => handleSectionToggle("franchiseTiming", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseTiming.delete}
-             onChange={() => handleSectionToggle("franchiseTiming", "delete")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE WORKER *</label>
-                        <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseworker.main}
-             onChange={() => handleSectionToggle("franchiseworker", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseworker.add}
-             onChange={() => handleSectionToggle("franchiseworker", "add")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>EDIT *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseworker.edit}
-             onChange={() => handleSectionToggle("franchiseworker", "edit")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseworker.delete}
-             onChange={() => handleSectionToggle("franchiseworker", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseworker.status}
-             onChange={() => handleSectionToggle("franchiseworker", "status")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>MANAGE CREDIT  *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.manageCredit.main}
-             onChange={() => handleSectionToggle("manageCredit", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ADD *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.manageCredit.add}
-             onChange={() => handleSectionToggle("manageCredit", "add")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>REQUEST  *</label>
-                         <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.request.main}
-             onChange={() => handleSectionToggle("request", "main")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>DELETE *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.request.delete}
-             onChange={() => handleSectionToggle("request", "delete")}
-           />
-                   </div>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>STATUS *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.request.status}
-             onChange={() => handleSectionToggle("request", "status")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>FRANCHISE PROFILE *</label>
-                                       <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.franchiseprofile.main}
-             onChange={() => handleSectionToggle("franchiseprofile", "main")}
-           />
-                   </div>
-                 </div>
-                       <div className={styles.permissionRow}>
-                   <div className={styles.permissionGroup}>
-                     <label className={styles.permissionLabel}>ACCOUNT *</label>
-                          <input
-             type="checkbox"
-             className={styles.toggle}
-             checked={sections.account.main}
-             onChange={() => handleSectionToggle("account", "main")}
-           />
-                   </div>
-                 </div>
-               </div>
-                  
-           
-               <button className={styles.btncreate}> {isEditMode ? 'Save' : 'Create Role'}</button>
+      <div className={styles.rols}>
+        <div className={styles.header}>
+         <div className={styles.breadcrumb}>
+              <span style={{ cursor: "pointer"}}
+        onClick={goToRoles}
+      >
+        Roles
+      </span>
+              <span className={styles.separator}> | </span>
+              <SlHome
+                style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
+                onClick={goToDashboard}
+                title="Go to Dashboard"
+              />
+              <span> &gt; </span>
+              <span className={styles.active}>Edit Roles</span>
+            </div>
+        </div>
+
+        <div className={styles.card1}>
+          <h2 className={styles.name}>NAME *</h2>
+          <input
+            type="text"
+            value={roleName}
+            onChange={(e) => setRoleName(e.target.value)}
+            placeholder="Enter role name"
+            className={styles.input}
+          />
+
+          <h2 className={styles.cardTitle1}>Permissions</h2>
+
+          {panels.map((panel) => (
+            <div key={panel.id} className={styles.panelBox}>
+              <div
+                className={`${styles.panelHeader} ${expanded === panel.id ? styles.panelHeaderActive : ""}`}
+                onClick={() => setExpanded(expanded === panel.id ? null : panel.id)}
+              >
+                <div className={styles.panelTitle}>
+                  {panel.icon} {panel.title}
+                </div>
+                <span className={styles.arrow}>{expanded === panel.id ? "▴" : "▾"}</span>
+              </div>
+
+              {expanded === panel.id && panel.id === "categories" && renderPanelBody(categories, "categories")}
+              {expanded === panel.id && panel.id === "subcategories" && renderPanelBody(subCategories, "subcategories")}
+              {expanded === panel.id && panel.id === "services" && (
+                <div>
                  
-             </div>
-               
-           </div>
-           <ScrollToTopButton />
+                  {renderPanelBody(services, "services")}
+
+                  <hr className={styles.divider} />
+
+                  
+                  {renderPanelBody(bestServices, "bestservices")}
+
+                  <hr className={styles.divider} />
+
+                  
+                  {renderPanelBody(serviceSpecs, "serviceSpecs")}
+
+                  <hr className={styles.divider} />
+
+                 
+                  {renderPanelBody(serviceFaq, "serviceFaq")}
+                </div>
+              )}
+
+              {expanded === panel.id && panel.id === "packages" && (
+                 <div>
+                  {renderPanelBody(packages, "packages")}
+                </div>
+             
+             )}
+             {expanded === panel.id && panel.id === "Leads"&&(
+              <div>
+                {renderPanelBody(Leads,"Leads")}
+              </div>
+             )}
+               {expanded === panel.id && panel.id === "Franchises"&&(
+              <div>
+                {renderPanelBody(Franchises,"Franchises")}
+                 <hr className={styles.divider} />
+                 {renderPanelBody(Franchisesuser,"Franchisesuser")}
+              </div>
+             )}
+             {expanded === panel.id&& panel.id === "offers"&&(
+              <div>
+                {renderPanelBody(offers,"offers")}
+                <hr className={styles.divider} />
+                {renderPanelBody(bestoffers,"bestoffers")}
+              </div>
+             )}
+             {expanded === panel.id&& panel.id === "gifts"&&(
+              <div>
+                {renderPanelBody(gifts,"gifts")}
+              </div>
+             )}
+             {expanded === panel.id&& panel.id === "orders"&&(
+              <div>
+                {renderPanelBody(orders,"orders")}
+                <hr className={styles.divider} />
+                {renderPanelBody(unallocatedorders,"unallocatedorders")}
+              </div>
+             )}
+             {expanded === panel.id&& panel.id === "Accounts"&&(
+              <div>
+                {renderPanelBody(Accounts,"Accounts")}
+              </div>
+             )}
+                  {expanded === panel.id&& panel.id === "Payments"&&(
+              <div>
+                {renderPanelBody(Payments,"Payments")}
+                  <hr className={styles.divider} />
+                  {renderPanelBody(CreditPlans,"CreditPlans")}
+                   <hr className={styles.divider} />
+                    {renderPanelBody(CustomePlans,"CustomePlans")}
+              </div>
+             )}
+                    {expanded === panel.id&& panel.id === "Ratings"&&(
+              <div>
+                {renderPanelBody(ServiceRatings,"ServiceRatings")}
+                  <hr className={styles.divider} />
+                  {renderPanelBody(PackageRatings,"PackageRatings")}
+                   <hr className={styles.divider} />
+                    {renderPanelBody(OrderReview,"OrderReview")}
+                     <hr className={styles.divider} />
+                    {renderPanelBody(Testimonial ,"Testimonial ")}
+              </div>
+             )}
+                  {expanded === panel.id&& panel.id === "Slider"&&(
+              <div>
+                {renderPanelBody(Slider,"Slider")}
+            
+              </div>
+             )}
+                       {expanded === panel.id&& panel.id === "Manage Pages"&&(
+              <div>
+                {renderPanelBody(AboutUs,"AboutUs")}
+                  <hr className={styles.divider} />
+                  {renderPanelBody(Blog ,"Blog ")}
+                   <hr className={styles.divider} />
+                    {renderPanelBody(NewsLetter,"NewsLetter")}
+                     <hr className={styles.divider} />
+                    {renderPanelBody(ReferralProgram,"ReferralProgram")}
+                     <hr className={styles.divider} />
+                    {renderPanelBody(RequestQuotes,"RequestQuotes")}
+                        <hr className={styles.divider} />
+                    {renderPanelBody(Followups,"Followups")}
+                        <hr className={styles.divider} />
+                    {renderPanelBody(Contact,"Contact")}
+              </div>
+             )}
+            {expanded === panel.id && panel.id === "franchiseOnly" && (
+  <div>
+    {renderPanelBody(FranchiseService, "FranchiseService")}
+    <hr className={styles.divider} />
+    {renderPanelBody(FranchiseOrders, "FranchiseOrders")}
+    <hr className={styles.divider} />
+    {renderPanelBody(FranchiseTiming, "FranchiseTiming")}
+    <hr className={styles.divider} />
+    {renderPanelBody(FranchiseWorker, "FranchiseWorker")}
+    <hr className={styles.divider} />
+    {renderPanelBody(ManageCredit, "ManageCredit")}
+    <hr className={styles.divider} />
+    {renderPanelBody(Request, "Request")}
+    <hr className={styles.divider} />
+    {renderPanelBody(FranchiseProfile, "FranchiseProfile")}
+    <hr className={styles.divider} />
+    {renderPanelBody(Account, "Account")}
+  </div>
+)}
+            </div>
+          ))}
+   <button className={styles.btncreate}  disabled={loading}>   {loading ? "Saving..." : "Update Role"}</button>
+        </div>
+      </div>
     </Layout>
   );
-};
-
-export default AddRole;
+}
