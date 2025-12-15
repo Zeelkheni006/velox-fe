@@ -233,3 +233,34 @@
         font-size: 20px;
     }
 }
+
+.phone-input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.phone-prefix {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: #555;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.phone-input {
+    width: 100%;
+    box-sizing: border-box;
+    /* 🔥 MUST */
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+}
+
+.phone-input.with-prefix {
+    padding-left: 65px;
+    /* 🔥 THIS FIXES OVERLAP */
+}

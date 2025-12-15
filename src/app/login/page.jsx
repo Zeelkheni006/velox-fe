@@ -54,6 +54,7 @@ export default function LoginTypeModal() {
         >
           <option value="">Select Login Type</option>
           <option value="user">Customer</option>
+            <option value="professional">Admin</option>
           <option value="professional">Franchise</option>
          
         </select>

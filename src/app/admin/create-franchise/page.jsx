@@ -35,7 +35,7 @@ const [initialServices, setInitialServices] = useState([]);
       const mapInstance = useRef(null);
       const polygonRef = useRef(null);
 const handleServiceChange = (selected) => {
-  setSelectedServices(selected || []);  // Avoid undefined
+  setSelectedServices(selected || []); 
 };
 
       const [form, setForm] = useState({
@@ -57,7 +57,6 @@ const handleServiceChange = (selected) => {
 
       const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-      // 🌍 Load Countries
       useEffect(() => {
         const loadCountries = async () => {
           const response = await getAllCountries();
@@ -67,7 +66,6 @@ const handleServiceChange = (selected) => {
         loadCountries();
       }, []);
 
-      // 📌 Load Requested Services
       useEffect(() => {
         if (selectedLeadId) loadRequestedServices(selectedLeadId);
       }, [selectedLeadId]);
@@ -100,7 +98,6 @@ const handleServiceChange = (selected) => {
       return null;
     }
 
-    // Zoom and optionally show marker
   async function zoomToLocation({ latitude, longitude, name }) {
     if (!mapInstance.current) return;
 
@@ -165,21 +162,17 @@ const handleServiceChange = (selected) => {
 
     drawingManager.setMap(map);
 
-    // ⚡ Capture polygon once drawn
     window.google.maps.event.addListener(drawingManager, "overlaycomplete", (e) => {
       if (e.type === "polygon") {
         // Remove previous polygon if exists
         if (polygonRef.current) polygonRef.current.setMap(null);
         
-        polygonRef.current = e.overlay; // Save the new polygon reference
-        drawingManager.setDrawingMode(null); // Stop drawing
+        polygonRef.current = e.overlay; 
+        drawingManager.setDrawingMode(null); 
         showPopup("✅ Polygon drawn");
       }
     });
   };
-
-
-      // 🌐 Load Points
       const handleLoadPoints = async () => {
     if (!polygonRef.current) return showPopup("Please draw a polygon first!", "error");
 
@@ -190,15 +183,12 @@ const handleServiceChange = (selected) => {
       const p = path.getAt(i);
       polygonPoints.push({ latitude: p.lat(), longitude: p.lng() });
     }
-
-    // ✅ Add the first point again at the end to close the polygon
     if (polygonPoints.length > 0) {
       polygonPoints.push({ 
         latitude: polygonPoints[0].latitude, 
         longitude: polygonPoints[0].longitude 
       });
     }
-
     try {
       const points = await fetchGooglePoints(polygonPoints);
       if (!points.length) return showPopup("⚠️ No points found.");
@@ -214,13 +204,12 @@ const handleServiceChange = (selected) => {
       showPopup("❌ Failed to load points.", "error");
     }
   };
-  // submit button code 
+
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!polygonRef.current) return showPopup("Please draw polygon!", "error");
 
-  // Collect polygon points
   let rawPolygonPoints = [];
   const path = polygonRef.current.getPath();
   for (let i = 0; i < path.getLength(); i++) {
@@ -237,7 +226,6 @@ const handleSubmit = async (e) => {
     });
   }
 
-  // Prepare FormData
   const formData = new FormData();
   formData.append("franchise_name", form.franchiseName);
   formData.append("franchise_email", form.email);
@@ -250,7 +238,6 @@ const handleSubmit = async (e) => {
   formData.append("worker_count", Number(form.workerCount) || 0); // number
   formData.append("raw_polygon_points", JSON.stringify(rawPolygonPoints));
 
-  // ✅ Send service_ids properly
  formData.append(
   "service_ids",
   JSON.stringify(selectedServices.map(s => Number(s.value)))
@@ -271,8 +258,8 @@ const handleSubmit = async (e) => {
   const res = await getFranchiseOwnersData(email);
 
   if (res?.success && res.data) {
-    const f = res.data.franchise_data;  // Franchise
-    const o = res.data.owner_data;      // Owner
+    const f = res.data.franchise_data;  
+    const o = res.data.owner_data;      
 
     // 🌟 service_list → only ids
     const selected = Array.isArray(f?.service_list)
@@ -281,9 +268,7 @@ const handleSubmit = async (e) => {
           label: service.title,
         }))
       : [];
-setSelectedServices(selected); // ✅ show in Select
-    // Optional: also set serviceOptions if you want to allow new selections
-
+setSelectedServices(selected); 
 setInitialServices(selected); 
     setForm({
       country: f?.frachise_country_id?.id || "",
@@ -295,12 +280,12 @@ setInitialServices(selected);
       commission: "",
       pincode: f?.franchise_pincode || "",
       email: f?.franchise_email || "", 
-      services: f?.service_list || "", // 🎉 Auto select services here
+      services: f?.service_list || "",
     });
 
     showPopup("Franchise data loaded ✔", "success");
 
-    // Load States & Cities
+   
     if (f?.frachise_country_id?.id)
       setStates(await getallStates(f.frachise_country_id.id));
 
@@ -336,8 +321,8 @@ useEffect(() => {
 
 const loadServices = async () => {
   try {
-    const services = await getServiceTitleIds();  // call API
-    setServiceOptions(services);                  // set dropdown options
+    const services = await getServiceTitleIds();  
+    setServiceOptions(services);                  
   } catch (err) {
     console.error("Failed to load services:", err);
   }
@@ -400,8 +385,8 @@ const loadServices = async () => {
 
   <ReactSelect
     isMulti
-    options={serviceOptions}      // static
-    value={selectedServices}      // static
+    options={serviceOptions}      
+    value={selectedServices}      
     onChange={handleServiceChange}
     closeMenuOnSelect={false}
     hideSelectedOptions={false}
@@ -417,11 +402,6 @@ const loadServices = async () => {
       }),
     }}
   />
-
-
-
-
-
 </div>
                 {/* Country / State / City selects */}
                 <div>
@@ -432,7 +412,6 @@ const loadServices = async () => {
   onChange={async (e) => {
     const c = e.target.value;
     const selectedCountry = countries.find(ct => ct.id.toString() === c.toString());
-
     setForm({
       ...form,
       country: c,
@@ -453,9 +432,6 @@ const loadServices = async () => {
     <option key={c.id} value={c.id}>{c.name}</option>
   ))}
 </select>
-
-
-
                 </div>
 
                 <div>
@@ -471,7 +447,6 @@ const loadServices = async () => {
         if (s) setCities(await getallCities(s));
       }}
     >
-
                     <option value="">Select State</option>
                     {states.map((s) => (
                       <option key={s.id} value={s.id}>{s.name}</option>
@@ -491,7 +466,6 @@ const loadServices = async () => {
         if (selectedCity) zoomToLocation({ name: selectedCity.name });
       }}
     >
-
                     <option value="">Select City</option>
                     {cities.map((c) => (
                       <option key={c.id} value={c.id}>{c.name}</option>
@@ -507,8 +481,8 @@ const loadServices = async () => {
   <label>FRANCHISE MOBILE</label>
   <input
     type="text"
-    placeholder={countryCode}          // shows phone code inside
-    value={form.mobile.replace(countryCode, "")} // show only number part
+    placeholder={countryCode}    
+    value={form.mobile.replace(countryCode, "")} 
     onChange={async (e) => {
       let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
       const fullNumber = countryCode + numberPart;
@@ -516,7 +490,6 @@ const loadServices = async () => {
       setForm({ ...form, mobile: fullNumber });
 
       showPopup("");
-
       if (numberPart.length === 10) {
         const res = await checkDuplicate("owner_phone", fullNumber);
         if (res.success) {
@@ -529,9 +502,6 @@ const loadServices = async () => {
     required
   />
 </div>
-
-
-
                 <div><label>FRANCHISE EMAIL</label><input name="email" value={form.email} onChange={handleChange} /></div>
                <div>
   <label>WORKER COUNT</label>
@@ -559,9 +529,7 @@ const loadServices = async () => {
                   </button>
                 </div>
               </div>
-
       <h3 className={styles.mapTitle}>Service Area (Draw Polygon)</h3>
-
   <div
     style={{
       position: "relative",
@@ -580,8 +548,8 @@ const loadServices = async () => {
       }}
     />
 
-    {/* 🎯 Bottom Button Group */}
-  {/* 🌍 MAP TYPE ICON BUTTONS (LEFT SIDE) */}
+
+  {/*  MAP TYPE ICON BUTTONS (LEFT SIDE) */}
   <div
     style={{
       position: "absolute",
@@ -736,4 +704,3 @@ const loadServices = async () => {
         </Layout>
       );
     }
-  // ?leadId=51

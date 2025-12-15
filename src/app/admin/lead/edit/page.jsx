@@ -5,7 +5,7 @@ import Layout from "../../pages/page";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams ,useParams } from 'next/navigation';
 import { SlHome } from "react-icons/sl";
-import { getStates, getCities, getCategoryList } from "../../../api/user-side/register-professional/location";
+import { getallStates, getallCities, getCategoryList } from "../../../api/user-side/register-professional/location";
 import { getLeadDetails ,updateLead } from "../../../api/manage_users/lead";
 import { useRef } from "react"; 
 import usePopup from "../../components/popup"
@@ -67,32 +67,16 @@ useEffect(() => {
 
 useEffect(() => {
   async function loadInitialData() {
-    try {
-      const savedStates = JSON.parse(localStorage.getItem("states"));
-      const savedCategories = JSON.parse(localStorage.getItem("categories"));
-
-      if (savedStates && savedCategories) {
-        setStates(savedStates);
-        setCategories(savedCategories);
-      } else {
-        const [stateData, categoryData] = await Promise.all([
-          getStates(1),
-          getCategoryList()
-        ]);
-
-        setStates(stateData || []);
-        setCategories(categoryData || []);
-
-        localStorage.setItem("states", JSON.stringify(stateData));
-        localStorage.setItem("categories", JSON.stringify(categoryData));
-      }
-    } catch (err) {
-      console.error("Error loading initial data:", err);
-    }
+    const [stateData, categoryData] = await Promise.all([
+      getallStates(1),
+      getCategoryList()
+    ]);
+    setStates(stateData || []);
+    setCategories(categoryData || []);
   }
-
   loadInitialData();
 }, []);
+
 
 
 useEffect(() => {
@@ -123,7 +107,7 @@ useEffect(() => {
         franchise_phone: franchise_data?.franchise_phone || "",
         franchise_pincode: franchise_data?.franchise_pincode || "",
         franchise_address: franchise_data?.franchise_address || "",
-        franchise_state_id: franchise_data?.franchise_state?.id || "",
+        franchise_state_id: franchise_data?.franchise_state_id?.id || "",
         franchise_city_id: franchise_data?.franchise_city_id?.id || "",
         message: franchise_data?.message || "",
       });
@@ -153,27 +137,27 @@ useEffect(() => {
   fetchLead();
 }, [leadId, token]);
 
-  const handleOwnerStateChange = async (e) => {
-    const stateId = e.target.value;
-    setForm({ ...form, owner_state_id: stateId, owner_city_id: "" });
-    if (stateId) {
-      const citiesData = await getCities(stateId);
-      setOwnerCities(citiesData || []);
-    } else {
-      setOwnerCities([]);
-    }
-  };
+const handleOwnerStateChange = async (e) => {
+  const stateId = e.target.value;
+  setForm({ ...form, owner_state_id: stateId, owner_city_id: "" });
+
+  if (stateId) {
+    const citiesData = await getallCities(stateId);
+    setOwnerCities(citiesData || []);
+  }
+};
+
 
   const handleFranchiseStateChange = async (e) => {
     const stateId = e.target.value;
     setForm({ ...form, franchise_state_id: stateId, franchise_city_id: "" });
-    if (stateId) {
-      const citiesData = await getCities(stateId);
-      setFranchiseCities(citiesData || []);
+     if (stateId) {
+       const citiesData = await getallCities(stateId);
+       setFranchiseCities(citiesData || []);
     } else {
-      setFranchiseCities([]);
+       setFranchiseCities([]);
     }
-  };
+   };
 
   const handleOwnerCityChange = (e) => setForm({ ...form, owner_city_id: e.target.value });
   const handleFranchiseCityChange = (e) => setForm({ ...form, franchise_city_id: e.target.value });

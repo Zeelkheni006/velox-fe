@@ -395,10 +395,14 @@ const columnKeyMap = {
   "franchise phone": "franchise_phone",
   "message": "message",
   "categories": "categories",
-  "franchise state": "franchise_state",
-  "franchise city": "franchise_city",
+
+  // ✅ nested keys
+  "franchise state": "franchise_state.name",
+  "franchise city": "franchise_city.name",
+
   "status": "status",
 };
+
    const goToDashboard = () => {
     router.push("/admin/dashboard"); 
   };
@@ -611,7 +615,6 @@ if (values.length > 0) {
   </div>
 
 </div>
-
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
             <thead>
@@ -1003,7 +1006,7 @@ of {totalLeads} entries
                 <p><strong>Email:</strong> {leadDetails.franchise_data?.franchise_email}</p>
                 <p><strong>Phone:</strong> {leadDetails.franchise_data?.franchise_phone}</p>
                 <p><strong>Pincode:</strong> {leadDetails.franchise_data?.franchise_pincode}</p>
-                <p><strong>State:</strong> {leadDetails.franchise_data?.franchise_state?.name}</p>
+                <p><strong>State:</strong> {leadDetails.franchise_data?.franchise_state_id?.name}</p>
                 <p><strong>City:</strong> {leadDetails.franchise_data?.franchise_city_id?.name}</p>
               </div>
 

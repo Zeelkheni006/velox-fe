@@ -99,6 +99,31 @@ export default function SignupPage() {
   };
 
   const handleClose = () => router.push("/");
+const handlePhoneChange = (e) => {
+  let value = e.target.value;
+
+  // remove +91 if pasted or editing
+  const rawNumber = value.replace(/^(\+91)/, '');
+
+  // allow only digits
+  if (!/^\d*$/.test(rawNumber)) return;
+
+  // max 10 digits
+  if (rawNumber.length > 10) return;
+
+  // auto add +91
+  if (rawNumber.length > 0) {
+    setFormData({
+      ...formData,
+      phonenumber: `+91${rawNumber}`,
+    });
+  } else {
+    setFormData({
+      ...formData,
+      phonenumber: '',
+    });
+  }
+};
 
   return (
     <div className="signup-page">
@@ -123,7 +148,15 @@ export default function SignupPage() {
               <form onSubmit={handleSignupSubmit}>
                 <input name="username" type="text" placeholder="Your Name" onChange={handleChange} required />
                 <input name="email" type="email" placeholder="Your Email" onChange={handleChange} required />
-                <input name="phonenumber" type="tel" placeholder="Your Mobile No" onChange={handleChange} required />
+              <input
+  name="phonenumber"
+  type="tel"
+  placeholder="Your Mobile No"
+  value={formData.phonenumber}
+  onChange={handlePhoneChange}
+  required
+/>
+
               
                 <input name="password" type="password" placeholder="Your Password" onChange={handleChange} required />
                 <input name="confirm_password" type="password" placeholder="Confirm Password" onChange={handleChange} required />

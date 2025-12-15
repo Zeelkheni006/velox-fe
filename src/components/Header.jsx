@@ -132,7 +132,7 @@ export default function Header() {
 
           {/* Logo */}
           <div className="logo">
-            <Image src="/images/logo.png" alt="Velox Logo" width={180} height={40} className="md:w-[120px] md:h-[35px]" />
+            <Image src="/images/logo.png" alt="Velox Logo" width={200} height={50} className="md:w-[120px] md:h-[35px]" />
           </div>
 
           {/* Desktop Nav */}

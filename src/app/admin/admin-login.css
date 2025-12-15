@@ -121,6 +121,7 @@
 }
 
 .admin-login-form input[type='email'],
+.admin-login-form input[type='otp'],
 .admin-login-form input[type='password'] {
     width: 100%;
     padding: 10px 15px;

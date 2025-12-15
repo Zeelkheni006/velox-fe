@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { initiateAdminLogin, loginWithPassword, sendOtp, loginWithOtp } from '../api/auth/admin-login';
+// import { initiateAdminLogin, loginWithPassword, sendOtp, loginWithOtp } from '../api/auth/admin-login';
 import Image from 'next/image';
 import Link from "next/link";
-import './admin-login.css';
+// import './admin-login.css';
 import { useRouter } from "next/navigation";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
-
+import "../admin/admin-login.css"
 export default function AdminLoginPage() {
   const router = useRouter();  
   const [email, setEmail] = useState("");
@@ -210,7 +210,7 @@ const handleVerifyOtp = async () => {
           {step==="otpInput" && (
             <div className="mb-4">
               <label className="block mb-1 text-sm font-medium text-gray-700">OTP</label>
-              <input type="otp" placeholder="Enter OTP" value={otp} onChange={handleOtpChange} className="w-full px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-400"/>
+              <input type="text" placeholder="Enter OTP" value={otp} onChange={handleOtpChange} className="w-full px-4 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring focus:border-blue-400"/>
             </div>
           )}
 <div className='forgot-link'>

@@ -251,7 +251,7 @@
     justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
-    width: 1658px;
+    width: 1667px;
 }
 
 .rightSection {
@@ -371,7 +371,7 @@
 /* footer */
 
 .footer {
-    width: 100%;
+    width: 120%;
     padding: 10px 20px;
     background-color: #ffffffee;
     /* Light gray */
@@ -386,7 +386,7 @@
 .heart {
     color: red;
     margin: 0 4px;
-    font-size: 10px;
+    font-size: 18px;
 }
 
 .loaderOverlay {
