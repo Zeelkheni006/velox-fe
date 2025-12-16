@@ -240,7 +240,7 @@
 .header {
     position: fixed;
     top: 0;
-    left: 250px;
+    left: 200px;
     /* sidebar ni width */
     right: 0;
     height: 60px;
@@ -560,4 +560,9 @@
 
 .notification:last-child {
     border-bottom: none;
+}
+
+#nprogress .bar {
+    height: 3px;
+    background: #ff7a00;
 }

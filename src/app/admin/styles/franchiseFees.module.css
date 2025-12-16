@@ -73,11 +73,7 @@
 /* Table Wrapper */
 
 .tableWrap {
-    overflow-x: auto;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-    padding: 10px;
+    color: #888;
 }
 
 
@@ -86,17 +82,15 @@
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
     font-size: 14px;
-    color: #888;
-    text-align: left;
 }
 
 .table th,
 .table td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
     text-align: left;
+    vertical-align: top;
 }
 
 .table thead {

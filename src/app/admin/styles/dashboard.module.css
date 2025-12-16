@@ -2,29 +2,26 @@
 
 .container {
     display: flex;
-    height: 100vh;
+    height: auto;
     margin: 0;
     padding: 0;
 }
 
 .content {
     flex-grow: 1;
-    background-color: #f4f6f9;
     padding: 20px;
     margin-left: 250px;
-    /* sidebar width */
-    height: 100vh;
-    overflow-y: auto;
-    width: calc(100% - 250px);
+    height: auto;
+    width: calc(100% - 400px);
 }
 
 .main {
-    padding: 20px;
+    padding: 50px;
     display: flex;
-    gap: 20px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-right: -40px;
-    margin-left: -30px;
+    /* margin-right: 40px;
+    margin-left: 30px; */
     text-align: center;
     font-size: 20px;
 }
@@ -122,8 +119,8 @@
 
 .container {
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    height: auto;
+    /* overflow: hidden; */
 }
 
 .sidebar {
@@ -131,15 +128,13 @@
     background: #1e2a3a;
     color: white;
     overflow-y: auto;
-    height: 100vh;
+    height: auto;
 }
 
 .content {
     flex-grow: 1;
-    background-color: #f4f6f9;
     padding: 20px;
-    overflow-y: auto;
-    height: 100%;
+    height: auto;
 }
 
 
@@ -153,15 +148,15 @@
 
 .container {
     display: flex;
-    height: 100vh;
-    overflow: hidden;
+    height: auto;
+    /* overflow: hidden; */
 }
 
 .content {
     display: flex;
     flex-direction: column;
     flex: 1;
-    height: 100vh;
+    height: auto;
     position: relative;
 }
 
@@ -181,8 +176,8 @@
 /* Scrollable main */
 
 .main {
-    padding: 20px;
-    margin-top: 10px;
+    padding: 5px;
+    margin-top: 25px;
     /* height of fixed header */
     margin-bottom: 60px;
     /* height of fixed footer */
@@ -202,7 +197,6 @@
     /* sidebar width */
     right: 20px;
     height: 45px;
-    background-color: #f3f4f6;
     display: flex;
     justify-content: space-between;
     align-items: center;

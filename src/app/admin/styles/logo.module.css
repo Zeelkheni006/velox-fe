@@ -9,7 +9,6 @@
     /* keep in one row */
     padding: 40px 20px;
     background-color: #f8fafb;
-    margin-top: -300px;
     /* allow horizontal scroll if needed */
 }
 
@@ -18,7 +17,7 @@
     border: 1px solid #00c2cb;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
-    width: 52%;
+    width: 57%;
     /* wider box */
     min-width: 300px;
     /* ensures box doesn’t shrink too much */

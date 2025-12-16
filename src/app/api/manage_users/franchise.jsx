@@ -1,7 +1,11 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
-export const getFranchiseOwners = async (page = 1, perPage = 10) => {
+export const getFranchiseOwners = async (
+  page = 1,
+  perPage = 10,
+  hasFranchise = 1 // 🔥 default = 1
+) => {
   try {
     if (typeof window === "undefined")
       return { success: false, data: [], total: 0, pages: 0, page: 1 };
@@ -10,7 +14,7 @@ export const getFranchiseOwners = async (page = 1, perPage = 10) => {
     if (!token) throw new Error("No access token");
 
     const res = await fetch(
-      `${API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/get?page=${page}&per_page=${perPage}`,
+      `${API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/get?page=${page}&per_page=${perPage}&has_franchise=${hasFranchise}`,
       {
         method: "GET",
         headers: {
@@ -23,7 +27,6 @@ export const getFranchiseOwners = async (page = 1, perPage = 10) => {
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
     const data = await res.json();
-    console.log("FRANCHISE OWNERS API RESPONSE:", data);
 
     if (data.success && Array.isArray(data.data?.franchise_owners)) {
       return {

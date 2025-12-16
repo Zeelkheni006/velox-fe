@@ -91,17 +91,18 @@
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
     font-size: 14px;
-    color: #888;
-    text-align: left;
+}
+
+.table thead {
+    background-color: #e5e7eb;
 }
 
 .table th,
 .table td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #e5e7eb;
     text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
 }
 
 .nameCell {

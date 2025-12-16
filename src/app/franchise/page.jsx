@@ -124,9 +124,6 @@ const handleVerifyOtp = async () => {
     setLoading(false);
   }
 };
-
-
-
   // Main button handler
   const handleButtonClick = async () => {
   if(step === "otpInput") {
