@@ -955,7 +955,7 @@
         
         .easy-process-section {
             background-color: #f9f9f9;
-            padding: -90px -50px;
+            padding: 90px 50px;
             position: relative;
             justify-content: space-between;
             align-items: center;
@@ -969,6 +969,7 @@
             gap: 2rem;
             /* space between steps */
             flex-wrap: wrap;
+            margin-top: 20PX;
         }
         /* Step Wrapper - now horizontal layout */
         
@@ -1047,8 +1048,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin-top: 40px;
-            margin-left: 800px;
+            margin-top: 50px;
+            justify-content: center;
+            align-items: center;
         }
         
         .steps-btn:hover {
@@ -1073,9 +1075,8 @@
         }
         
         .easy-process-section h2 {
-            margin-left: 700px;
             font-size: 40px;
-            margin-top: -1px;
+            text-align: center;
         }
         
         .service-underline {
@@ -1085,7 +1086,6 @@
             background-color: #ff6600;
             margin: 5px auto 10px auto;
             border-radius: 2px;
-            margin-left: 130px;
         }
         /* BestOffer.module.css */
         
@@ -1273,6 +1273,25 @@
             text-align: left;
         }
         
+        .reviewSwiper {
+            padding: 0 160px;
+            /* left-right extra gap remove */
+        }
+        
+        .reviewSwiper .swiper-slide {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .reviewCard {
+            width: 100%;
+            /* slide ne full width aapo */
+            max-width: 420px;
+            /* control spacing */
+            margin: 0 auto;
+            /* center */
+        }
+        
         .quote {
             font-size: 50px;
             color: #888;
@@ -1368,6 +1387,11 @@
             background-color: #ff6803;
         }
         /* Responsive */
+        
+        .reviewSwiper .swiper-button-next,
+        .reviewSwiper .swiper-button-prev {
+            display: none !important;
+        }
         
         @media (max-width: 768px) {
             .row {
@@ -4041,4 +4065,31 @@
         
         .flip-back {
             transform: rotateY(180deg);
+        }
+        /* page loader css */
+        
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #eee;
+            border-top: 6px solid orange;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }

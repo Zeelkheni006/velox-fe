@@ -18,21 +18,28 @@ const { popupMessage, popupType, showPopup } = usePopup();
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-
+const [hasFranchise, setHasFranchise] = useState(1);
   // ✅ Fetch data from API
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await getFranchiseOwners(currentPage, entriesPerPage);
-      if (res.success) {
-        setFranchises(res.data);
-        setTotalEntries(res.total);
-      } else {
-        setFranchises([]);
-        setTotalEntries(0);
-      }
-    };
-    fetchData();
-  }, [currentPage, entriesPerPage]);
+useEffect(() => {
+  const fetchData = async () => {
+    const res = await getFranchiseOwners(
+      currentPage,
+      entriesPerPage,
+      hasFranchise // 👈 IMPORTANT
+    );
+
+    if (res.success) {
+      setFranchises(res.data);
+      setTotalEntries(res.total);
+    } else {
+      setFranchises([]);
+      setTotalEntries(0);
+    }
+  };
+
+  fetchData();
+}, [currentPage, entriesPerPage, hasFranchise]);
+
 
   // ✅ Sorting logic
   const handleSort = (key) => {
@@ -85,19 +92,34 @@ const { popupMessage, popupType, showPopup } = usePopup();
         <div className={styles.card}>
           <h1 className={styles.title}>Franchise User</h1>
 
-          <div className={styles.showEntries}>
-            Show{" "}
-            <select
-              className={styles.select1}
-              value={entriesPerPage}
-              onChange={(e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>{" "}
-            entries
-          </div>
+      
+  <div className={styles.showEntries}>
+    Show{" "}
+    <select
+      className={styles.select1}
+      value={entriesPerPage}
+      onChange={(e) => {
+        setEntriesPerPage(Number(e.target.value));
+        setCurrentPage(1);
+      }}
+    >
+      <option value={10}>10</option>
+      <option value={25}>25</option>
+      <option value={50}>50</option>
+    </select>{" "}
+    entries
+  </div>
+<div className={styles.topActions}>
+  <button
+    className={styles.btntrue}
+    onClick={() => {
+      setHasFranchise((prev) => (prev === 1 ? 0 : 1)); // 👈 TOGGLE
+      setCurrentPage(1);
+    }}
+  >
+    {hasFranchise === 1 ? "Show False Data" : "Show True Data"}
+  </button>
+</div>
 
           <div className={styles.controls}>
             <label className={styles.searchLabel}>
@@ -138,30 +160,30 @@ const { popupMessage, popupType, showPopup } = usePopup();
                     >
                       Edit
                     </button>
-                    {item.make_franchise && (
-<button
-  className={styles.createButton}
-  onClick={async () => {
-    try {
+              {item.make_franchise_button_visible && (
+  <button
+    className={styles.createButton}
+    onClick={async () => {
       const res = await getFranchiseOwnersData(item.owner_email);
 
       if (res.success) {
-        localStorage.setItem("franchiseOwnersData", JSON.stringify(res.data));
-        router.push(`/admin/create-franchise?owner_email=${item.owner_email}`);
+        localStorage.setItem(
+          "franchiseOwnersData",
+          JSON.stringify(res.data)
+        );
+        router.push(
+          `/admin/create-franchise?owner_email=${item.owner_email}`
+        );
         showPopup("Franchise owner data fetched successfully ✔", "success");
       } else {
         showPopup(res.message || "Failed to fetch data", "error");
       }
-    } catch (err) {
-      console.error("Error fetching franchise owner data:", err);
-      showPopup("Something went wrong! Try again.", "error");
-    }
-  }}
->
-  Create Franchise
-</button>
+    }}
+  >
+    Create Franchise
+  </button>
+)}
 
-                    )}
                   </td>
                 </tr>
               ))}

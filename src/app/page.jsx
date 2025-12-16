@@ -14,7 +14,7 @@ import { getSliders , getFullLocation , getCategories} from "./api/add-image/add
 import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
 import {getStats} from "./api/user-side/home_api";
-
+import PageLoader from "../components/PageLoader";
 
 // Array with image + text
 
@@ -111,6 +111,12 @@ const reviews = [
       image: '/images/profile.png',
       rating: 5,
     },
+      {
+    name: "RAJ PATEL",
+    image: "/images/profile.png",
+    rating: 4,
+  },
+  
   ];
 
 export default function Home() {
@@ -121,36 +127,24 @@ export default function Home() {
     const { popupMessage, popupType, showPopup } = usePopup();
     const [suggestions, setSuggestions] = useState([]);
 
+useEffect(() => {
+  const fetchSlides = async () => {
+    try {
+      const data = await getSliders();
 
- useEffect(() => {
-    const fetchSlides = async () => {
-      try {
-        setLoading(true);
-        const data = await getSliders();
-        console.log("Fetched slides:", data);
+      if (Array.isArray(data)) setSlides(data);
+      else if (Array.isArray(data?.data)) setSlides(data.data);
+      else setSlides([]);
 
-        if (Array.isArray(data)) {
-          setSlides(data);
-        } else if (Array.isArray(data.slides)) {
-          setSlides(data.slides);
-        } else if (Array.isArray(data.data)) {
-          setSlides(data.data);
-        } else {
-          setSlides([]);
-        }
+    } catch (err) {
+      setSlides([]);
+    } finally {
+      setApiDone(prev => ({ ...prev, sliders: true }));
+    }
+  };
 
-        showPopup("✅ Slides fetched successfully!", "success"); // ✅ Success popup
-      } catch (err) {
-        console.error("Error fetching slides:", err);
-        setSlides([]);
-        showPopup("❌ Failed to fetch slides.", "error"); // ❌ Error popup
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSlides();
-  }, []);
+  fetchSlides();
+}, []);
 
 
   // Trigger resize for Swiper layout fix
@@ -163,21 +157,33 @@ export default function Home() {
   const [services, setServices] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+  const fetchCategories = async () => {
+    try {
       const data = await getCategories();
-      setServices(data); // Assuming data is an array of categories
-    };
-    fetchCategories();
-  }, []);
+      setServices(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setServices([]);
+    } finally {
+      setApiDone(prev => ({ ...prev, categories: true }));
+    }
+  };
+
+  fetchCategories();
+}, []);
+
 
     const [stats, setStats] = useState([]);
 
-  useEffect(() => {
-    async function fetchStats() {
+useEffect(() => {
+  async function fetchStats() {
+    try {
       const data = await getStats();
       console.log("📌 Final Stats Data:", data);
 
-      if (!data) return;
+      if (!data) {
+        setStats([]);
+        return;
+      }
 
       const formatted = [
         {
@@ -208,10 +214,28 @@ export default function Home() {
 
       console.log("📌 FORMATTED STATS:", formatted);
       setStats(formatted);
-    }
 
-    fetchStats();
-  }, []);
+    } catch (error) {
+      console.error("❌ Stats API error:", error);
+      setStats([]);
+    } finally {
+      // 🔥 STATS API COMPLETE SIGNAL
+      setApiDone(prev => ({ ...prev, stats: true }));
+    }
+  }
+
+  fetchStats();
+}, []);
+const [apiDone, setApiDone] = useState({
+  sliders: false,
+  categories: false,
+  stats: false,
+});
+useEffect(() => {
+  if (apiDone.sliders && apiDone.categories && apiDone.stats) {
+    setPageLoading(false);
+  }
+}, [apiDone]);
 
     const inputRef = useRef(null);
 
@@ -261,17 +285,18 @@ export default function Home() {
       setFullLocation(full);
     });
   };
+const [pageLoading, setPageLoading] = useState(true);
+ 
 
+  
     return (
+      <> {pageLoading && <PageLoader />}
+       {!pageLoading && (
       <main>
   <PopupAlert message={popupMessage} type={popupType} />
         <section id="hero" className="heroSection">
 
-          {loading ? (
-          <div className="spinnerWrapper">
-            <div className="spinner"></div>
-          </div>
-          ) : slides.length > 0 ? (
+          
           <Swiper
     modules={[Navigation, Pagination, Autoplay, EffectFade]}
     navigation
@@ -301,9 +326,9 @@ export default function Home() {
     ))}
   </Swiper>
 
-          ) : (
+        
             <p className="noSliders">No sliders available</p>
-        )}
+       
 
         {/* 🔥 Static Search Box */}
         <div className="searchBox">
@@ -361,7 +386,7 @@ export default function Home() {
       </div>
 
       <button type="submit" className="searchButton">
-        {loading ? "Loading..." : "Go"}
+         Go
       </button>
     </form>
 
@@ -373,11 +398,7 @@ export default function Home() {
       </section>
 
 <section className="services-section">
-  {loading ? (
-    <div className="spinner-container">
-      <div className="spinner"></div>
-    </div>
-  ) : (
+ 
     <div className="services-grid">
       {services.map((service) => (
         <Link
@@ -398,7 +419,7 @@ export default function Home() {
         </Link>
       ))}
     </div>
-  )}
+  
 </section>
 
       <section className="py-10 px-4  ">
@@ -533,7 +554,7 @@ export default function Home() {
    <section className="py-12 bg-gray-50 easy-process-section">
   <div className="container mx-auto px-6 text-center">
     {/* Heading */}
-    <h2 className="text-3xl font-bold mb-10 relative inline-block">
+    <h2 className="text-3xl font-bold mb-10 relative inline-block ">
       Easy Ordering Process
        <span className="service-underline"></span>
     </h2>
@@ -647,39 +668,52 @@ export default function Home() {
         </div>
       </div>
     </section>
-<section className="reviewSection">
-      <h2 className="refer-title">
-        Customers Review
-        <span className="underline"></span>
-      </h2>
+  <section className="reviewSection">
+  <h2 className="refer-title">
+    Customers Review
+    <span className="underline"></span>
+  </h2>
 
-      <div className="reviewContainer">
-        {reviews.map((review, index) => (
-          <div className="reviewCard" key={index}>
-            <div className="quote">❝</div>
-            <div className="userInfo">
-              <Image
-                src={review.image}
-                alt={review.name}
-                width={50}
-                height={50}
-                className="avatar"
-              />
-              <div>
-                <p className="name">{review.name}</p>
-                <div className="stars">
-                  {Array(review.rating)
-                    .fill()
-                    .map((_, i) => (
-                      <span key={i}>⭐</span>
-                    ))}
-                </div>
+ <Swiper
+  modules={[Navigation]}
+  spaceBetween={-20}
+  slidesPerView={2}
+  slidesPerGroup={1}
+  navigation
+  pagination={false}
+  className="reviewSwiper"
+>
+
+    {reviews.map((review, index) => (
+      <SwiperSlide key={index}>
+        <div className="reviewCard">
+          <div className="quote">❝</div>
+
+          <div className="userInfo">
+            <Image
+              src={review.image}
+              alt={review.name}
+              width={50}
+              height={50}
+              className="avatar"
+            />
+            <div>
+              <p className="name">{review.name}</p>
+              <div className="stars">
+                {Array(review.rating)
+                  .fill()
+                  .map((_, i) => (
+                    <span key={i}>⭐</span>
+                  ))}
               </div>
             </div>
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+</section>
+
 
      <section className="enterpriseSection">
       <h2 className="enterprise-title">
@@ -708,6 +742,7 @@ export default function Home() {
       </form>
     </section>
     </main>
-   
+    )}
+   </>
   );
 }

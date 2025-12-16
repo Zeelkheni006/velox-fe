@@ -60,6 +60,39 @@
     margin-bottom: 20px;
 }
 
+.topActions {
+    display: flex;
+    justify-content: flex-end;
+    /* 👉 right side */
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.showEntries {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.select1 {
+    margin: 0 6px;
+}
+
+.btntrue {
+    padding: 8px 24px;
+    background-color: #0070f3;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+}
+
+.btntrue:hover {
+    background-color: #0070f3;
+}
+
 .searchLabel {
     display: flex;
     align-items: center;
