@@ -18,7 +18,7 @@ export default function EditCategory() {
   const { popupMessage, popupType, showPopup } = usePopup();
 
   const [title, setTitle] = useState('');
-  const [categoryId, setCategoryId] = useState('');
+  const [categoryId, setCategory] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoUrl, setLogoUrl] = useState(null);
@@ -26,20 +26,20 @@ export default function EditCategory() {
   const [categories, setCategories] = useState([]);
 
   // ✅ Load subcategory data from localStorage
-  useEffect(() => {
-    const savedData = JSON.parse(localStorage.getItem("editSubCategoryData"));
+ useEffect(() => {
+  const savedData = JSON.parse(localStorage.getItem("editSubCategoryData"));
 
-    if (!savedData) {
-      showPopup("No edit data found!", "error");
-      router.push("/admin/sub-categories");
-      return;
-    }
+  if (!savedData) {
+    showPopup("No edit data found!", "error");
+    router.push("/admin/sub-categories");
+    return;
+  }
 
-    setTitle(savedData.title || "");
- setCategoryId(savedData.category_id || "");
+  setTitle(savedData.title || "");
+  setCategory((savedData.category_title || "")); // ✅ IMPORTANT
+  setLogoUrl(`${process.env.NEXT_PUBLIC_API_BASE_URL}${savedData.logo}`);
+}, []);
 
-    setLogoUrl(`${process.env.NEXT_PUBLIC_API_BASE_URL}${savedData.logo}`);
-  }, []);
 
   // ✅ Fetch categories list
   useEffect(() => {
@@ -134,19 +134,20 @@ export default function EditCategory() {
             />
 
             <label className={styles.editlabel}>CATEGORY</label>
-            <select
-              className={styles.editinput}
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              required
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.title}
-                </option>
-              ))}
-            </select>
+           <select
+  className={styles.editinput}
+  value={categoryId}
+  onChange={(e) => setCategory(e.target.value)}
+  required
+>
+  <option value="">Select Category</option>
+  {categories.map((cat) => (
+    <option key={cat.id} value={String(cat.id)}>
+      {cat.title}
+    </option>
+  ))}
+</select>
+
 
             <label className={styles.editlabel}>LOGO (SVG only)</label>
             <input

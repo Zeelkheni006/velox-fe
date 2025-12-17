@@ -169,6 +169,7 @@ const handlePhoneChange = (e) => {
           {otpStep === 1 && (
             <>
              <div className="modal-otp">
+            
               <h2>Verify Email</h2>
               <form onSubmit={handleEmailOtpSubmit} className="otp-form">
                 <input type="text" maxLength="6" placeholder="Enter Email OTP" value={otp} onChange={(e) => setEmailOtp(e.target.value)} required className="otp-input" disabled={loading} />

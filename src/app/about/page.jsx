@@ -4,6 +4,7 @@ import Image from "next/image";
 import './main.css';  
 import { useEffect ,useState} from 'react';
 import {getStats} from "../api/user-side/home_api";
+import PageLoader from "../../components/pageloader";
 const teamMembers = [
   {
     name: 'MAYANK RATHOD',
@@ -19,13 +20,26 @@ const teamMembers = [
  
 export default function aboutpage() {
    const [stats, setStats] = useState([]);
-
-  useEffect(() => {
-    async function fetchStats() {
+const [pageLoading, setPageLoading] = useState(true);
+const [apiDone, setApiDone] = useState({
+ 
+  stats: false,
+});
+useEffect(() => {
+  if ( apiDone.stats) {
+    setPageLoading(false);
+  }
+}, [apiDone]);
+useEffect(() => {
+  async function fetchStats() {
+    try {
       const data = await getStats();
       console.log("📌 Final Stats Data:", data);
 
-      if (!data) return;
+      if (!data) {
+        setStats([]);
+        return;
+      }
 
       const formatted = [
         {
@@ -56,11 +70,21 @@ export default function aboutpage() {
 
       console.log("📌 FORMATTED STATS:", formatted);
       setStats(formatted);
-    }
 
-    fetchStats();
-  }, []);
+    } catch (error) {
+      console.error("❌ Stats API error:", error);
+      setStats([]);
+    } finally {
+      // 🔥 STATS API COMPLETE SIGNAL
+      setApiDone(prev => ({ ...prev, stats: true }));
+    }
+  }
+
+  fetchStats();
+}, []);
     return (
+      <>{pageLoading && <PageLoader />}
+       {!pageLoading && (
         <section className="container">
       <h2 className="title">
         Velox Solution : Leading the Way in Doorstep Service Innovation
@@ -177,6 +201,7 @@ export default function aboutpage() {
       </div>
     </div>
         </section>  
-    
+          )}
+    </>
     );
 }

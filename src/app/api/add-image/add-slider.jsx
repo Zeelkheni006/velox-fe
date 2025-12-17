@@ -1,16 +1,22 @@
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function addSlider(formData) {
+export async function addSlider(formData, service_id) {
   try {
-    const token = localStorage.getItem('access_token'); // get your token
+    const token = localStorage.getItem("access_token");
 
-    const res = await fetch(`${API_BASE_URL}/api/v1/admin/slider-image/add`, {
-      method: "POST",
-      headers: {
-        'Authorization': `Bearer ${token}` // use the correct variable
-      },
-      body: formData, // formData includes files and other fields
-    });
+    // ✅ service_id add to formData
+    formData.append("service_id", service_id);
+
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/admin/slider-image/add`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
 
     const data = await res.json();
 
@@ -24,6 +30,7 @@ export async function addSlider(formData) {
     throw err;
   }
 }
+
 
 
     // ✅ GET sliders list
@@ -110,6 +117,58 @@ export const getCategories = async () => {
   }
 };
 
+export const updateSlider = async (id, formData) => {
+  try {
+    const token = localStorage.getItem("access_token");
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/slider-image/update/${id}`, {
+      method: "PATCH", // Update API mostly PUT
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: formData, // formData includes files, title, service_id, description
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed to update slider");
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Update slider error:", err);
+    throw err;
+  }
+};
+
+export const updateSliderStatus = async (id, status) => {
+  try {
+    const token = localStorage.getItem("access_token"); // 🔑 access token
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/slider-image/update-status/${id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // 🔑 pass token
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData?.message || "Failed to update slider status");
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Error updating slider status:", err);
+    throw err;
+  }
+};
 
 
 

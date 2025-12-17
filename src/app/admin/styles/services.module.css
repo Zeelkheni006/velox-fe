@@ -358,6 +358,13 @@
     font-size: 15px;
 }
 
+.fild {
+    color: #888;
+    text-align: left;
+    font-size: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 
 /* Dropdown Select Styling */
 

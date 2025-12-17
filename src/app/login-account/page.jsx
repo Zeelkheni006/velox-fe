@@ -33,10 +33,10 @@ const isEmail = (v) => /\S+@\S+\.\S+/.test(v);
         setLoginType(res.data.login_type);
         setUserId(res.data.user_id);
       } else {
-        showPopup(res.message || "Login failed.");
+        showPopup(res.message || "Login failed.","error");
       }
     } catch (err) {
-      showPopup(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.","error");
     }
   };
 
@@ -57,17 +57,17 @@ const isEmail = (v) => /\S+@\S+\.\S+/.test(v);
           router.push(`/otp?mobile=${loginValue.trim()}`);
         }
       } else {
-        showPopup(res.message || "Failed to send OTP.");
+        showPopup(res.message || "Failed to send OTP.","error");
       }
     } catch (err) {
       console.error(err);
-      showPopup(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.","error");
     }
   };
 
   // Step 3: Login with password
   const handlePasswordLogin = async () => {
-    if (!password) return alert("Enter your password.");
+    if (!password) return showPopup("Enter your password.");
 
     try {
       const res = await loginWithPassword(loginValue.trim(), password);
@@ -77,10 +77,10 @@ const isEmail = (v) => /\S+@\S+\.\S+/.test(v);
         showPopup(res.message || "Logged in successfully!");
         router.push("/dashboard");
       } else {
-        showPopup(res.message || "Password login failed.");
+        showPopup(res.message || "Password login failed.","error");
       }
     } catch (err) {
-      showPopup(err.message || "API call failed.");
+      showPopup(err.message || "API call failed.","error");
     }
   };
 

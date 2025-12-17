@@ -430,6 +430,8 @@
     margin-top: 20px;
     text-align: left;
     font-size: 15px;
+    color: #888;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .flex1 label {

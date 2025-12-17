@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 import usePopup from "../../components/popup"
 import PopupAlert from "../../components/PopupAlert";// ✅ Import icons
 import { SlHome } from "react-icons/sl";
-
+import { getServiceTitleIds } from "../../../api/admin-service/category-list";
 const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
 
 export default function AddSlider() {
@@ -24,36 +24,41 @@ export default function AddSlider() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
+  const [serviceId, setServiceId] = useState("");
+const [services, setServices] = useState([]);
   const editor = useRef(null);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("title", title);
-    // formData.append("service", service);  ❌ remove if backend doesn't need it
-    formData.append("image", image);
-    formData.append("mobile_image", mobileImage);
-    formData.append("description", description);
+  if (!image || !mobileImage) {
+    showPopup("❌ Please upload both images");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await addSlider(formData);
-      showPopup("✅ Slider added successfully!");
-      
-      // Reset form
-      setTitle("");
-      setService("");
-      setImage(null);
-      setMobileImage(null);
-      setDescription("");
-    } catch (err) {
-      showPopup(err.message || "Something went wrong!");
-  
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const formData = new FormData();
+  formData.append("title", title);
+  formData.append("service_id", serviceId);
+  formData.append("image", image);
+  formData.append("mobile_image", mobileImage);
+  formData.append("description", description);
+
+  try {
+    setLoading(true);
+    await addSlider(formData);
+    showPopup("✅ Slider added successfully!");
+
+    setTitle("");
+    setServiceId("");
+    setImage(null);
+    setMobileImage(null);
+    setDescription("");
+  } catch (err) {
+    showPopup(err.message || "Something went wrong!","error");
+  } finally {
+    setLoading(false);
+  }
+};
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -63,6 +68,21 @@ export default function AddSlider() {
       const goToManageCustomer = () => {
     router.push("/admin/services"); // Customer page
   };
+
+  useEffect(() => {
+  setMounted(true);
+
+  const fetchServices = async () => {
+    try {
+      const data = await getServiceTitleIds();
+      setServices(data); // [{label, value}]
+    } catch (err) {
+      showPopup("❌ Failed to load services","error");
+    }
+  };
+
+  fetchServices();
+}, []);
   return (
     <Layout>
              <PopupAlert message={popupMessage} type={popupType} />
@@ -72,7 +92,7 @@ export default function AddSlider() {
             <div>
                                 <span className="breadcrumb"style={{ cursor: "pointer"}}
                                 onClick={goToManageCustomer}>Slider</span> 
-                                   <span className={styles.separator}> | </span>
+                                   <span className="separator"> | </span>
                                                <SlHome
                                                       style={{ verticalAlign: "middle", margin: "0 5px", cursor: "pointer" }}
                                                       onClick={goToDashboard}
@@ -100,18 +120,18 @@ export default function AddSlider() {
 </label>
           <label>Service
           <select
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-            required
-          >
-           
-            <option value="">Select Service</option>
-            <option value="AC Services">AC Services</option>
-            <option value="Pedicure">Pedicure</option>
-            <option value="Facial">Facial</option>
-            <option value="Car Wash">Car Wash</option>
-            <option value="Kitchen Cleaning">Kitchen Cleaning</option>
-          </select>
+    value={serviceId}
+    onChange={(e) => setServiceId(e.target.value)}
+    required
+  >
+    <option value="">Select Service</option>
+
+    {services.map((service) => (
+      <option key={service.value} value={service.value}>
+        {service.label}
+      </option>
+    ))}
+  </select>
  </label>
           <label>Image
           <input
