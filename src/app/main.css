@@ -1038,19 +1038,27 @@
         }
         /* Button */
         
-        .steps-btn {
-            background-color: #ff7a00;
-            padding: 12px 32px;
-            border: none;
+        .book-now-btn {
+            background-color: #f97316;
+            /* orange-500 */
+            color: #ffffff;
+            padding: 16px 32px;
+            /* px-8 py-4 */
             border-radius: 9999px;
-            color: white;
-            font-size: 16px;
+            /* rounded-full */
+            font-size: 18px;
+            /* text-lg */
             font-weight: 600;
+            border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin-top: 50px;
+        }
+        
+        .book-btn-wrapper {
+            margin-top: 40px;
+            /* mt-10 */
+            display: flex;
             justify-content: center;
-            align-items: center;
         }
         
         .steps-btn:hover {
@@ -4071,25 +4079,88 @@
         .page-loader {
             position: fixed;
             inset: 0;
-            background: #ffffff;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loader-image {
+            animation: spin 1.2s linear infinite;
+            margin-bottom: 14px;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .page-loader h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .page-loader p {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .page-loader {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 999999;
+            height: 100vh;
         }
         
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid #eee;
-            border-top: 6px solid orange;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .loader-diamond {
+            position: relative;
+            width: 130px;
+            /* ⬆ gap mate thodu vadharo */
+            height: 130px;
         }
         
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+        .loader-diamond img {
+            position: absolute;
+            /* transition: all 0.35s ease-in-out; */
+            transition: none;
+        }
+        /* TOP */
+        /* ✅ transition only after JS enables animation */
+        
+        .loader-diamond.animate img {
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .top {
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+        /* BOTTOM */
+        
+        .bottom {
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+        /* LEFT */
+        
+        .left {
+            left: 0;
+            top: 50%;
+            transform: translate(0, -50%);
+        }
+        /* RIGHT */
+        
+        .right {
+            right: 0;
+            top: 50%;
+            transform: translate(0, -50%);
         }

@@ -102,11 +102,6 @@ export default function EditFranchiseUser() {
             onChange={handleChange}
           /> */}
 
-          <label>Role</label>
-          <select name="role" value={formData.role} onChange={handleChange}>
-            <option value="franchises">franchises</option>
-            <option value="admin">admin</option>
-          </select>
 
           <label>Password</label>
           <input

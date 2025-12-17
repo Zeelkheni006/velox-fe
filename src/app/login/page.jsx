@@ -18,7 +18,7 @@ export default function LoginTypeModal() {
   } else if (loginType === 'professional') {
     router.push('/professionallogin'); // (Optional: for other login types)
   } else {
-    showPopup("Please select a login type");
+    showPopup("Please select a login type","error");
   }
 };
 

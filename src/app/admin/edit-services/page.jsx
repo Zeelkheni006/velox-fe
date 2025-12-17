@@ -40,31 +40,32 @@ const { popupMessage, popupType, showPopup } = usePopup();
     }
     fetchData();
   }, []);
+useEffect(() => {
+  const storedService = localStorage.getItem("editServiceData");
+  if (!storedService) return;
 
-  useEffect(() => {
-  const storedService = localStorage.getItem("selectedService");
-  if (storedService) {
-    const service = JSON.parse(storedService);
+  const service = JSON.parse(storedService);
 
-    // ✅ Duration split (HH:MM)
-    const [hrs, mins] = service.duration ? service.duration.split(":") : ["00", "00"];
+  const [hrs, mins] = service.duration
+    ? service.duration.split(":")
+    : ["00", "00"];
 
-    setFormData({
-      title: service.title || "",
-      category_id: service.category_id || "",
-      sub_category_id: service.sub_category_id || "",
-      price: service.price || "",
-      displayNumber: service.display_number || "",
-      image: service.image || null,
-      banner: service.banner || null,
-      hours: hrs || "",
-      minutes: mins || "",
-    });
+  setFormData({
+    title: service.title || "",
+    category_id: service.category_id || "",
+    sub_category_id: service.sub_category_id || "",
+    price: service.price || "",
+    displayNumber: service.display_number || "",
+    image: service.image || null,
+    banner: service.banner || null,
+    hours: hrs,
+    minutes: mins,
+  });
 
-    setDescription(service.description || "");
-    setLongDescription(service.long_description || "");
-  }
+  setDescription(service.description || "");
+  setLongDescription(service.long_description || "");
 }, []);
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -187,6 +188,7 @@ const handleSubmit = async (e) => {
 
 {/* ✅ Preview existing image or newly selected */}
 {formData.image && (
+   <div style={{ marginTop: "10px", textAlign: "left" }}>
   <img
     src={
       formData.image instanceof File
@@ -200,6 +202,7 @@ const handleSubmit = async (e) => {
     width={70}
     height={70}
   />
+  </div>
 )}
             {/* BANNER */}
            <label>BANNER</label>
@@ -212,6 +215,7 @@ const handleSubmit = async (e) => {
 
 {/* ✅ Preview existing banner or newly selected */}
 {formData.banner && (
+   <div style={{ marginTop: "10px", textAlign: "left" }}>
   <img
     src={
       formData.banner instanceof File
@@ -223,6 +227,7 @@ const handleSubmit = async (e) => {
     alt="Banner"
     className={styles.previewBanner}
   />
+  </div>
 )}
             {/* PRICE | DISPLAY NUMBER */}
             <div className={styles.flexRow}>
@@ -257,13 +262,46 @@ const handleSubmit = async (e) => {
             </div>
 
             {/* DESCRIPTION */}
+            <div className={styles.fild}>
             <label>DESCRIPTION</label>
-            <JoditEditor value={description} onBlur={setDescription} />
+            <JoditEditor value={description} onBlur={setDescription} 
+               config={{
+      readonly: false,
+      height: 200,
+      toolbarSticky: false,
+      buttons: [
+         'undo', 'redo', '|',
+                      'bold', 'italic', 'underline', 'strikethrough', '|',
+                      'backcolor', '|',
+                      'ul', 'ol', '|',
+                      'font', 'fontsize', 'brush', '|',
+                      'align', '|',
+                      'table', 'link', 'image', 'video', '|',
+                      'horizontalrule', 'source', '|',
+                      'help'
+      ]
+    }}/>
 
             {/* LONG DESCRIPTION */}
             <label>LONG DESCRIPTION</label>
-            <JoditEditor value={longDescription} onBlur={setLongDescription} />
-
+            <JoditEditor value={longDescription} onBlur={setLongDescription} 
+               config={{
+      readonly: false,
+      height: 200,
+      toolbarSticky: false,
+      buttons: [
+         'undo', 'redo', '|',
+                      'bold', 'italic', 'underline', 'strikethrough', '|',
+                      'backcolor', '|',
+                      'ul', 'ol', '|',
+                      'font', 'fontsize', 'brush', '|',
+                      'align', '|',
+                      'table', 'link', 'image', 'video', '|',
+                      'horizontalrule', 'source', '|',
+                      'help'
+      ]
+    }}/>
+</div>
             {/* SUBMIT */}
             <button type="submit" className={styles.submitButton}>
               Update

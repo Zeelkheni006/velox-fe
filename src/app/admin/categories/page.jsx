@@ -218,11 +218,6 @@ try {
   </div>
     )}
       </div>
-  {/* RIGHT SIDE — Search Box ALWAYS beside Filter Button */}
-
-
-
- 
     {/* Show Entries UNDER filter button */}
     <div className={styles.showEntries}>
       <label>
@@ -235,8 +230,6 @@ try {
         entries
       </label>
     </div>
- 
-
  
             <table className={styles.table}>
               <thead>

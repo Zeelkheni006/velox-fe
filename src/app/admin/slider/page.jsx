@@ -9,7 +9,7 @@ import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
 import { SlHome } from "react-icons/sl";
 import Select from "react-select";
-
+import {updateSliderStatus} from "../../api/add-image/add-slider"
 export default function SliderTable() {
   const router = useRouter();
   const [sliders, setSliders] = useState([]);
@@ -22,21 +22,24 @@ const [showFilter, setShowFilter] = useState(false);
   const { popupMessage, popupType, showPopup } = usePopup();
 
   useEffect(() => {
-    const fetchSliders = async () => {
-      setLoading(true);
-      try {
-        const res = await getSliders();
-        const data = Array.isArray(res)
-          ? res
-          : Array.isArray(res?.data)
-          ? res.data
-          : [];
-        setSliders(data);
-      } catch (err) {
-        console.error("Error fetching sliders:", err);
-      }
-      setLoading(false);
-    };
+ const fetchSliders = async () => {
+  setLoading(true);
+  try {
+    const res = await getSliders();
+
+    // ✅ correct path
+    const data = Array.isArray(res?.data?.sliderimages)
+      ? res.data.sliderimages
+      : [];
+
+    setSliders(data);
+  } catch (err) {
+    console.error("Error fetching sliders:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
     fetchSliders();
   }, []);
 
@@ -82,27 +85,55 @@ const sortedSliders = useMemo(() => {
     </span>
   );
 
-  const handleEdit = (id) => router.push(`/admin/edit-slider?id=${id}`);
+ 
 
   const handleDelete = (id) => {
     showPopup("Delete API is pending", "error");
   };
 
-  const handleToggleStatus = (id) => {
-    setSliders((prev) =>
-      prev.map((slider) =>
-        slider._id === id
-          ? { ...slider, status: !slider.status }
-          : slider
+const handleToggleStatus = async (id) => {
+  const slider = sliders.find(s => s.id === id);
+  if (!slider) return;
+
+  const newStatus = !slider.status; // ✅ boolean toggle
+
+  // 🔥 UI instantly update (NO REFRESH)
+  setSliders(prev =>
+    prev.map(s =>
+      s.id === id ? { ...s, status: newStatus } : s
+    )
+  );
+
+  try {
+    await updateSliderStatus(id, newStatus);
+    showPopup("✅ Status updated successfully!", "success");
+  } catch (err) {
+    console.error(err);
+
+    // ❌ API fail → rollback UI
+    setSliders(prev =>
+      prev.map(s =>
+        s.id === id ? { ...s, status: slider.status } : s
       )
     );
-    showPopup("Status Updated ✅", "success");
-  };
+
+    showPopup("❌ Failed to update status", "error");
+  }
+};
 
     const goToDashboard = () => {
     router.push("/admin/dashboard"); 
   };
+const handleEdit = (id) => {
+  const slider = sliders.find(s => s.id === id);
+  if (!slider) return;
 
+  // ✅ Store full data for edit page
+  localStorage.setItem("editSliderData", JSON.stringify(slider));
+
+  // ✅ Navigate with ID in URL
+  router.push(`/admin/edit-slider?id=${id}`);
+};
 
   return (
     <Layout>
@@ -126,7 +157,7 @@ const sortedSliders = useMemo(() => {
         </div>
 </div>
         <div className="tableCard">
-              <div classNam="header">
+              <div className="header">
           <h3 className="tableTitle">Manage Sliders</h3>
           <button className="addBtn" onClick={() => router.push("/admin/admin-add/add-slider")}>
             + Add New
@@ -224,14 +255,14 @@ const sortedSliders = useMemo(() => {
       return (
         <tr
           key={slide._id}
-          onDoubleClick={() => handleEdit(slide._id)}
+          onDoubleClick={() => handleEdit(slide.id)}
           style={{ cursor: "pointer" }}
         >
           <td onClick={(e) => handleCopy(e, slide.title, "title", showPopup)}>
             {slide.title}
           </td>
 
-          <td>
+          <td onClick={(e)=> handleCopy(e, slide.image,"image",showPopup)}>
             <img
               src={
                 slide.image
@@ -255,19 +286,32 @@ const sortedSliders = useMemo(() => {
           </td>
 
           <td>
-            <button className="edit-btn" onClick={() => handleEdit(slide._id)}>Edit</button>
+          <button
+  className="edit-btn"
+  onClick={() => {
+    // ✅ Store full slider data
+    localStorage.setItem("editSliderData", JSON.stringify(slide));
+
+    // ✅ Only ID in URL
+    router.push(`/admin/edit-slider?id=${slide.id}`);
+  }}
+>
+  Edit
+</button>
+
             <button className="delete-btn" onClick={() => handleDelete(slide._id)}>Delete</button>
 
-            <button
-              className="toggle-btn"
-              style={{
-                backgroundColor: isActive ? "#5cb85c" : "#d9534f",
-                color: "white",
-              }}
-              onClick={() => handleToggleStatus(slide._id)}
-            >
-              {isActive ? "Inactive" : "Active"}
-            </button>
+ <button
+  className="toggle-btn"
+  style={{
+    backgroundColor: slide.status ? "#d9534f" : "#5cb85c",
+    color: "white",
+  }}
+  onClick={() => handleToggleStatus(slide.id)}
+>
+  {slide.status ? "Inactive" : "Active"}
+</button>
+
           </td>
         </tr>
       );

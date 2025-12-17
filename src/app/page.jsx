@@ -126,17 +126,20 @@ export default function Home() {
     const [fullLocation, setFullLocation] = useState("");
     const { popupMessage, popupType, showPopup } = usePopup();
     const [suggestions, setSuggestions] = useState([]);
-
+const [isMobile, setIsMobile] = useState(false);
 useEffect(() => {
   const fetchSlides = async () => {
     try {
-      const data = await getSliders();
+      const res = await getSliders();
 
-      if (Array.isArray(data)) setSlides(data);
-      else if (Array.isArray(data?.data)) setSlides(data.data);
-      else setSlides([]);
+      // ✅ correct path
+      const slidesData = Array.isArray(res?.data?.sliderimages)
+        ? res.data.sliderimages.filter(slide => slide.status === true) // optional
+        : [];
 
+      setSlides(slidesData);
     } catch (err) {
+      console.error("Slider fetch error:", err);
       setSlides([]);
     } finally {
       setApiDone(prev => ({ ...prev, sliders: true }));
@@ -144,6 +147,16 @@ useEffect(() => {
   };
 
   fetchSlides();
+}, []);
+useEffect(() => {
+  const checkScreen = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  checkScreen(); // initial
+  window.addEventListener("resize", checkScreen);
+
+  return () => window.removeEventListener("resize", checkScreen);
 }, []);
 
 
@@ -312,10 +325,16 @@ const [pageLoading, setPageLoading] = useState(true);
       <SwiperSlide key={slide.id || index}>
         <div className="heroSlide">
           <img
-            src={slide.image ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}` : "https://via.placeholder.com/800x500"}
-            alt={slide.title || "Slide"}
-            className="heroSlide max-w-full max-h-full object-contain"
-          />
+  src={
+    isMobile && slide.mobile_image
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.mobile_image}`
+      : slide.image
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${slide.image}`
+      : "https://via.placeholder.com/800x500"
+  }
+  alt={slide.title || "Slide"}
+  className="heroSlide max-w-full max-h-full object-cover"
+/>
           <div className="heroOverlay"></div>
           <div className="heroContent">
             <h1 className="heroTitle">{slide.title}</h1>
@@ -604,11 +623,11 @@ const [pageLoading, setPageLoading] = useState(true);
     </div>
 
     {/* Button */}
-    <div className="mt-10 ">
-      <button className=" bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-full font-semibold text-lg steps-btn">
-        Book Now
-      </button>
-    </div>
+   <div className="book-btn-wrapper">
+  <button className="book-now-btn">
+    Book Now
+  </button>
+</div>
   </div>
 </section>
 
