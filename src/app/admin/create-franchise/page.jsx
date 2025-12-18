@@ -28,7 +28,7 @@ const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
       const [cities, setCities] = useState([]);
       const [serviceOptions, setServiceOptions] = useState([]);
       const [selectedServices, setSelectedServices] = useState([]);
-const ownerEmailParam = searchParams.get("owner_email");
+const ownerEmailParam = searchParams.get("admin_id");
 const [countryCode, setCountryCode] = useState("");
 const [initialServices, setInitialServices] = useState([]);
       const mapRef = useRef(null);
@@ -254,8 +254,8 @@ const handleSubmit = async (e) => {
 };
 
 
-    const fetchFranchiseOwnerData = async (email) => {
-  const res = await getFranchiseOwnersData(email);
+    const fetchFranchiseOwnerData = async (adminId) => {
+  const res = await getFranchiseOwnersData(adminId);
 
   if (res?.success && res.data) {
     const f = res.data.franchise_data;  

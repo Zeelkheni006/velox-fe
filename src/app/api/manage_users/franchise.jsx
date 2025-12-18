@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 export const getFranchiseOwners = async (
   page = 1,
   perPage = 10,
-  hasFranchise = 1 // 🔥 default = 1
+  hasFranchise = 1 
 ) => {
   try {
     if (typeof window === "undefined")
@@ -45,19 +45,20 @@ export const getFranchiseOwners = async (
   }
 };
 
-export const getFranchiseOwnersData = async (ownerEmail) => {
+export const getFranchiseOwnersData = async (adminId) => {
   try {
     const token = localStorage.getItem("token");
     
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/get/franchise-owners-data`,
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/get/franchise-owners-data/${adminId}`,
        {
       method: "POST", // IMPORTANT
       headers: {
         "Content-Type": "application/json",
         Authorization: token ? `Bearer ${token}` : "",
       },
-      body: JSON.stringify({ owner_email: ownerEmail }), // JSON body
+      body: JSON.stringify({ 
+        admin_id: adminId }), // JSON body
     });
 
     const json = await response.json();
@@ -78,13 +79,68 @@ export const makeFranchise = async (formData) => {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: formData,   // <-- use directly
+      body: formData,   
     }
   );
 
   const data = await res.json();
   return data;
 };
+// src/app/api/manage_users/franchise.jsx
+export const updateFranchiseOwner = async (adminId, payload) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/update/franchise-owner-data/${adminId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    const data = await res.json();
+
+    console.log("STATUS:", res.status);
+    console.log("RESPONSE:", data);
+
+    return data;
+  } catch (err) {
+    console.error(err);
+    return { success: false, message: "Network error" };
+  }
+};
+export const searchFranchiseOwners = async (query) => {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/search?q=${encodeURIComponent(query)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      const text = await res.text();  // get backend message
+      console.warn("Search API failed:", res.status, text);
+      return { success: false, data: [] };
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return { success: false, data: [] };
+  }
+};
+
+
 
 
 
