@@ -6,17 +6,17 @@ import styles from "../styles/Franchises.module.css"; // you’ll create this CS
 import Layout from "../pages/page";
 import { SlHome } from "react-icons/sl";
 import { useRouter } from "next/navigation";
+import { updateFranchiseOwner } from "../../api/manage_users/franchise";
 
 export default function EditFranchiseUser() {
   const searchParams = useSearchParams();
+   const adminId = searchParams.get("admin_id");
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     mobile: "",
-    role: "franchises",
     password: "",
-    file: null,
   });
 
   useEffect(() => {
@@ -24,26 +24,55 @@ export default function EditFranchiseUser() {
       name: searchParams.get("name") || "",
       email: searchParams.get("email") || "",
       mobile: searchParams.get("mobile") || "",
-      role: "franchises",
+     
       password: "",
       file: null,
     });
   }, [searchParams]);
 
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === "file") {
-      setFormData({ ...formData, file: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+  useEffect(() => {
+  const stored = localStorage.getItem("franchiseOwnersData");
+  if (!stored) return;
+
+  const owner = JSON.parse(stored);
+
+  setFormData({
+    owner_name: owner.owner_name || "",
+    owner_email: owner.owner_email || "",
+    owner_phone: owner.owner_phone || "",
+    password: "",
+  });
+}, []);
+
+ const handleChange = (e) => {
+  const { name, value } = e.target;
+  setFormData(prev => ({ ...prev, [name]: value }));
+};
+
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const payload = {
+    owner_name: formData.owner_name,
+    owner_email: formData.owner_email,
+    owner_phone: formData.owner_phone,
+    password: formData.password || undefined, // empty hoy to skip
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // 🚀 Submit logic here
-    console.log("Updated Data:", formData);
-  };
+  if (formData.password && formData.password.length >= 8) {
+    payload.password = formData.password;
+  }
+  const res = await updateFranchiseOwner(adminId, payload);
+
+  if (res.success) {
+    alert("Franchise user updated successfully ✔");
+    router.push("/admin/franchises-user");
+  } else {
+    alert(res.message || "Update failed");
+  }
+};
+
       const goToDashboard = () => {
     router.push("/admin/dashboard"); // Replace with your dashboard route
   };
@@ -73,24 +102,24 @@ export default function EditFranchiseUser() {
           <label>Name</label>
           <input
             type="text"
-            name="name" 
-            value={formData.name}
+            name="owner_name" 
+            value={formData.owner_name}
             onChange={handleChange}
           />
 
           <label>Email</label>
           <input
             type="email"
-            name="email"
-            value={formData.email}
+            name="owner_email"
+            value={formData.owner_email}
             onChange={handleChange}
           />
 
           <label>Phone</label>
           <input
             type="text"
-            name="mobile"
-            value={formData.mobile}
+            name="owner_phone"
+            value={formData.owner_phone}
             onChange={handleChange}
           />
 

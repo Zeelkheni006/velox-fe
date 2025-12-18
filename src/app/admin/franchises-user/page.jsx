@@ -1,16 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter,useSearchParams } from "next/navigation";
 import Layout from "../pages/page";
 import { SlHome } from "react-icons/sl";
 import styles from "../styles/Franchises.module.css";
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
-import { getFranchiseOwners ,getFranchiseOwnersData} from "../../api/manage_users/franchise";
+import { getFranchiseOwners ,getFranchiseOwnersData,searchFranchiseOwners} from "../../api/manage_users/franchise";
 
 export default function FranchisesPage() {
-  const router = useRouter();
+ const router = useRouter();
+const searchParams = useSearchParams(); 
+const adminId = searchParams.get("admin_id");
 const { popupMessage, popupType, showPopup } = usePopup();
   const [franchises, setFranchises] = useState([]);
   const [totalEntries, setTotalEntries] = useState(0);
@@ -19,13 +21,14 @@ const { popupMessage, popupType, showPopup } = usePopup();
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
 const [hasFranchise, setHasFranchise] = useState(1);
-  // ✅ Fetch data from API
+
+  //  Fetch data from API
 useEffect(() => {
   const fetchData = async () => {
     const res = await getFranchiseOwners(
       currentPage,
       entriesPerPage,
-      hasFranchise // 👈 IMPORTANT
+      hasFranchise 
     );
 
     if (res.success) {
@@ -41,7 +44,7 @@ useEffect(() => {
 }, [currentPage, entriesPerPage, hasFranchise]);
 
 
-  // ✅ Sorting logic
+  //  Sorting logic
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
@@ -69,6 +72,37 @@ useEffect(() => {
   const startIndex = (currentPage - 1) * entriesPerPage;
   const endIndex = Math.min(startIndex + entriesPerPage, filtered.length);
   
+useEffect(() => {
+  const delayDebounce = setTimeout(async () => {
+    const trimmed = search.trim();
+
+    // If search is empty or too short, just fetch full list
+    if (!trimmed || trimmed.length < 3) {
+      const res = await getFranchiseOwners(currentPage, entriesPerPage, hasFranchise);
+      if (res.success) {
+        setFranchises(res.data);
+        setTotalEntries(res.total);
+      }
+      return;
+    }
+
+    // Only call API if query length >= 3
+    try {
+      const res = await searchFranchiseOwners(trimmed);
+      if (res.success) {
+        setFranchises(res.data); 
+        setTotalEntries(res.data.length); // if API does not return total
+        setCurrentPage(1);
+      }
+    } catch (e) {
+      console.warn("Search query not valid for backend", e);
+    }
+
+  }, 500);
+
+  return () => clearTimeout(delayDebounce);
+}, [search]);
+
 
 
   return (
@@ -113,7 +147,7 @@ useEffect(() => {
   <button
     className={styles.btntrue}
     onClick={() => {
-      setHasFranchise((prev) => (prev === 1 ? 0 : 1)); // 👈 TOGGLE
+      setHasFranchise((prev) => (prev === 1 ? 0 : 1)); 
       setCurrentPage(1);
     }}
   >
@@ -145,35 +179,40 @@ useEffect(() => {
             </thead>
             <tbody>
               {filtered.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.admin_id}>
                   <td onClick={(e)=> handleCopy(e,item.owner_email,"name",showPopup)}>{item.owner_name}</td>
                   <td onClick={(e)=> handleCopy(e,item.owner_email,"email",showPopup)}>{item.owner_email}</td>
                   <td onClick={(e)=>handleCopy(e,item.owner_phone,"phone" , showPopup)}>{item.owner_phone}</td>
                   <td>
-                    <button
-                      className={styles.editButton}
-                      onClick={() =>
-                        router.push(
-                          `/admin/edit-franchise?id=${item.id}`
-                        )
-                      }
-                    >
-                      Edit
-                    </button>
-              {item.make_franchise_button_visible && (
+<button
+  className={styles.editButton}
+  onClick={() => {
+    // Current row na data store karo
+    localStorage.setItem("franchiseOwnersData", JSON.stringify(item));
+    // Edit page redirect
+    router.push(`/admin/edit-franchise?admin_id=${item.admin_id}`);
+  }}
+>
+  Edit
+</button>
+
+
+           {item.make_franchise_button_visible && (
   <button
     className={styles.createButton}
     onClick={async () => {
-      const res = await getFranchiseOwnersData(item.owner_email);
+      const res = await getFranchiseOwnersData(item.admin_id);
 
       if (res.success) {
         localStorage.setItem(
           "franchiseOwnersData",
           JSON.stringify(res.data)
         );
+
         router.push(
-          `/admin/create-franchise?owner_email=${item.owner_email}`
+          `/admin/create-franchise?admin_id=${item.admin_id}`
         );
+
         showPopup("Franchise owner data fetched successfully ✔", "success");
       } else {
         showPopup(res.message || "Failed to fetch data", "error");
