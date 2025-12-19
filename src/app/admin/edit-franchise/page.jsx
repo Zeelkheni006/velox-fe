@@ -6,12 +6,15 @@ import styles from "../styles/Franchises.module.css"; // you’ll create this CS
 import Layout from "../pages/page";
 import { SlHome } from "react-icons/sl";
 import { useRouter } from "next/navigation";
+import usePopup from "../components/popup"
+import PopupAlert from "../components/PopupAlert";
 import { updateFranchiseOwner } from "../../api/manage_users/franchise";
 
 export default function EditFranchiseUser() {
   const searchParams = useSearchParams();
    const adminId = searchParams.get("admin_id");
   const router = useRouter();
+  const { popupMessage, popupType, showPopup } = usePopup();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -66,10 +69,10 @@ export default function EditFranchiseUser() {
   const res = await updateFranchiseOwner(adminId, payload);
 
   if (res.success) {
-    alert("Franchise user updated successfully ✔");
+    showPopup("Franchise user updated successfully ✔");
     router.push("/admin/franchises-user");
   } else {
-    alert(res.message || "Update failed");
+    showPopup(res.message || "Update failed", "error");
   }
 };
 
@@ -81,6 +84,7 @@ export default function EditFranchiseUser() {
   };
   return (
     <Layout>
+        <PopupAlert message={popupMessage} type={popupType} />
        <div className={styles.container1}>
               <div className={styles.headerContainer}>
           <div>

@@ -10,10 +10,10 @@ import "./main.css";
 import Script from "next/script";
 import Link from 'next/link';
 import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
-import { getSliders , getFullLocation , getCategories} from "./api/add-image/add-slider"; 
+import {  getFullLocation , } from "./api/add-image/add-slider"; 
 import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
-import {getStats} from "./api/user-side/home_api";
+import {getStats, fetchSliders,getCategories} from "./api/user-side/home_api";
 import PageLoader from "../components/PageLoader";
 
 // Array with image + text
@@ -127,14 +127,21 @@ export default function Home() {
     const { popupMessage, popupType, showPopup } = usePopup();
     const [suggestions, setSuggestions] = useState([]);
 const [isMobile, setIsMobile] = useState(false);
-useEffect(() => {
-  const fetchSlides = async () => {
-    try {
-      const res = await getSliders();
 
-      // ✅ correct path
-      const slidesData = Array.isArray(res?.data?.sliderimages)
-        ? res.data.sliderimages.filter(slide => slide.status === true) // optional
+useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+  }, []);
+
+  // 🔹 Fetch slider data
+// 🔹 Fetch slider data
+useEffect(() => {
+  const getSliders = async () => {
+    try {
+      const res = await fetchSliders();
+
+      // ✅ Backend data path: res.data.sliderImages
+      const slidesData = Array.isArray(res?.data?.sliderImages)
+        ? res.data.sliderImages
         : [];
 
       setSlides(slidesData);
@@ -146,8 +153,9 @@ useEffect(() => {
     }
   };
 
-  fetchSlides();
+  getSliders();
 }, []);
+
 useEffect(() => {
   const checkScreen = () => {
     setIsMobile(window.innerWidth <= 768);

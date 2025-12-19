@@ -116,7 +116,7 @@
 }
 
 .section span {
-    color: #888;
+    /* color: #888; */
     font-size: 14px;
     text-align: left;
 }
@@ -167,13 +167,12 @@
 /* Status label colors */
 
 .status {
-    padding: 6px 12px;
+    padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;
-    font-weight: bold;
+    font-weight: 500;
     display: inline-block;
-    width: 80px;
-    /* ✅ Set a fixed width */
+    width: 70px;
     text-align: center;
 }
 

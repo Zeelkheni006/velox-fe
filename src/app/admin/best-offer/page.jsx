@@ -162,7 +162,17 @@ export default function Offer() {
                 currentOffers.map((offer, index) => (
                   <tr key={index}>
                     <td>{offer.title}</td>
-                    <td>{offer.status}</td>
+                     <td>
+                      <span
+                        className={`${styles.status} ${
+                          offer.status === "Active"
+                            ? styles.active
+                            : styles.inactive
+                        }`}
+                      >
+                        {offer.status}
+                      </span>
+                    </td>
                     <td>
                       <button
                         className={styles.editBtn}

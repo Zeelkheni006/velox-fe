@@ -61,24 +61,21 @@ useEffect(() => {
     setFranchises(sorted);
   };
 
-  const filtered = franchises.filter(
-    (f) =>
-      f.owner_name.toLowerCase().includes(search.toLowerCase()) ||
-      f.owner_email.toLowerCase().includes(search.toLowerCase()) ||
-      f.owner_phone.includes(search)
-  );
+ 
 
   const totalPages = Math.ceil(totalEntries / entriesPerPage);
   const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = Math.min(startIndex + entriesPerPage, filtered.length);
+ 
   
 useEffect(() => {
   const delayDebounce = setTimeout(async () => {
-    const trimmed = search.trim();
+    if (search.trim() === "") {
+      const res = await getFranchiseOwners(
+        currentPage,
+        entriesPerPage,
+        hasFranchise
+      );
 
-    // If search is empty or too short, just fetch full list
-    if (!trimmed || trimmed.length < 3) {
-      const res = await getFranchiseOwners(currentPage, entriesPerPage, hasFranchise);
       if (res.success) {
         setFranchises(res.data);
         setTotalEntries(res.total);
@@ -86,25 +83,30 @@ useEffect(() => {
       return;
     }
 
-    // Only call API if query length >= 3
-    try {
-      const res = await searchFranchiseOwners(trimmed);
-      if (res.success) {
-        setFranchises(res.data); 
-        setTotalEntries(res.data.length); // if API does not return total
-        setCurrentPage(1);
-      }
-    } catch (e) {
-      console.warn("Search query not valid for backend", e);
-    }
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("token")
+        : null;
+
+  const res = await searchFranchiseOwners(search, token);
+
+if (res.success && Array.isArray(res.data?.franchise_owners)) {
+  setFranchises(res.data.franchise_owners); // proper array
+  setTotalEntries(res.data.total); // total entries
+  setCurrentPage(1); // page reset
+} else {
+  setFranchises([]);
+  setTotalEntries(0);
+}
+
 
   }, 500);
 
   return () => clearTimeout(delayDebounce);
-}, [search]);
+}, [search, currentPage, entriesPerPage, hasFranchise]);
 
 
-
+const displayedData = franchises.slice(startIndex, startIndex + entriesPerPage);
   return (
     <Layout>
             <PopupAlert message={popupMessage} type={popupType} />
@@ -178,7 +180,7 @@ useEffect(() => {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((item) => (
+           {displayedData.map((item) => (
                 <tr key={item.admin_id}>
                   <td onClick={(e)=> handleCopy(e,item.owner_email,"name",showPopup)}>{item.owner_name}</td>
                   <td onClick={(e)=> handleCopy(e,item.owner_email,"email",showPopup)}>{item.owner_email}</td>
@@ -231,7 +233,8 @@ useEffect(() => {
 
           <div className={styles.pagination}>
             <span>
-              Showing {startIndex + 1} to {Math.min(startIndex + filtered.length, totalEntries)} of {totalEntries} entries
+          Showing {startIndex + 1} to {Math.min(startIndex + displayedData.length, totalEntries)} of {totalEntries} entries
+
             </span>
            
              <div className={styles.paginationControls}>

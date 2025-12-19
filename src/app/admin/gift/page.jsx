@@ -164,7 +164,17 @@ export default function Gift() {
                     <td>{offer.giftvalue}</td>
                     <td>{offer.image ? <Image src={offer.image} width={50} height={50} alt={offer.title} /> : "-"}</td>
                     <td>{offer.valideupto}</td>
-                    <td>{offer.status}</td>
+                    <td>
+                                        <span
+                                          className={`${styles.status} ${
+                                            offer.status === "Active"
+                                              ? styles.active
+                                              : styles.inactive
+                                          }`}
+                                        >
+                                          {offer.status}
+                                        </span>
+                                      </td>
                     <td>
                       <button className={styles.editBtn} onClick={() => { localStorage.setItem("selectedGift", JSON.stringify(offer)); router.push(`/admin/edit-gift?id=${offer.id}`); }}>Edit</button>
                       <button className={offer.status === "Active" ? styles.inactiveBtn : styles.activeBtn} onClick={() => toggleStatus(index)}>

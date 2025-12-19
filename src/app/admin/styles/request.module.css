@@ -149,7 +149,7 @@
 .statusBtn {
     display: inline-block;
     padding: 5px 10px;
-    border-radius: 5px;
+    border-radius: 12px;
     background-color: #ccf5f8;
     font-weight: 500;
     color: #00bcd4;

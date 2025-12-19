@@ -329,49 +329,68 @@ const validateStep3 = () => {
       
       <div className="container">
             <PopupAlert message={popupMessage} type={popupType} />
-        <h2 className="title">Easy <span>Register</span> Process</h2>
-        <div className="steps">
-          <div className="step">
-            <div className="circle1">1</div>
-            <div className="text">
-              <h3>Feel The Form</h3>
-              <p>
-                First of all you give us what you are doing In which category
-                you are the best ever in the world.
-              </p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="circle2">2</div>
-            <div className="text">
-              <h3>Call From Our HR Team</h3>
-              <p>
-                Our HR team will call you and get the perfect and full details
-                about your franchise worker and etc.
-              </p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="circle3">3</div>
-            <div className="text">
-              <h3>Document Verified</h3>
-              <p>
-                Document verification process for the customer and your safety
-                to help both of you.
-              </p>
-            </div>
-          </div>
-          <div className="step">
-            <div className="circle4">4</div>
-            <div className="text">
-              <h3>Enjoy Your Franchise</h3>
-              <p>
-                Enjoy your franchise with orders and help your customers to give
-                them full fill services.
-              </p>
-            </div>
-          </div>
-        </div>
+       <h2 className="title">
+  Easy <span>Register</span> Process
+</h2>
+
+<div className="steps">
+  <div className="step">
+    <div className="stepImage">
+          <span className="step-number">1</span>
+      <img src="/images/loaderImages/download2.png"className="step-circle" alt="Fill the form" />
+    </div>
+    <div className="text">
+      <h3>Fill The Form</h3>
+      <p>
+        First of all you give us what you are doing In which category
+        you are the best ever in the world.
+      </p>
+    </div>
+  </div>
+
+  <div className="step">
+    <div className="stepImage">
+       <span className="step-number">2</span>
+      <img src="/images/loaderImages/download1.png" className="step-circle"alt="HR call" />
+    </div>
+    <div className="text">
+      <h3>Call From Our HR Team</h3>
+      <p>
+        Our HR team will call you and get the perfect and full details
+        about your franchise worker and etc.
+      </p>
+    </div>
+  </div>
+
+  <div className="step">
+    <div className="stepImage">
+       <span className="step-number">3</span>
+      <img src="/images/loaderImages/download3.png" className="step-circle" alt="Document verified"/>
+    </div>
+    <div className="text">
+      <h3>Document Verified</h3>
+      <p>
+        Document verification process for the customer and your safety
+        to help both of you.
+      </p>
+    </div>
+  </div>
+
+  <div className="step">
+    <div className="stepImage">
+       <span className="step-number">4</span>
+      <img src="/images/loaderImages/download4.png"className="step-circle" alt="Enjoy franchise" />
+    </div>
+    <div className="text">
+      <h3>Enjoy Your Franchise</h3>
+      <p>
+        Enjoy your franchise with orders and help your customers to give
+        them full fill services.
+      </p>
+    </div>
+  </div>
+</div>
+
         <p className="query">
           Now Our Franchise first Easy registration verification and get the
           order and earn more income and give the satisfaction to our valuable

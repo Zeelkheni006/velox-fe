@@ -19,20 +19,18 @@
 }
 
 .steps {
+    position: relative;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 40px;
-    position: relative;
-    align-items: center;
-    text-align: center;
-    /* Ensures the circles are vertically aligned with the line */
+    margin-top: 60px;
 }
 
 .step {
+    width: 10%;
     text-align: center;
-    width: 30%;
     position: relative;
-    display: inline-block;
+    flex-direction: column;
+    z-index: 2;
 }
 
 .step-heading {
@@ -48,95 +46,17 @@
     color: #333;
 }
 
-.circle1 {
-    width: 100px;
-    height: 100px;
-    background-color: #9b59b6;
-    /* Four-color gradient */
-    /* Purple */
-    border-radius: 50%;
-    color: white;
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    margin-top: -20px;
-    /* Ensures circles are above the line */
-}
-
-.circle2 {
-    width: 100px;
-    height: 100px;
-    background-color: #3b90a5;
-    /* Four-color gradient */
-    /* Purple */
-    border-radius: 50%;
-    color: white;
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    margin-top: 20px;
-    /* Ensures circles are above the line */
-}
-
-.circle3 {
-    width: 100px;
-    height: 100px;
-    background-color: #469776;
-    /* Four-color gradient */
-    /* Purple */
-    border-radius: 50%;
-    color: white;
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    margin-top: -20px;
-    /* Ensures circles are above the line */
-}
-
-.circle4 {
-    width: 100px;
-    height: 100px;
-    background-color: #2c7922;
-    /* Four-color gradient */
-    /* Purple */
-    border-radius: 50%;
-    color: white;
-    font-size: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    border-radius: 50%;
-    margin-bottom: 10px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    z-index: 1;
-    margin-top: -20px;
-    /* Ensures circles are above the line */
-}
-
 .text {
     font-size: 1rem;
     color: #555;
-    margin-right: 130px;
     margin-top: 40px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: 700;
+    /* image dark hoy to white */
+    z-index: 2;
+    pointer-events: none;
 }
 
 .text h3 {
@@ -151,22 +71,23 @@
     color: #444;
     line-height: 1.4;
     width: 200px;
+    text-align: center;
 }
 
 .steps::before {
-    content: '';
+    content: "";
     position: absolute;
-    right: 150px;
-    top: 20%;
-    transform: translateY(-50%);
-    width: 800px;
-    height: 20px;
-    background: linear-gradient(to right, #9b59b6, #2980b9, #59a8b6, #1e803e);
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    z-index: -1;
-    left: 80px;
-    /* Ensures the line stretches across the full width */
+    top: -13px;
+    left: 8%;
+    right: 5%;
+    height: 16px;
+    background: linear-gradient( to right, #8154b3, /* purple */
+    #3c7baf, /* blue */
+    #12a99e, /* teal */
+    #225f37/* green */
+    );
+    border-radius: 20px;
+    z-index: 1;
 }
 
 .stepIndicator {
@@ -1069,4 +990,63 @@ button:hover {
 
 .nextBtn:focus {
     outline: none;
+}
+
+.stepImage {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-number {
+    position: absolute;
+    top: -2%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: 700;
+    color: #e9e9e9;
+    /* image dark hoy to white */
+    z-index: 2;
+    pointer-events: none;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+}
+
+.stepImage img {
+    width: 110px;
+    height: 110px;
+    object-fit: contain;
+    margin-top: -100px;
+    margin-bottom: 12px;
+    margin-right: 10px;
+}
+
+
+/* Common step */
+
+
+/* 🔥 Blob Shape */
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+    .processWrapper {
+        flex-direction: column;
+        gap: 50px;
+    }
+    .processStep {
+        width: 100%;
+    }
+    .shape::after {
+        display: none;
+    }
 }

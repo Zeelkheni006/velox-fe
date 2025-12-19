@@ -114,31 +114,78 @@ export const updateFranchiseOwner = async (adminId, payload) => {
     return { success: false, message: "Network error" };
   }
 };
+
 export const searchFranchiseOwners = async (query) => {
   try {
+    const token = localStorage.getItem("access_token"); // ✅ SAME KEY
+
     const res = await fetch(
       `${API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/search?q=${encodeURIComponent(query)}`,
       {
         method: "GET",
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: token ? `Bearer ${token}` : "",
         },
       }
     );
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const text = await res.text();  // get backend message
-      console.warn("Search API failed:", res.status, text);
+      console.warn("Search API failed:", res.status, data);
       return { success: false, data: [] };
     }
 
-    return await res.json();
+    return data;
   } catch (err) {
     console.error(err);
     return { success: false, data: [] };
   }
 };
+
+export const fetchFranchises = async () => {
+  try {
+    // ✅ Correct token key
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+      throw new Error("Access token not found. Please login.");
+    }
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchises`,
+      {
+        method: "GET",
+        headers: {
+          // ❌ Content-Type NOT added (preflight avoid)
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include", // optional but safe
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.message || `HTTP Error: ${res.status}`);
+    }
+
+    return data; // { success, data: { franchise_data: [] } }
+
+  } catch (err) {
+    console.error("Error fetching franchises:", err);
+    return {
+      success: false,
+      data: {
+        franchise_data: [],
+      },
+    };
+  }
+};
+
+
+
+
 
 
 

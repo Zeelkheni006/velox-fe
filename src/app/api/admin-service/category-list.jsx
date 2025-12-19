@@ -139,6 +139,33 @@ export const getServiceTitleIds = async () => {
   }
 };
 
+export const updateServiceStatus = async (serviceId) => {
+  try {
+    const token = localStorage.getItem("access_token"); 
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/service/update/status/${serviceId}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ token added
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Status update failed");
+    }
+
+    return data; // { success: true, message: "...", data: {...} }
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 
 

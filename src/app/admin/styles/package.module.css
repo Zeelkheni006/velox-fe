@@ -110,19 +110,29 @@
 }
 
 .activeStatus {
-    background: #22c55e;
-    color: #fff;
-    padding: 3px 6px;
+    background-color: #ccf5f8;
+    color: #00bcd4;
+    padding: 6px 12px;
     border-radius: 12px;
     font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
 }
 
 .inactiveStatus {
-    background: #ef4444;
-    color: #fff;
-    padding: 3px 6px;
+    background-color: #fdecea;
+    color: #f44336;
+    padding: 6px 12px;
     border-radius: 12px;
     font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    width: 80px;
+    /* ✅ Set a fixed width */
+    text-align: center;
 }
 
 .editBtn {
