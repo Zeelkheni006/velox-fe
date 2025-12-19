@@ -90,32 +90,7 @@ const res = await fetch(
 
 // api/home.js
 // api/categories.js
-export const getCategories = async () => {
-  try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home_page_body/categories/get`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Add authorization if required
-          // Authorization: `Bearer ${token}`,
-        },
-      }
-    );
 
-    if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "Failed to fetch categories");
-    }
-
-    const data = await res.json();
-    return data.data; // return the "data" array
-  } catch (error) {
-    console.error("Error fetching categories:", error);
-    return [];
-  }
-};
 
 export const updateSlider = async (id, formData) => {
   try {

@@ -4152,14 +4152,14 @@
         }
         /* LEFT */
         
-        .left {
+        .left1 {
             left: 0;
             top: 50%;
             transform: translate(0, -50%);
         }
         /* RIGHT */
         
-        .right {
+        .right1 {
             right: 0;
             top: 50%;
             transform: translate(0, -50%);

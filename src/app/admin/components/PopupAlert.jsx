@@ -5,6 +5,7 @@ import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 export default function PopupAlert({ message, type }) {
   if (!message) return null;
 
+   const displayMessage = typeof message === "object" ? (message?.message || JSON.stringify(message)) : message;
   return (
      <div
       className={`${styles["email-popup"]} ${
@@ -18,11 +19,14 @@ export default function PopupAlert({ message, type }) {
       )}
 
     
-<span>
+{/* <span>
   {String(
     typeof message === "object" ? message?.message ?? "" : message ?? ""
   ).replace(/^✅ |^❌ /, "")}
-</span>
+</span> */}
+ <span>{displayMessage.replace(/^✅ |^❌ /, "")}</span>
+ {/* <span>{typeof message === "object" ? (message?.message || JSON.stringify(message)) : message}</span> */}
+
     </div>
   );
 }

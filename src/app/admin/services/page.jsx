@@ -12,7 +12,7 @@ import {
 import usePopup from "../components/popup"
 import PopupAlert from "../components/PopupAlert";
 import { handleCopy } from "../components/popup";
-import { getServices } from "../../api/admin-service/category-list";
+import { getServices,updateServiceStatus } from "../../api/admin-service/category-list";
 import { SlHome } from "react-icons/sl";
 import Select from "react-select";
 export default function ServicesPage() {
@@ -90,21 +90,42 @@ useEffect(() => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-const handleToggleStatus = (index) => {
-  const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
-  if (originalIndex !== -1) {
-    const updated = [...servicesList];
-    updated[originalIndex].status =
-      updated[originalIndex].status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-    setServicesList(updated);
+const handleToggleStatus = async (index) => {
+  const service = currentItems[index];
+  if (!service?.id) return;
+
+  try {
+    setLoading(true);
+
+    // 🔥 API CALL
+    const res = await updateServiceStatus(service.id);
+
+    // 🔄 Status toggle locally
+    const updatedStatus =
+      service.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+    setServicesList(prev =>
+      prev.map(s =>
+        s.id === service.id ? { ...s, status: updatedStatus } : s
+      )
+    );
 
     showPopup(
-      `Service "${updated[originalIndex].title}" status changed to ${updated[originalIndex].status}`,
+      `Service "${service.title}" status changed to ${updatedStatus}`,
       "success"
     );
+  } catch (error) {
+    console.error(error);
+    showPopup(
+      error?.message || "Failed to update service status",
+      "error"
+    );
+  } finally {
+    setLoading(false);
+    setOpenDropdownIndex(null);
   }
-  setOpenDropdownIndex(null);
 };
+
 
  const handleDelete = (index) => {
   const originalIndex = servicesList.findIndex(s => s.title === currentItems[index].title);
@@ -307,9 +328,11 @@ const handleToggleStatus = (index) => {
                             </li>
 
                             <li onClick={() => handleToggleStatus(index)}>
-                              <FontAwesomeIcon icon={service.status === "ACTIVE" ? faCircleXmark : faCircleCheck} />
-                              {service.status === "ACTIVE" ? "Inactivate" : "Activate"}
-                            </li>
+  <FontAwesomeIcon
+    icon={service.status === "ACTIVE" ? faCircleXmark : faCircleCheck}
+  />
+  {service.status === "ACTIVE" ? "Inactivate" : "Activate"}
+</li>
 
                             <li
                               onClick={() => {

@@ -31,72 +31,102 @@ export default function SignupPage() {
 
 
   // Step 0: Signup
-  const handleSignupSubmit = async (e) => {
-    e.preventDefault();
+ const handleSignupSubmit = async (e) => {
+  e.preventDefault();
 
-    if (formData.password !== formData.confirm_password) {
-      showPopup("❌ Passwords do not match!", "error");
+  if (formData.password !== formData.confirm_password) {
+    showPopup("❌ Passwords do not match!", "error"); // Password mismatch
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await signupUser(formData);
+    console.log("signupUser response:", res);
+
+    const id = res?.data?.user_id || res?.data?.userId || res?.user_id;
+    if (!id) {
+      // ❌ Backend did not return user id
+      showPopup(res?.message || "❌ Signup did not return userId", "error");
       return;
     }
 
-    setLoading(true);
-    try {
-      const res = await signupUser(formData);
-      const id = res?.data?.user_id || res?.data?.userId || res?.user_id;
-      if (!id) throw new Error("Signup did not return userId");
+    setUserId(String(id));
+    setOtpStep(1);
+    setEmailOtp("");
 
-      setUserId(String(id));
-      setOtpStep(1);
-      setEmailOtp("");
-      showPopup("✅ OTP sent to your email!", "success");
-    } catch (err) {
-      console.error(err);
-      showPopup(err?.data?.message || err.message || "Signup failed!", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ Success message from backend if available
+    showPopup(res?.message || "✅ OTP sent to your email!", "success");
+  } catch (err) {
+    console.error(err);
+    // ❌ Catch any API/network errors
+    showPopup(err?.response?.data?.message || err?.message || "Signup failed!", "error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Step 1: Email OTP
-  const handleEmailOtpSubmit = async (e) => {
-    e.preventDefault();
+ const handleEmailOtpSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
-    if (!otp.trim()) return showPopup("❌ Please enter the Email OTP.", "error");
+  if (!user_id) {
+    showPopup("❌ User ID missing. Please signup again.", "error");
+    return;
+  }
+  if (!otp.trim()) {
+    showPopup("❌ Please enter the Email OTP.", "error");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      await verifyEmail(Number(user_id), Number(otp.trim()));
-      setOtpStep(2);
-      setPhoneOtp("");
-      showPopup("✅ Email verified! Now enter OTP sent to your phone.", "success");
-    } catch (err) {
-      console.error(err);
-     showPopup(err?.data?.message || err.message || "Email OTP verification failed.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await verifyEmail(Number(user_id), Number(otp.trim()));
+    console.log("verifyEmail response:", res);
+
+    // ✅ Success message from backend if available
+    setOtpStep(2);
+    setPhoneOtp("");
+    showPopup(res?.message || "✅ Email verified! Now enter OTP sent to your phone.", "success");
+  } catch (err) {
+    console.error(err);
+    // ❌ Show backend error or fallback
+    showPopup(err?.response?.data?.message || err?.message || "Email OTP verification failed.", "error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Step 2: Phone OTP
-  const handlePhoneOtpSubmit = async (e) => {
-    e.preventDefault();
+const handlePhoneOtpSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!user_id) return showPopup("❌ User ID missing. Please signup again.", "error");
-    if (!Phoneotp.trim()) return showPopup("❌ Please enter the Phone OTP.", "error");
+  if (!user_id) {
+    showPopup("❌ User ID missing. Please signup again.", "error");
+    return;
+  }
+  if (!Phoneotp.trim()) {
+    showPopup("❌ Please enter the Phone OTP.", "error");
+    return;
+  }
 
-    setLoading(true);
-    try {
-      await verifyPhone(Number(user_id), Number(Phoneotp.trim()));
-      showPopup("✅ Phone verified! Signup complete.", "success");
-      router.push("/login");
-    } catch (err) {
-      console.error(err);
-      showPopup(err?.data?.message || err.message || "Phone OTP verification failed.", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await verifyPhone(Number(user_id), Number(Phoneotp.trim()));
+    console.log("verifyPhone response:", res);
+
+    // ✅ Success message from backend if available
+    showPopup(res?.message || "✅ Phone verified! Signup complete.", "success");
+    router.push("/login");
+  } catch (err) {
+    console.error(err);
+    // ❌ Show backend error or fallback
+    showPopup(err?.response?.data?.message || err?.message || "Phone OTP verification failed.", "error");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleClose = () => router.push("/");
 const handlePhoneChange = (e) => {

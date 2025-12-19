@@ -5,27 +5,51 @@ import Layout from "../pages/page";
 import styles from "../styles/Franchises.module.css";
 import dynamic from "next/dynamic";
 import { SlHome } from "react-icons/sl";
-const franchiseData = [
-  { id: 34, name: "ABC ENTERPRICE JAM", country: "India", state: "Gujarat", city: "Jamnagar", commission: "20%", status: "Active" },
-  { id: 33, name: "Velox Ahmedabad", country: "India", state: "Gujarat", city: "Ahmedabad", commission: "0%", status: "Active" },
-  { id: 32, name: "Spark Services", country: "India", state: "Gujarat", city: "Morbi", commission: "0%", status: "Active" },
-  { id: 31, name: "Execelent Management", country: "India", state: "Gujarat", city: "Rajkot", commission: "0%", status: "Active" },
-  { id: 30, name: "Jony Rathod", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
-  { id: 29, name: "Manisha Beauty Care", country: "India", state: "Gujarat", city: "Jamnagar", commission: "10%", status: "Active" },
-  { id: 28, name: "MP MANAGEMENT", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
-  { id: 27, name: "XYZ Car Service", country: "India", state: "Gujarat", city: "Surat", commission: "10%", status: "Active" },
-];
+import {fetchFranchises} from "../../api/manage_users/franchise"
+
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
 export default function FranchisesPage() {
   const router = useRouter();
-  const [franchises, setFranchises] = useState(franchiseData);
+const [franchises, setFranchises] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedFranchise, setSelectedFranchise] = useState(null);
+
+useEffect(() => {
+  const loadFranchises = async () => {
+    try {
+      const res = await fetchFranchises();   // API call
+
+      const apiData = res?.data?.franchise_data || [];
+
+      const mappedData = apiData.map(franchise => ({
+        id: franchise.franchise_id || '',
+        name: franchise.franchise_name || '',
+        country: franchsie.country || '',
+        state: franchise.state || '',
+        city: franchise.city || '',
+        commission: `${franchise.commission_rate}%` || '',
+        status: franchise.status ? "Active" : "Inactive" || '',
+        ownerName: franchise.owner_name || '',
+        email: franchise.email || '',
+        mobile: franchise.phone || '',
+        worker:franchise.worker_count || '',
+      }));
+
+      setFranchises(mappedData);
+    } catch (error) {
+      console.error("Franchise fetch error:", error);
+      setFranchises([]);
+    }
+  };
+
+  loadFranchises();
+}, []);
+
 
   // Sorting
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
@@ -153,9 +177,12 @@ export default function FranchisesPage() {
                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Id <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
+                <th>Owner name</th>
               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Franchise Name <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
+                <th>phone number</th>
+                <th>Email</th>
               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Country <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
@@ -168,6 +195,7 @@ export default function FranchisesPage() {
                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Commission <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
+                <th>Worker Count</th>
             <th>More Information</th>
                <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Status <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
@@ -179,11 +207,15 @@ export default function FranchisesPage() {
              {currentFranchises.map((franchise,index) => (
           <tr key={startIndex + index}>
               <td>{franchise.id}</td>
-              <td>{franchise.name}</td>
+              <td>{franchise.owner_name}</td>
+              <td>{franchise.franchise_name}</td>
+              <td>{franchise.phone}</td>
+              <td>{franchise.email}</td>
               <td>{franchise.country}</td>
               <td>{franchise.state}</td>
               <td>{franchise.city}</td>
-              <td>{franchise.commission}</td>
+              <td>{franchise.commission_rate}</td>
+              <td>{franchise.worker_count}</td>
               <td>
                 <a
     href="#"

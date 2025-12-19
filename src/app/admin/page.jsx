@@ -6,8 +6,9 @@ import Image from 'next/image';
 import Link from "next/link";
 import './admin-login.css';
 import { useRouter } from "next/navigation";
-import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 
+import usePopup from '../admin/components/popup';
+import PopupAlert from "../admin/components/PopupAlert";
 export default function AdminLoginPage() {
   const router = useRouter();  
   const [email, setEmail] = useState("");
@@ -17,10 +18,9 @@ export default function AdminLoginPage() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [emailStatus, setEmailStatus] = useState(""); // "success" | "error" | ""
-  const [popupMessage, setPopupMessage] = useState(""); 
-  const [popupType, setPopupType] = useState("");
-  const [id, setOtpId] = useState(""); // store OTP session ID
 
+  const [id, setOtpId] = useState(""); // store OTP session ID
+const { popupMessage, popupType, showPopup } = usePopup();
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
     setIsValidEmailFormat(validateEmail(e.target.value));
@@ -31,41 +31,26 @@ export default function AdminLoginPage() {
   const handleOtpChange = (e) => setOtp(e.target.value);
 
   // Validate email with API
-  useEffect(() => {
-    if (!isValidEmailFormat) return;
-    setLoading(true);
-    initiateAdminLogin(email)
-      .then(data => {
-        if(data.success){
-          setEmailStatus("success");
-          setPopupMessage("✅ Success! Email exists.");
-          setPopupType("success");
-        } else {
-          setEmailStatus("error");
-          setPopupMessage("❌ Email not found.");
-          setPopupType("error");
-        }
-      })
-      .catch(()=> {
+ useEffect(() => {
+  if (!isValidEmailFormat) return;
+  setLoading(true);
+  initiateAdminLogin(email)
+    .then(data => {
+      if(data.success){
+        setEmailStatus("success");
+        showPopup( "✅ Success! Email exists.", "success");
+      } else {
         setEmailStatus("error");
-        setPopupMessage("❌ email is Incorect!");
-        setPopupType("error");
-      })
-      .finally(()=> setLoading(false));
-  }, [email, isValidEmailFormat]);
-
-  // Popup auto-hide
-  useEffect(() => {
-    if (!popupMessage) return;
-    const timer = setTimeout(() => {
-      setPopupType(prev => prev + " hide"); 
-      setTimeout(() => {
-        setPopupMessage("");
-        setPopupType("");
-      }, 400);
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
+        showPopup(data.message || "❌ Email not found.", "error");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      setEmailStatus("error");
+      showPopup(err?.message || "❌ Email is incorrect!", "error");
+    })
+    .finally(()=> setLoading(false));
+}, [email, isValidEmailFormat]);
 
   // Handle sending OTP
 const handleSendOtp = async () => {
@@ -76,27 +61,25 @@ const handleSendOtp = async () => {
 
     if (data.success) {
       setOtpId(data.data.admin_id); // ← use admin_id
-      setPopupMessage("✅ OTP sent to your email.");
-      setPopupType("success");
+      // Backend message show karo
+      showPopup(data.message || "✅ OTP sent to your email.", "success");
       setStep("otpInput");
     } else {
-      setPopupMessage("❌ Failed to send OTP.");
-      setPopupType("error");
+      showPopup(data.message || "❌ Failed to send OTP.", "error");
     }
   } catch (err) {
     console.error(err);
-    setPopupMessage("❌ Failed to send OTP.");
-    setPopupType("error");
+    showPopup(err?.response?.data?.message || err.message || "❌ Failed to send OTP.", "error");
   } finally {
     setLoading(false);
   }
 };
 
+
   // Handle OTP verification
 const handleVerifyOtp = async () => {
   if (!id || !otp) {
-    setPopupMessage("❌ OTP or session missing. Send OTP again.");
-    setPopupType("error");
+    showPopup("❌ OTP or session missing. Send OTP again.", "error");
     return;
   }
 
@@ -105,21 +88,19 @@ const handleVerifyOtp = async () => {
     const data = await loginWithOtp(email, id, otp); // email, admin_id, otp
     console.log("loginWithOtp response:", data);
 
-   if (data.ok && data.success && data.data?.access_token) {
+    if (data.ok && data.success && data.data?.access_token) {
       // ✅ Store access token
       localStorage.setItem("access_token", data.data.access_token);
       localStorage.setItem("admin_id", data.data.admin_id);
-      setPopupMessage("✅ OTP verified successfully!");
-      setPopupType("success");
+
+      showPopup(data.message || "✅ OTP verified successfully!", "success");
       router.push("/admin/dashboard");
     } else {
-      setPopupMessage(`❌ ${data.message || "Invalid OTP"}`);
-      setPopupType("error");
+      showPopup(data.message || "❌ Invalid OTP", "error");
     }
   } catch (err) {
     console.error("OTP verify error:", err);
-    setPopupMessage("❌ OTP verification failed. Try again.");
-    setPopupType("error");
+    showPopup(err?.response?.data?.message || err.message || "❌ OTP verification failed. Try again.", "error");
   } finally {
     setLoading(false);
   }
@@ -127,59 +108,56 @@ const handleVerifyOtp = async () => {
 
 
 
+
   // Main button handler
-  const handleButtonClick = async () => {
-  if(step === "otpInput") {
-    await handleVerifyOtp();
-  } else if(step === "password") {
+const handleButtonClick = async () => {
+  if (step === "otpInput") {
+    await handleVerifyOtp(); // already shows backend messages via showPopup
+  } else if (step === "password") {
     setLoading(true);
     try {
       const data = await loginWithPassword(email, password);
-        if(data.success && data.data?.access_token) {
-      // ✅ Store access token
-      localStorage.setItem("access_token", data.data.access_token);
-      localStorage.setItem("admin_id", data.data.admin_id);
-        setPopupMessage("✅ Password is valid! Logging in...");
-        setPopupType("success");
+      
+      if (data.success && data.data?.access_token) {
+        // ✅ Store access token
+        localStorage.setItem("access_token", data.data.access_token);
+        localStorage.setItem("admin_id", data.data.admin_id);
+
+        // Show backend message if available
+        showPopup(data.message || "✅ Password is valid! Logging in...", "success");
 
         // Small delay so user sees the success message
         setTimeout(() => {
           router.push("../admin/dashboard");
         }, 800); // 0.8 seconds
       } else {
-        setPopupMessage("❌ Invalid password. Try again.");
-        setPopupType("error");
+        // Show backend error message if available
+        showPopup(data.message || "❌ Invalid password. Try again.", "error");
       }
-    } catch(err){
+    } catch (err) {
       console.error(err);
-      setPopupMessage("❌ Login failed. Try again.");
-      setPopupType("error");
+      // Show backend error if exists, else fallback
+      showPopup(err?.response?.data?.message || err.message || "❌ Login failed. Try again.", "error");
     } finally {
       setLoading(false);
     }
   } else {
-    await handleSendOtp(); // default click → send OTP
+    await handleSendOtp(); // default click → send OTP (already uses showPopup)
   }
 };
 
 
+
   return (
     <div className="admin-login-wrapper">
+           <PopupAlert message={popupMessage} type={popupType} />
       {[...Array(6)].map((_, i) => <div key={i} className={`pill-shape pill${i+1}`}></div>)}
       <div className="admin-login-card">
         <div className="admin-login-form">
           <h2 className="text-2xl font-semibold text-center mb-2">Login Now</h2>
           <p className="text-sm text-gray-500 text-center mb-6">Welcome Back, Please Sign In Below</p>
 
-          {/* Popup */}
-          {popupMessage && (
-            <div className={`email-popup ${popupType} show flex items-center gap-2`}>
-              {popupType==="success" ? 
-                <AiOutlineCheckCircle className="text-green-500 text-lg"/> : 
-                <AiOutlineCloseCircle className="text-red-500 text-lg"/>}
-              <span>{popupMessage.replace(/^✅ |^❌ /,"")}</span>
-            </div>
-          )}
+         
 
           {/* Email input */}
           <label className="block mb-1 text-sm font-medium text-gray-700">EMAIL ADDRESS</label>

@@ -32,8 +32,8 @@ export default function PageLoader() {
     <div className="page-loader">
       <div className={`loader-diamond ${animate ? "animate" : ""}`}>
         <Image src={images[order[0]]} className="top" width={65} height={65} alt="" />
-        <Image src={images[order[1]]} className="left" width={65} height={65} alt="" />
-        <Image src={images[order[2]]} className="right" width={65} height={65} alt="" />
+        <Image src={images[order[1]]} className="left1" width={65} height={65} alt="" />
+        <Image src={images[order[2]]} className="right1" width={65} height={65} alt="" />
         <Image src={images[order[3]]} className="bottom" width={65} height={65} alt="" />
       </div>
 
