@@ -5,14 +5,17 @@ import Layout from "../pages/page";
 import styles from "../styles/Franchises.module.css";
 import dynamic from "next/dynamic";
 import { SlHome } from "react-icons/sl";
-import {fetchFranchises} from "../../api/manage_users/franchise"
-
+ import usePopup from "../components/popup";
+    import PopupAlert from "../components/PopupAlert";
+import {fetchFranchises,fetchFranchiseById ,updateFranchiseStatus } from "../../api/manage_users/franchise"
+import Image from "next/image";
 
 const jsPDF = dynamic(() => import("jspdf").then(mod => mod.jsPDF), { ssr: false });
 
 export default function FranchisesPage() {
   const router = useRouter();
 const [franchises, setFranchises] = useState([]);
+  const { popupMessage, popupType, showPopup } = usePopup();
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(10);
   const [search, setSearch] = useState("");
@@ -26,19 +29,19 @@ useEffect(() => {
 
       const apiData = res?.data?.franchise_data || [];
 
-      const mappedData = apiData.map(franchise => ({
-        id: franchise.franchise_id || '',
-        name: franchise.franchise_name || '',
-        country: franchsie.country || '',
-        state: franchise.state || '',
-        city: franchise.city || '',
-        commission: `${franchise.commission_rate}%` || '',
-        status: franchise.status ? "Active" : "Inactive" || '',
-        ownerName: franchise.owner_name || '',
-        email: franchise.email || '',
-        mobile: franchise.phone || '',
-        worker:franchise.worker_count || '',
-      }));
+  const mappedData = apiData.map(franchise => ({
+  id: franchise.franchise_id || '',
+  name: franchise.franchise_name || '',
+  country: franchise.country || '',
+  state: franchise.state || '',
+  city: franchise.city || '',
+  commission: franchise.commission_rate ? `${franchise.commission_rate}%` : '',
+  status: franchise.status ? "Active" : "Inactive",
+  ownerName: franchise.owner_name || '',
+  email: franchise.email || '',
+  mobile: franchise.phone || '',
+  worker: franchise.worker_count || '',
+}));
 
       setFranchises(mappedData);
     } catch (error) {
@@ -89,11 +92,71 @@ useEffect(() => {
   const handleNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const handleEntriesChange = (e) => { setEntriesPerPage(Number(e.target.value)); setCurrentPage(1); };
 
-  const toggleStatus = (id) => {
-    setFranchises(prev => prev.map(f => f.id === id ? { ...f, status: f.status === "Active" ? "Inactive" : "Active" } : f));
-  };
+const toggleStatus = async (id) => {
+  try {
+    const res = await updateFranchiseStatus(id);
 
-  const handleMoreInfo = (franchise) => { setSelectedFranchise(franchise); setShowModal(true); };
+    if (res?.success) {
+      setFranchises(prev =>
+        prev.map(f =>
+          f.id === id
+            ? {
+                ...f,
+                status: f.status === "Active" ? "Inactive" : "Active",
+              }
+            : f
+        )
+      );
+
+      // ✅ SUCCESS MESSAGE
+      showPopup(res?.message || "Status updated successfully");
+    } else {
+      showPopup(res?.message || "Status update failed");
+    }
+  } catch (error) {
+    console.error("Status update error:", error);
+    showPopup("Something went wrong while updating status");
+  }
+};
+
+
+
+ const handleMoreInfo = async (franchise) => {
+  try {
+    const res = await fetchFranchiseById(franchise.id);
+
+    const owner = res?.data?.owner_info || {};
+    const info = res?.data?.franchise_info || {};
+
+    const mappedDetail = {
+      // Owner
+      ownerName: owner.owner_name || "",
+      ownerEmail: owner.owner_email || "",
+      ownerMobile: owner.owner_phone || "",
+      ownerAddress: owner.owner_address || "",
+      ownerPincode: owner.owner_pincode || "",
+       ownerPhoto: owner.owner_photo || "", 
+      // Franchise
+      name: info.franchise_name || "",
+      email: info.franchise_email || "",
+      mobile: info.franchise_phone || "",
+      city: info.city || "",
+      state: info.state || "",
+      pincode: info.pincode || "",
+      message: info.message || "",
+      services: info.services || [],
+      worker: info.worker_count || "",
+      commission: info.commission_rate || "",
+      status: info.status ? "Active" : "Inactive",
+    };
+
+    setSelectedFranchise(mappedDetail);
+    setShowModal(true);
+  } catch (error) {
+    console.error("More info error:", error);
+  }
+};
+
   const handleCloseModal = () => { setShowModal(false); setSelectedFranchise(null); };
 
   const handlePrintClick = () => { localStorage.setItem("franchisesToPrint", JSON.stringify(franchises)); router.push("/admin/print-franchises"); };
@@ -112,6 +175,7 @@ useEffect(() => {
   };
   return (
     <Layout>
+       <PopupAlert message={popupMessage} type={popupType} />
     <div className={styles.container}>
         <div className={styles.headerContainer}>
             <div>
@@ -183,9 +247,9 @@ useEffect(() => {
                 </th>
                 <th>phone number</th>
                 <th>Email</th>
-              <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
+              {/* <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   Country <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
-                </th>
+                </th> */}
               <th onClick={() => handleSort("title")} style={{ cursor: "pointer" }}>
                   State <SortArrow direction={sortConfig.key === "title" ? sortConfig.direction : null} />
                 </th>
@@ -203,37 +267,39 @@ useEffect(() => {
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-             {currentFranchises.map((franchise,index) => (
-          <tr key={startIndex + index}>
-              <td>{franchise.id}</td>
-              <td>{franchise.owner_name}</td>
-              <td>{franchise.franchise_name}</td>
-              <td>{franchise.phone}</td>
-              <td>{franchise.email}</td>
-              <td>{franchise.country}</td>
-              <td>{franchise.state}</td>
-              <td>{franchise.city}</td>
-              <td>{franchise.commission_rate}</td>
-              <td>{franchise.worker_count}</td>
-              <td>
-                <a
-    href="#"
-    className={styles.moreInfo}
-    onClick={(e) => {
-      e.preventDefault();
-      handleMoreInfo(franchise);
-    }}
-  >
-    More Information...
-  </a>
-              </td>
-             
-                    <td className={styles.status}>{franchise.status}</td>
-                      <td>
- <button
+       <tbody>
+  {currentFranchises.map((franchise, index) => (
+    <tr key={startIndex + index}>
+      <td>{franchise.id}</td>
+      <td>{franchise.ownerName}</td>
+      <td>{franchise.name}</td>
+      <td>{franchise.mobile}</td>
+      <td>{franchise.email}</td>
+      {/* <td>{franchise.country}</td> */}
+      <td>{franchise.state}</td>
+      <td>{franchise.city}</td>
+      <td>{franchise.commission}</td>
+      <td>{franchise.worker}</td>
+
+      <td>
+        <a
+          href="#"
+          className={styles.moreInfo}
+          onClick={(e) => {
+            e.preventDefault();
+            handleMoreInfo(franchise);
+          }}
+        >
+          More Information...
+        </a>
+      </td>
+
+      <td className={styles.status}>{franchise.status}</td>
+
+      <td>
+       <button
   className={styles.editBtn}
- onClick={() => router.push(`/admin/franchises-edit`)}
+  onClick={() => router.push(`/admin/franchises-edit?id=${franchise.id}`)}
 >
   Edit
 </button>
@@ -241,7 +307,7 @@ useEffect(() => {
         <button
           onClick={() => toggleStatus(franchise.id)}
           className={
-            franchise.status.trim() === "Active"
+            franchise.status === "Active"
               ? styles.activeBtn
               : styles.inactiveBtn
           }
@@ -249,9 +315,10 @@ useEffect(() => {
           {franchise.status}
         </button>
       </td>
-            </tr>
-          ))}
-        </tbody>
+    </tr>
+  ))}
+</tbody>
+
       </table>  
       </div>
                 <div className={styles.pagination}>
@@ -296,6 +363,16 @@ useEffect(() => {
       <hr />
       <div className={styles.modalSection}>
         <h4>Owner Info</h4>
+        {selectedFranchise.ownerPhoto && (
+  <div className={styles.ownerPhotoWrapper}>
+    <img
+      src={selectedFranchise.ownerPhoto}
+      alt="Owner"
+      className={styles.ownerPhoto}
+    />
+  </div>
+)}
+
         <div className={styles.modalRow}>
           <span className={styles.label}>User Name</span>
           <span className={styles.separator}>:</span>
@@ -310,6 +387,16 @@ useEffect(() => {
           <span className={styles.label}>Mobile</span>
           <span className={styles.separator}>:</span>
            <span className={styles.value}>{selectedFranchise.mobile}</span>
+        </div>
+          <div className={styles.modalRow}>
+          <span className={styles.label}>Address</span>
+          <span className={styles.separator}>:</span>
+           <span className={styles.value}>{selectedFranchise.ownerAddress}</span>
+        </div>
+         <div className={styles.modalRow}>
+          <span className={styles.label}>Pincode</span>
+          <span className={styles.separator}>:</span>
+           <span className={styles.value}>{selectedFranchise.ownerPincode}</span>
         </div>
       </div>
       <hr />
@@ -331,9 +418,35 @@ useEffect(() => {
            <span className={styles.value}>{selectedFranchise.mobile}</span>
         </div>
         <div className={styles.modalRow}>
-          <span className={styles.label}>Time</span>
+          <span className={styles.label}>Pincode</span>
           <span className={styles.separator}>:</span>
-         <span className={styles.value}>{selectedFranchise.time}</span>
+         <span className={styles.value}>{selectedFranchise.pincode}</span>
+        </div>
+         <div className={styles.modalRow}>
+          <span className={styles.label}>City</span>
+          <span className={styles.separator}>:</span>
+         <span className={styles.value}>{selectedFranchise.city}</span>
+        </div>
+         <div className={styles.modalRow}>
+          <span className={styles.label}>State</span>
+          <span className={styles.separator}>:</span>
+         <span className={styles.value}>{selectedFranchise.state}</span>
+        </div>
+       
+         <div className={styles.modalRow}>
+          <span className={styles.label}>Services</span>
+          <span className={styles.separator}>:</span>
+         <span className={styles.value}>{selectedFranchise.services}</span>
+        </div>
+        <div className={styles.modalRow}>
+          <span className={styles.label}>Worker Count</span>
+          <span className={styles.separator}>:</span>
+         <span className={styles.value}>{selectedFranchise.worker}</span>
+        </div>
+          <div className={styles.modalRow}>
+          <span className={styles.label}> Commission</span>
+          <span className={styles.separator}>:</span>
+         <span className={styles.value}>{selectedFranchise.commission}%</span>
         </div>
       </div>
       <div className={styles.modalFooter}>

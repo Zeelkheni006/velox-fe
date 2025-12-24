@@ -13,7 +13,7 @@ import { FaSearch, FaMapMarkerAlt, FaTimesCircle } from "react-icons/fa";
 import {  getFullLocation , } from "./api/add-image/add-slider"; 
 import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
-import {getStats, fetchSliders,getCategories} from "./api/user-side/home_api";
+import {getStats, fetchSliders,getCategories,getCityWiseCategories} from "./api/user-side/home_api";
 import PageLoader from "../components/PageLoader";
 
 // Array with image + text
@@ -127,6 +127,7 @@ export default function Home() {
     const { popupMessage, popupType, showPopup } = usePopup();
     const [suggestions, setSuggestions] = useState([]);
 const [isMobile, setIsMobile] = useState(false);
+const [showLocationPopup, setShowLocationPopup] = useState(false);
 
 useEffect(() => {
     setIsMobile(window.innerWidth <= 768);
@@ -271,43 +272,85 @@ useEffect(() => {
 
     return () => clearInterval(interval);
   }, []);
+const [selectedCity, setSelectedCity] = useState(""); // user selected city
 
-  const initGoogleAutocomplete = () => {
-    if (!inputRef.current) return;
+const autocompleteRef = useRef(null);
 
-    const autocomplete = new window.google.maps.places.Autocomplete(
-      inputRef.current,
-      {
-        types: ["(cities)"], // only city search
-      }
-    );
+const initGoogleAutocomplete = () => {
+  if (!inputRef.current || !window.google || autocompleteRef.current) return;
 
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-
-      const city =
-        place.address_components?.find((ac) =>
-          ac.types.includes("locality")
-        )?.long_name || "";
-
-      const state =
-        place.address_components?.find((ac) =>
-          ac.types.includes("administrative_area_level_1")
-        )?.long_name || "";
-
-      const country =
-        place.address_components?.find((ac) =>
-          ac.types.includes("country")
-        )?.long_name || "";
-
-      const full = `${city}, ${state}, ${country}`;
-
-      setQuery(full);
-      setFullLocation(full);
+  autocompleteRef.current =
+    new window.google.maps.places.Autocomplete(inputRef.current, {
+      types: ["(cities)"],                 // 🔥 city only
+      componentRestrictions: { country: "in" },
+      fields: ["address_components", "geometry"],
     });
-  };
+
+  autocompleteRef.current.addListener("place_changed", () => {
+    const place = autocompleteRef.current.getPlace();
+    if (!place.address_components) return;
+
+    const getComponent = (types) =>
+      place.address_components.find(ac =>
+        types.some(t => ac.types.includes(t))
+      )?.long_name || "";
+
+    // ✅ City fallback (IMPORTANT)
+    const city =
+      getComponent(["locality"]) ||
+      getComponent(["administrative_area_level_2"]) ||
+      getComponent(["postal_town"]);
+
+    const state = getComponent(["administrative_area_level_1"]);
+    const country = getComponent(["country"]);
+
+    const fullLocation = [city, state, country].filter(Boolean).join(", ");
+
+    setQuery(fullLocation);
+    setFullLocation(fullLocation);
+    
+
+    console.log({
+      city,
+      state,
+      country,
+      lat: place.geometry?.location?.lat(),
+      lng: place.geometry?.location?.lng(),
+    });
+  });
+};
+
+
 const [pageLoading, setPageLoading] = useState(true);
  
+const handleSearch = async (e) => {
+  e.preventDefault();
+
+  // city empty hoy → all categories
+  if (!query.trim()) {
+    const data = await getCategories();
+    setServices(Array.isArray(data) ? data : []);
+    return;
+  }
+
+  // "Surat, Gujarat, India" → Surat
+  const cityName = query.split(",")[0].trim();
+
+  const data = await getCityWiseCategories(cityName);
+  setServices(Array.isArray(data) ? data : []);
+};
+
+const handleCategoryClick = (e, slug) => {
+  // 🚫 city select નથી
+  if (!query.trim()) {
+    e.preventDefault(); // navigation stop
+    setShowLocationPopup(true);
+    return;
+  }
+
+  // ✅ city selected → navigation allow
+  window.location.href = `/services-list/${slug}`;
+};
 
   
     return (
@@ -359,22 +402,23 @@ const [pageLoading, setPageLoading] = useState(true);
 
         {/* 🔥 Static Search Box */}
         <div className="searchBox">
-    <form className="searchForm" >
+    <form className="searchForm" onSubmit={handleSearch}>
       <div className="searchInputWrapper">
         
         <span className="searchIcon"><FaSearch /></span>
-  <input
-    ref={inputRef}
-    type="text"
-    placeholder="Search City / State / Country"
-    className="searchInput"
-    value={query}
-    onChange={(e) => setQuery(e.target.value)}
-  />
+<input
+  ref={inputRef}
+  type="text"
+  placeholder="Search City / State / Country"
+  className="searchInput"
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+/>
 
- <Script
+<Script
   src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`}
   strategy="afterInteractive"
+  onLoad={initGoogleAutocomplete}
 />
 
         {/* 🔥 AUTOCOMPLETE DROPDOWN */}
@@ -417,9 +461,7 @@ const [pageLoading, setPageLoading] = useState(true);
       </button>
     </form>
 
-    {fullLocation && (
-      <p className="searchResult">📍 {fullLocation}</p>
-    )}
+
   </div>
 
       </section>
@@ -427,24 +469,40 @@ const [pageLoading, setPageLoading] = useState(true);
 <section className="services-section">
  
     <div className="services-grid">
-      {services.map((service) => (
-        <Link
-          key={service.id}
-          href={`/services-list/${service.slug}`}
-          className="service-card"
-        >
-          <div className="service-image">
-            <Image
-              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
-              alt={service.title}
-              width={50}
-              height={50}
-              className="service-img"
-            />
-          </div>
-          <p className="service-label">{service.title}</p>
-        </Link>
-      ))}
+     {services.map((service) => (
+  <Link
+    key={service.id}
+    href={`/services-list/${service.slug}`}
+    className="service-card"
+    onClick={(e) => handleCategoryClick(e, service.slug)}
+  >
+    <div className="service-image">
+      <Image
+        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
+        alt={service.title}
+        width={50}
+        height={50}
+      />
+    </div>
+    <p className="service-label">{service.title}</p>
+  </Link>
+))}
+
+{showLocationPopup && (
+  <div className="popup-overlay">
+    <div className="popup-box">
+      <h2>Info</h2>
+      <p>Please select location</p>
+      <button
+        className="popup-btn"
+        onClick={() => setShowLocationPopup(false)}
+      >
+        OK
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   
 </section>
