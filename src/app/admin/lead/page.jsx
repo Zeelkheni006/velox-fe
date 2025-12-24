@@ -56,6 +56,9 @@ const [selectedLead, setSelectedLead] = useState(null);
 const [franchiseMessage, setFranchiseMessage] = useState("");
 const [isProcessing, setIsProcessing] = useState(false);
   const [loadingKyc, setLoadingKyc] = useState(false);
+  const searchParams = useSearchParams();
+const leadId = searchParams.get("lead_id");
+const adminId = searchParams.get("admin_id");
 const fetchLeadsData = async (page = currentPage, perPage = entriesPerPage, filters = {}) => {
    setLoading(true);
   try {
@@ -164,7 +167,9 @@ const sortedLeads = useMemo(() => {
   return sorted;
 }, [leads, sortConfig]);
 
-const [selectedOwnerEmail, setSelectedOwnerEmail] = useState(null);
+// Rename state to store lead ID
+const [selectedLeadId, setSelectedLeadId] = useState(null);
+ const [selectedAdminId, setSelectedAdminId] = useState(null);
 
 const handleAddToFranchise = async (lead) => {
   if (!lead?.id) return showPopup("Lead ID is missing!", "error");
@@ -183,8 +188,13 @@ const handleAddToFranchise = async (lead) => {
       setFranchiseMessage("Admin added successfully!");
       setFranchiseStatus("success");
 
-      // ✅ Save owner_email for modal button
-      setSelectedOwnerEmail(data.data.owner_email);
+      // ✅ Keep lead_id ALSO
+      setSelectedLeadId(lead.id);
+
+      // ✅ Save admin_id from backend
+      setSelectedAdminId(data.data.admin_id); 
+      // ⬆️ backend response: { success, data: { admin_id: xxx } }
+
     } else {
       setFranchiseMessage(data.message || "Already created or failed!");
       setFranchiseStatus("error");
@@ -195,6 +205,7 @@ const handleAddToFranchise = async (lead) => {
     setFranchiseStatus("error");
   }
 };
+
 
 const handleOkClick = async () => {
   setShowFranchisePopup(false);
@@ -936,7 +947,7 @@ of {totalLeads} entries
 
       <p className={styles.p}>{franchiseMessage}</p>
 
-{!isProcessing && franchiseStatus === "success" && selectedOwnerEmail && (
+{!isProcessing && franchiseStatus === "success" && selectedLeadId && selectedAdminId && (
   <div className={styles.modalActions}>
     <button
       className={styles.acceptBtn}
@@ -944,10 +955,11 @@ of {totalLeads} entries
         // 1️⃣ Open Franchise User page in new tab
         const newTab = window.open("/admin/franchises-user", "_blank");
 
-        // 2️⃣ Redirect to create-franchise with owner_email
+        // 2️⃣ Redirect to create-franchise with lead_id + admin_id
         if (newTab) {
           newTab.onload = () => {
-            newTab.location.href = `/admin/create-franchise?owner_email=${selectedOwnerEmail}`;
+            newTab.location.href =
+              `/admin/create-franchise?lead_id=${selectedLeadId}&admin_id=${selectedAdminId}`;
           };
         }
 

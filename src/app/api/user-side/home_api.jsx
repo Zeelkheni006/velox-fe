@@ -82,3 +82,27 @@ export const getCategories = async () => {
     return [];
   }
 };
+export const getCityWiseCategories = async (city) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home_page_body/city-wise`,
+      {
+        method: "POST", // ✅ MUST be POST
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ city }), // ✅ body only in POST
+      }
+    );
+
+    const result = await res.json();
+    return result?.data || [];
+  } catch (error) {
+    console.error("City-wise category error:", error);
+    return [];
+  }
+};
+
+
+
+

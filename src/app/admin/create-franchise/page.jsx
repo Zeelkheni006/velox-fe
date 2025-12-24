@@ -34,6 +34,7 @@ const [initialServices, setInitialServices] = useState([]);
       const mapRef = useRef(null);
       const mapInstance = useRef(null);
       const polygonRef = useRef(null);
+      
 const handleServiceChange = (selected) => {
   setSelectedServices(selected || []); 
 };
@@ -65,6 +66,19 @@ const handleServiceChange = (selected) => {
         };
         loadCountries();
       }, []);
+useEffect(() => {
+  const leadId = localStorage.getItem("lead_id");
+  const adminId = localStorage.getItem("admin_id");
+
+  if (!leadId || !adminId) {
+    console.warn("Lead/Admin ID missing");
+    return;
+  }
+
+  // 👉 aahi API call / form autofill karo
+  console.log("Lead ID:", leadId);
+  console.log("Admin ID:", adminId);
+}, []);
 
       useEffect(() => {
         if (selectedLeadId) loadRequestedServices(selectedLeadId);

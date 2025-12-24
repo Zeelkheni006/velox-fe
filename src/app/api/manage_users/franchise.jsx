@@ -145,22 +145,16 @@ export const searchFranchiseOwners = async (query) => {
 
 export const fetchFranchises = async () => {
   try {
-    // ✅ Correct token key
     const token = localStorage.getItem("access_token");
 
-    if (!token) {
-      throw new Error("Access token not found. Please login.");
-    }
-
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchises`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchises/`,
       {
         method: "GET",
         headers: {
-          // ❌ Content-Type NOT added (preflight avoid)
           Authorization: `Bearer ${token}`,
         },
-        credentials: "include", // optional but safe
+        credentials: "include",
       }
     );
 
@@ -170,18 +164,75 @@ export const fetchFranchises = async () => {
       throw new Error(data?.message || `HTTP Error: ${res.status}`);
     }
 
-    return data; // { success, data: { franchise_data: [] } }
+    return data;
 
   } catch (err) {
     console.error("Error fetching franchises:", err);
     return {
       success: false,
-      data: {
-        franchise_data: [],
-      },
+      data: { franchise_data: [] },
     };
   }
 };
+
+export const fetchFranchiseById = async (id) => {
+  try {
+    const token = localStorage.getItem("access_token");
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchises/${id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to fetch franchise details");
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Fetch franchise detail error:", err);
+    throw err;
+  }
+};
+
+export const updateFranchiseStatus = async (franchiseId) => {
+  try {
+    // ✅ Get access token
+    const token = localStorage.getItem("access_token");
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchises/update/status/${franchiseId}`,
+      {
+        method: "PATCH", // backend pramane
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("Status update failed:", res.status, data);
+      return { success: false, message: data?.message || "Update failed" };
+    }
+
+    return data;
+  } catch (err) {
+    console.error("Status update error:", err);
+    return { success: false, message: "Network error" };
+  }
+};
+
+
 
 
 

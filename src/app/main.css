@@ -4164,3 +4164,43 @@
             top: 50%;
             transform: translate(0, -50%);
         }
+        
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: 17px;
+        }
+        
+        .popup-box {
+            background: #fff;
+            width: 450px;
+            padding: 30px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .popup-box h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .popup-box p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .popup-btn {
+            background: orange;
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }

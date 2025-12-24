@@ -303,10 +303,10 @@
     background-color: #fff;
     padding: 25px 30px;
     border-radius: 6px;
-    width: 500px;
+    width: 600px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     position: relative;
-    height: 500px;
+    height: auto;
 }
 
 .modalHeader {
@@ -345,6 +345,20 @@
     font-weight: 600;
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 5px;
+}
+
+.ownerPhotoWrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.ownerPhoto {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
 }
 
 .modalRow {
