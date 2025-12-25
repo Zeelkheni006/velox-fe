@@ -260,9 +260,7 @@ try {
                 ) : (
                   currentCategories.map((cat, i) => (
                     <tr key={i} onDoubleClick={() =>
-    router.push(
-      `/admin/edit-category?id=${cat.id}&title=${encodeURIComponent(cat.title)}&logo=${encodeURIComponent(cat.logo)}&description=${encodeURIComponent(cat.description)}`
-    )}>
+    router.push(`/admin/edit-category?id=${cat.id}`)}>
                       <td onClick={(e)=>handleCopy(e,cat.title , "title" , showPopup )}>{cat.title}</td>
                       <td onClick={(e)=>handleCopy(e, cat.img , "img" , showPopup)}>
                         <img

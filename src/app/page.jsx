@@ -18,7 +18,12 @@ import PageLoader from "../components/PageLoader";
 
 // Array with image + text
 
-
+const OTHER_CATEGORY = {
+  id: "other",
+  title: "Other",
+  slug: "other",
+  logo: "/icon/other.png", // public/images/other.png
+};
 
 const bestServices = [
   {
@@ -128,7 +133,13 @@ export default function Home() {
     const [suggestions, setSuggestions] = useState([]);
 const [isMobile, setIsMobile] = useState(false);
 const [showLocationPopup, setShowLocationPopup] = useState(false);
+const [showOther, setShowOther] = useState(false);
+const [services, setServices] = useState([]);
+const [showServicePopup, setShowServicePopup] = useState(false);
+const [initialServices, setInitialServices] = useState([]);
 
+const isOnlyOther =
+  showOther && services.length === 0;
 useEffect(() => {
     setIsMobile(window.innerWidth <= 768);
   }, []);
@@ -176,7 +187,7 @@ useEffect(() => {
     }, 100);
   }, []);
 
-  const [services, setServices] = useState([]);
+
 
   useEffect(() => {
   const fetchCategories = async () => {
@@ -326,19 +337,38 @@ const [pageLoading, setPageLoading] = useState(true);
 const handleSearch = async (e) => {
   e.preventDefault();
 
-  // city empty hoy → all categories
+  // 🔥 Empty search → show INITIAL categories
   if (!query.trim()) {
-    const data = await getCategories();
-    setServices(Array.isArray(data) ? data : []);
+    setServices(initialServices);
+    setShowOther(false);
     return;
   }
 
-  // "Surat, Gujarat, India" → Surat
   const cityName = query.split(",")[0].trim();
-
   const data = await getCityWiseCategories(cityName);
-  setServices(Array.isArray(data) ? data : []);
+
+  if (Array.isArray(data) && data.length > 0) {
+    // City has categories
+    setServices(data);
+    setShowOther(false);
+  } else {
+    // City has NO categories
+    setServices([]);
+    setShowOther(true);
+  }
 };
+useEffect(() => {
+  const loadCategories = async () => {
+    const data = await getCategories();
+    const list = Array.isArray(data) ? data : [];
+
+    setServices(list);        // currently showing
+    setInitialServices(list); // 🔥 save default
+  };
+
+  loadCategories();
+}, []);
+
 
 const handleCategoryClick = (e, slug) => {
   // 🚫 city select નથી
@@ -347,12 +377,26 @@ const handleCategoryClick = (e, slug) => {
     setShowLocationPopup(true);
     return;
   }
-
+ if (slug === "other") {
+    e.preventDefault(); // stop navigation
+    setShowServicePopup(true); // open popup
+    return;
+  }
   // ✅ city selected → navigation allow
   window.location.href = `/services-list/${slug}`;
 };
+const handleClearSearch = () => {
+  setQuery("");
+  setFullLocation("");
+  setSuggestions([]);
+  setShowOther(false);
 
-  
+  // 🔥 Restore INITIAL categories (NOT city)
+  setServices(initialServices);
+};
+
+
+
     return (
       <> {pageLoading && <PageLoader />}
        {!pageLoading && (
@@ -441,18 +485,14 @@ const handleCategoryClick = (e, slug) => {
 
         <span className="locationIcon"><FaMapMarkerAlt /></span>
 
-        {query && (
-          <span
-            className="clearIcon"
-            onClick={() => {
-              setQuery("");
-              setFullLocation("");
-              setSuggestions([]);
-            }}
-          >
-            <FaTimesCircle />
-          </span>
-        )}
+      {query && (
+  <span
+    className="clearIcon"
+    onClick={handleClearSearch}
+  >
+    <FaTimesCircle />
+  </span>
+)}
 
       </div>
 
@@ -468,42 +508,84 @@ const handleCategoryClick = (e, slug) => {
 
 <section className="services-section">
  
-    <div className="services-grid">
-     {services.map((service) => (
-  <Link
-    key={service.id}
-    href={`/services-list/${service.slug}`}
-    className="service-card"
-    onClick={(e) => handleCategoryClick(e, service.slug)}
-  >
-    <div className="service-image">
-      <Image
-        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`}
-        alt={service.title}
-        width={50}
-        height={50}
-      />
-    </div>
-    <p className="service-label">{service.title}</p>
-  </Link>
-))}
+ <div
+  className={`services-grid ${
+    isOnlyOther ? "only-other-center" : ""
+  }`}
+>
+  {[
+    ...services,
+    ...(showOther ? [OTHER_CATEGORY] : []),
+  ].map((service) => (
+    <Link
+      key={service.id}
+      href={`/services-list/${service.slug}`}
+      className="service-card"
+      onClick={(e) => handleCategoryClick(e, service.slug)}
+    >
+      <div className="service-image">
+        <Image
+          src={
+            service.slug === "other"
+              ? service.logo
+              : `${process.env.NEXT_PUBLIC_API_BASE_URL}${service.logo}`
+          }
+          alt={service.title}
+          width={50}
+          height={50}
+        />
+      </div>
+      <p className="service-label">{service.title}</p>
+    </Link>
+  ))}
 
-{showLocationPopup && (
-  <div className="popup-overlay">
-    <div className="popup-box">
-      <h2>Info</h2>
-      <p>Please select location</p>
+  {showLocationPopup && (
+    <div className="popup-overlay">
+      <div className="popup-box">
+        <h2>Info</h2>
+        <p>Please select location</p>
+        <button
+          className="popup-btn"
+          onClick={() => setShowLocationPopup(false)}
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  )}
+
+  {showServicePopup && (
+  <div className="popup-overlay-other">
+    <div className="service-popup">
       <button
-        className="popup-btn"
-        onClick={() => setShowLocationPopup(false)}
+        className="close-btn"
+        onClick={() => setShowServicePopup(false)}
       >
-        OK
+        ✕
       </button>
+
+      <h2>Service Request</h2>
+
+      <input type="text" placeholder="Name" />
+      <input type="email" placeholder="E-mail" />
+      <input type="tel" placeholder="Phone" />
+      <input type="text" placeholder="Address" />
+
+      <select>
+        <option>Select Service</option>
+        <option>Other</option>
+      </select>
+
+      <textarea placeholder="Message"></textarea>
+<div className="other-btn">
+      <button className="submit-btn">Submit</button>
+    </div>
     </div>
   </div>
 )}
 
-    </div>
+</div>
+
   
 </section>
 

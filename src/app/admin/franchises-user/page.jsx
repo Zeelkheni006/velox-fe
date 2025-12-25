@@ -179,56 +179,54 @@ const displayedData = franchises.slice(startIndex, startIndex + entriesPerPage);
                 <th>ACTION</th>
               </tr>
             </thead>
-            <tbody>
-           {displayedData.map((item) => (
-                <tr key={item.admin_id}>
-                  <td onClick={(e)=> handleCopy(e,item.owner_email,"name",showPopup)}>{item.owner_name}</td>
-                  <td onClick={(e)=> handleCopy(e,item.owner_email,"email",showPopup)}>{item.owner_email}</td>
-                  <td onClick={(e)=>handleCopy(e,item.owner_phone,"phone" , showPopup)}>{item.owner_phone}</td>
-                  <td>
-<button
-  className={styles.editButton}
-  onClick={() => {
-    // Current row na data store karo
-    localStorage.setItem("franchiseOwnersData", JSON.stringify(item));
-    // Edit page redirect
-    router.push(`/admin/edit-franchise?admin_id=${item.admin_id}`);
-  }}
->
-  Edit
-</button>
+      <tbody>
+  {displayedData.map((item) => (
+    <tr
+      key={item.admin_id}
+      onDoubleClick={() => {
+        // Current row na data store karo
+        localStorage.setItem("franchiseOwnersData", JSON.stringify(item));
+        // Edit page redirect
+        router.push(`/admin/edit-franchise?admin_id=${item.admin_id}`);
+      }}
+      style={{ cursor: "pointer" }} // UX improvement: show pointer
+    >
+      <td onClick={(e) => handleCopy(e, item.owner_name, "name", showPopup)}>{item.owner_name}</td>
+      <td onClick={(e) => handleCopy(e, item.owner_email, "email", showPopup)}>{item.owner_email}</td>
+      <td onClick={(e) => handleCopy(e, item.owner_phone, "phone", showPopup)}>{item.owner_phone}</td>
+      <td>
+        <button
+          className={styles.editButton}
+          onClick={() => {
+            localStorage.setItem("franchiseOwnersData", JSON.stringify(item));
+            router.push(`/admin/edit-franchise?admin_id=${item.admin_id}`);
+          }}
+        >
+          Edit
+        </button>
 
+        {item.make_franchise_button_visible && (
+          <button
+            className={styles.createButton}
+            onClick={async () => {
+              const res = await getFranchiseOwnersData(item.admin_id);
+              if (res.success) {
+                localStorage.setItem("franchiseOwnersData", JSON.stringify(res.data));
+                router.push(`/admin/create-franchise?admin_id=${item.admin_id}`);
+                showPopup("Franchise owner data fetched successfully ✔", "success");
+              } else {
+                showPopup(res.message || "Failed to fetch data", "error");
+              }
+            }}
+          >
+            Create Franchise
+          </button>
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
 
-           {item.make_franchise_button_visible && (
-  <button
-    className={styles.createButton}
-    onClick={async () => {
-      const res = await getFranchiseOwnersData(item.admin_id);
-
-      if (res.success) {
-        localStorage.setItem(
-          "franchiseOwnersData",
-          JSON.stringify(res.data)
-        );
-
-        router.push(
-          `/admin/create-franchise?admin_id=${item.admin_id}`
-        );
-
-        showPopup("Franchise owner data fetched successfully ✔", "success");
-      } else {
-        showPopup(res.message || "Failed to fetch data", "error");
-      }
-    }}
-  >
-    Create Franchise
-  </button>
-)}
-
-                  </td>
-                </tr>
-              ))}
-            </tbody>
           </table>
 
           <div className={styles.pagination}>

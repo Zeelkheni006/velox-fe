@@ -4204,3 +4204,77 @@
             cursor: pointer;
             font-size: 16px;
         }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+        }
+        /* 🔥 Only when Other is alone */
+        
+        .only-other-center {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .popup-overlay-other {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .service-popup {
+            background: #fff;
+            width: 450px;
+            padding: 40px;
+            border-radius: 12px;
+            position: relative;
+        }
+        
+        .service-popup h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            background-color: white;
+        }
+        
+        .service-popup input,
+        .service-popup select,
+        .service-popup textarea {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 5px;
+        }
+        
+        .submit-btn {
+            background: orange;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            align-items: center;
+            font-size: 17px;
+        }
+        
+        .other-btn {
+            text-align: center;
+        }

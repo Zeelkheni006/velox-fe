@@ -29,31 +29,31 @@ const Header = ({ toggleMenu }) => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    const loadNotifications = async () => {
-      const data = await fetchNotifications();
-      setNotifications(data?.message || {});
-      const total = data?.message
-        ? Object.values(data.message).reduce((sum, val) => sum + val, 0)
-        : 0;
-      setNotificationCount(total);
-    };
-    loadNotifications();
+  // useEffect(() => {
+  //   const loadNotifications = async () => {
+  //     const data = await fetchNotifications();
+  //     setNotifications(data?.message || {});
+  //     const total = data?.message
+  //       ? Object.values(data.message).reduce((sum, val) => sum + val, 0)
+  //       : 0;
+  //     setNotificationCount(total);
+  //   };
+  //   loadNotifications();
 
-    const interval = setInterval(loadNotifications, 50000);
-    return () => clearInterval(interval);
-  }, []);
-const handleNotificationClick = async (type) => {
-  try {
-    await clearNotification(); // call API
+  //   const interval = setInterval(loadNotifications, 50000);
+  //   return () => clearInterval(interval);
+  // }, []);
+// const handleNotificationClick = async (type) => {
+//   try {
+//     await clearNotification(); // call API
 
-    // UI update
-    setNotificationCount(0);
-    setNotifications({});
-  } catch (error) {
-    console.error("Error clearing notification:", error);
-  }
-};
+//     // UI update
+//     setNotificationCount(0);
+//     setNotifications({});
+//   } catch (error) {
+//     console.error("Error clearing notification:", error);
+//   }
+// };
 
   return (
     <header className={styles.header}>

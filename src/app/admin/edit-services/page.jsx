@@ -15,6 +15,7 @@ export default function EditService() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const serviceId = searchParams.get("service_id");
+const [originalService, setOriginalService] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -50,21 +51,38 @@ useEffect(() => {
     ? service.duration.split(":")
     : ["00", "00"];
 
-  setFormData({
+  const normalized = {
     title: service.title || "",
-    category_id: service.category_id || "",
-    sub_category_id: service.sub_category_id || "",
-    price: service.price || "",
-    displayNumber: service.display_number || "",
+    category_id: String(service.category_id || ""),
+    sub_category_id: String(service.sub_category_id || ""),
+    price: String(service.price || ""),
+    displayNumber: String(service.display_number || ""),
     image: service.image || null,
     banner: service.banner || null,
     hours: hrs,
     minutes: mins,
+    description: service.description || "",
+    longDescription: service.long_description || "",
+  };
+
+  setFormData({
+    title: normalized.title,
+    category_id: normalized.category_id,
+    sub_category_id: normalized.sub_category_id,
+    price: normalized.price,
+    displayNumber: normalized.displayNumber,
+    image: normalized.image,
+    banner: normalized.banner,
+    hours: normalized.hours,
+    minutes: normalized.minutes,
   });
 
-  setDescription(service.description || "");
-  setLongDescription(service.long_description || "");
+  setDescription(normalized.description);
+  setLongDescription(normalized.longDescription);
+
+  setOriginalService(normalized); // 🔥 ORIGINAL SAVE
 }, []);
+
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   const handleChange = (e) => {
@@ -85,9 +103,38 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  const formattedHours = formData.hours ? String(formData.hours).padStart(2, "0") : "00";
-  const formattedMinutes = formData.minutes ? String(formData.minutes).padStart(2, "0") : "00";
+  if (!originalService) {
+    showPopup("❌ No original data found", "error");
+    return;
+  }
 
+  const formattedHours = formData.hours
+    ? String(formData.hours).padStart(2, "0")
+    : "00";
+  const formattedMinutes = formData.minutes
+    ? String(formData.minutes).padStart(2, "0")
+    : "00";
+
+  // 🔴 CHANGE DETECTION
+  const isNoChange =
+    formData.title === originalService.title &&
+    String(formData.category_id) === originalService.category_id &&
+    String(formData.sub_category_id) === originalService.sub_category_id &&
+    String(formData.price) === originalService.price &&
+    String(formData.displayNumber) === originalService.displayNumber &&
+    formattedHours === originalService.hours &&
+    formattedMinutes === originalService.minutes &&
+    description === originalService.description &&
+    longDescription === originalService.longDescription &&
+    !(formData.image instanceof File) &&
+    !(formData.banner instanceof File);
+
+  if (isNoChange) {
+    showPopup("❌ No changes detected. Please update something.", "error");
+    return;
+  }
+
+  // ✅ Proceed update
   const payload = new FormData();
   payload.append("title", formData.title);
   payload.append("description", description);
@@ -98,21 +145,25 @@ const handleSubmit = async (e) => {
   payload.append("display_number", formData.displayNumber);
   payload.append("duration", `${formattedHours}:${formattedMinutes}`);
 
-  // ✅ If new image selected → send File  
-  // ✅ Else → send existing image path from DB
-  payload.append("image", formData.image instanceof File ? formData.image : formData.image);
-  payload.append("banner", formData.banner instanceof File ? formData.banner : formData.banner);
+  payload.append(
+    "image",
+    formData.image instanceof File ? formData.image : formData.image
+  );
+  payload.append(
+    "banner",
+    formData.banner instanceof File ? formData.banner : formData.banner
+  );
 
   const res = await updateService(serviceId, payload);
 
   if (res.success) {
-    showPopup("✅ Service updated successfully!");
+    showPopup("✅ Service updated successfully!", "success");
     router.push("/admin/services");
   } else {
-    console.error(res);
-    showPopup("❌ " + JSON.stringify(res.message));
+    showPopup("❌ " + (res.message || "Update failed"), "error");
   }
 };
+
 
     const goToDashboard = () => {
     router.push("/admin/dashboard"); // Replace with your dashboard route

@@ -6,7 +6,8 @@ import styles from "../styles/Franchises.module.css";
 import dynamic from "next/dynamic";
 import { SlHome } from "react-icons/sl";
  import usePopup from "../components/popup";
-    import PopupAlert from "../components/PopupAlert";
+ import PopupAlert from "../components/PopupAlert";
+  import { handleCopy } from "../components/popup";
 import {fetchFranchises,fetchFranchiseById ,updateFranchiseStatus } from "../../api/manage_users/franchise"
 import Image from "next/image";
 
@@ -269,17 +270,24 @@ const toggleStatus = async (id) => {
         </thead>
        <tbody>
   {currentFranchises.map((franchise, index) => (
-    <tr key={startIndex + index}>
-      <td>{franchise.id}</td>
-      <td>{franchise.ownerName}</td>
-      <td>{franchise.name}</td>
-      <td>{franchise.mobile}</td>
-      <td>{franchise.email}</td>
+ <tr
+  key={startIndex + index}
+  onDoubleClick={() =>
+    router.push(`/admin/franchises-edit?id=${franchise.id}`)
+  }
+  style={{ cursor: "pointer" }}
+>
+
+      <td onClick={(e)=>handleCopy(e,franchise.id,"id",showPopup)}>{franchise.id}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.ownerName,"name",showPopup)}>{franchise.ownerName}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.name,"name",showPopup)}>{franchise.name}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.mobile,"mobile",showPopup)}>{franchise.mobile}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.email,"email",showPopup)}>{franchise.email}</td>
       {/* <td>{franchise.country}</td> */}
-      <td>{franchise.state}</td>
-      <td>{franchise.city}</td>
-      <td>{franchise.commission}</td>
-      <td>{franchise.worker}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.state,"state",showPopup)}>{franchise.state}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.city,"city",showPopup)}>{franchise.city}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.commission,"commission",showPopup)}>{franchise.commission}</td>
+      <td onClick={(e)=>handleCopy(e,franchise.worker,"worker",showPopup)}>{franchise.worker}</td>
 
       <td>
         <a
