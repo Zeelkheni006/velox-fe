@@ -337,7 +337,7 @@ const validateStep3 = () => {
   <div className="step">
     <div className="stepImage">
           <span className="step-number">1</span>
-      <img src="/images/loaderImages/download2.png"className="step-circle" alt="Fill the form" />
+      <img src="/images/loaderImages/download2.png"className="step-circle1" alt="Fill the form" />
     </div>
     <div className="text">
       <h3>Fill The Form</h3>
@@ -351,7 +351,7 @@ const validateStep3 = () => {
   <div className="step">
     <div className="stepImage">
        <span className="step-number">2</span>
-      <img src="/images/loaderImages/download1.png" className="step-circle"alt="HR call" />
+      <img src="/images/loaderImages/download1.png" className="step-circle2"alt="HR call" />
     </div>
     <div className="text">
       <h3>Call From Our HR Team</h3>
@@ -365,7 +365,7 @@ const validateStep3 = () => {
   <div className="step">
     <div className="stepImage">
        <span className="step-number">3</span>
-      <img src="/images/loaderImages/download3.png" className="step-circle" alt="Document verified"/>
+      <img src="/images/loaderImages/download3.png" className="step-circle3" alt="Document verified"/>
     </div>
     <div className="text">
       <h3>Document Verified</h3>
@@ -379,7 +379,7 @@ const validateStep3 = () => {
   <div className="step">
     <div className="stepImage">
        <span className="step-number">4</span>
-      <img src="/images/loaderImages/download4.png"className="step-circle" alt="Enjoy franchise" />
+      <img src="/images/loaderImages/download4.png"className="step-circle4" alt="Enjoy franchise" />
     </div>
     <div className="text">
       <h3>Enjoy Your Franchise</h3>

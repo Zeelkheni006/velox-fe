@@ -22,7 +22,7 @@ export default function EditCategory() {
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoUrl, setLogoUrl] = useState(null);
-
+const [originalData, setOriginalData] = useState(null);
   const [categories, setCategories] = useState([]);
 
   // ✅ Load subcategory data from localStorage
@@ -35,10 +35,23 @@ export default function EditCategory() {
     return;
   }
 
-  setTitle(savedData.title || "");
-  setCategory((savedData.category_title || "")); // ✅ IMPORTANT
-  setLogoUrl(`${process.env.NEXT_PUBLIC_API_BASE_URL}${savedData.logo}`);
+  const normalized = {
+    title: savedData.title || "",
+    categoryId: String(savedData.category_id || ""),
+    logo: savedData.logo || null,
+  };
+
+  setTitle(normalized.title);
+  setCategory(normalized.categoryId);
+  setLogoUrl(
+    normalized.logo
+      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${normalized.logo}`
+      : null
+  );
+
+  setOriginalData(normalized); // 🔥 ORIGINAL SAVE
 }, []);
+
 
 
   // ✅ Fetch categories list
@@ -66,36 +79,46 @@ export default function EditCategory() {
   };
 
   // ✅ Submit Update
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!title || !categoryId) {
-      showPopup('Please fill all required fields!', "error");
-      return;
+  // 🔴 Required field check
+  if (!title || !categoryId) {
+    showPopup('Please fill all required fields!', "error");
+    return;
+  }
+
+  // 🔴 No change detection
+  const isTitleSame = title === originalData?.title;
+  const isCategorySame = categoryId === originalData?.categoryId;
+  const isLogoSame = !logoFile; // logoFile null = no new upload
+
+  if (isTitleSame && isCategorySame && isLogoSame) {
+    showPopup("❌ No changes detected. Please update something.", "error");
+    return;
+  }
+
+  const data = new FormData();
+  data.append('title', title);
+  data.append('category_id', categoryId);
+  if (logoFile) data.append('logo', logoFile);
+
+  try {
+    const res = await updateSubCategory(Number(idFromURL), data);
+
+    if (res.success) {
+      showPopup("✅ Sub Category Updated Successfully!", "success");
+      localStorage.removeItem("editSubCategoryData");
+      setTimeout(() => router.push('/admin/sub-categories'), 800);
+    } else {
+      showPopup(res.message || "Update failed!", "error");
     }
+  } catch (err) {
+    console.error(err);
+    showPopup("Something went wrong!", "error");
+  }
+};
 
-    const data = new FormData();
-    data.append('title', title);
-    data.append('category_id', categoryId);
-    if (logoFile) data.append('logo', logoFile);
-
-    try {
-      const res = await updateSubCategory(Number(idFromURL), data);
-
-      if (res.success) {
-        showPopup("✅ Sub Category Updated Successfully!", "success");
-        localStorage.removeItem("editSubCategoryData"); // ✅ clean memory
-        setTimeout(() => {
-          router.push('/admin/sub-categories');
-        }, 800);
-      } else {
-        showPopup(res.message || "Update failed!", "error");
-      }
-    } catch (err) {
-      console.error(err);
-      showPopup("Something went wrong!", "error");
-    }
-  };
 
   return (
     <Layout>

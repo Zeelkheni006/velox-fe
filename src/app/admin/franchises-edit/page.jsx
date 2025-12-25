@@ -184,29 +184,34 @@ const drawWorkingAreaPolygonFromStored = () => {
   mapInstance.current.fitBounds(bounds);
 };
 
-
-
-
 const initMap = () => {
-  if (!window.google || mapInstance.current) return;
- if (hasStoredPolygon.current) {
-    console.log("✅ Stored polygon exists, skipping drawingManager");
-  }
+  // 🛑 Safety checks
+  if (!window.google || !mapRef.current || mapInstance.current) return;
+
+  // 🗺️ Create map
   const map = new window.google.maps.Map(mapRef.current, {
-    center: { lat: 20.5937, lng: 78.9629 },
+    center: { lat: 20.5937, lng: 78.9629 }, // India default
     zoom: 4,
     mapTypeControl: false,
-  }); 
+    streetViewControl: false,
+    fullscreenControl: false,
+  });
 
   mapInstance.current = map;
 
-  // 🔹 Apply pending zoom
+  // 🔥 IMPORTANT: Force resize so map shows without refresh
+  setTimeout(() => {
+    window.google.maps.event.trigger(map, "resize");
+    map.setCenter({ lat: 20.5937, lng: 78.9629 });
+  }, 300);
+
+  // 🔹 Apply pending zoom (city/state auto zoom)
   if (pendingZoomRef.current) {
     zoomToLocation(pendingZoomRef.current);
     pendingZoomRef.current = null;
   }
 
-  // ✅ ONLY allow drawing if NO backend polygon
+  // 🔹 Drawing manager ONLY if backend polygon NOT present
   if (!hasStoredPolygon.current) {
     const drawingManager = new window.google.maps.drawing.DrawingManager({
       drawingMode: window.google.maps.drawing.OverlayType.POLYGON,
@@ -218,25 +223,47 @@ const initMap = () => {
       polygonOptions: {
         fillColor: "#FF0000",
         fillOpacity: 0.3,
+        strokeColor: "#FF0000",
         strokeWeight: 2,
         editable: true,
+        clickable: true,
       },
     });
 
     drawingManager.setMap(map);
 
-    window.google.maps.event.addListener(drawingManager, "overlaycomplete", (e) => {
-      if (e.type === "polygon") {
-        if (polygonRef.current) polygonRef.current.setMap(null);
-        polygonRef.current = e.overlay;
-        drawingManager.setDrawingMode(null);
-        showPopup("✅ Polygon drawn");
+    // 🧩 When polygon drawing completed
+    window.google.maps.event.addListener(
+      drawingManager,
+      "overlaycomplete",
+      (e) => {
+        if (e.type === "polygon") {
+          // remove old polygon if any
+          if (polygonRef.current) {
+            polygonRef.current.setMap(null);
+          }
+
+          polygonRef.current = e.overlay;
+          drawingManager.setDrawingMode(null);
+
+          // save points to ref
+          const path = e.overlay.getPath();
+          workingAreaRef.current = path.getArray().map(p => ({
+            latitude: p.lat(),
+            longitude: p.lng(),
+          }));
+
+          showPopup("✅ Polygon drawn");
+        }
       }
-    });
+    );
+  } else {
+    console.log("✅ Backend polygon exists → Drawing disabled");
   }
 
   setIsMapReady(true);
 };
+
 
 
 
@@ -394,80 +421,117 @@ const [states, setStates] = useState([]);
 const [cities, setCities] = useState([]);
 
 useEffect(() => {
+  if (!states.length) return;
+  if (!form.state || typeof form.state !== "string") return;
+
+  const matchedState = states.find(
+    s => s.name.toLowerCase() === form.state.toLowerCase()
+  );
+
+  if (matchedState) {
+    setForm(prev => ({
+      ...prev,
+      state: matchedState.id,
+    }));
+
+    getallCities(matchedState.id).then(cityData => {
+      setCities(cityData);
+
+      if (form.city) {
+        const matchedCity = cityData.find(
+          c => c.name.toLowerCase() === form.city.toLowerCase()
+        );
+
+        if (matchedCity) {
+          setForm(prev => ({
+            ...prev,
+            city: matchedCity.id,
+          }));
+
+          pendingZoomRef.current = { name: matchedCity.name };
+        }
+      }
+    });
+  }
+}, [states]);
+
+useEffect(() => {
   const loadStates = async () => {
     const data = await getallStates(1); // India
     setStates(data);
-
-   if (form.state && typeof form.state === "string") {
-  const matchedState = data.find(
-    (s) => s.name.toLowerCase() === form.state.toLowerCase()
-      );
-
-      if (matchedState) {
-        setForm((prev) => ({
-          ...prev,
-          state: matchedState.id,
-        }));
-
-        // load cities of that state
-        const cityData = await getallCities(matchedState.id);
-        setCities(cityData);
-
-        // ✅ AUTO SELECT CITY
-        if (form.city) {
-          const matchedCity = cityData.find(
-            (c) => c.name.toLowerCase() === form.city.toLowerCase()
-          );
-          if (matchedCity) {
-            setForm((prev) => ({
-              ...prev,
-              city: matchedCity.id,
-            }));
-
-            // 🔹 Set pending zoom for map
-            pendingZoomRef.current = { name: matchedCity.name };
-          }
-        }
-      }
-    }
   };
 
   loadStates();
-}, [form.state, form.city]);
+}, []); // 👈 EMPTY dependency
 
 
 
 const handleStateChange = async (e) => {
   const stateId = e.target.value;
 
-  setForm({
-    ...form,
+  setForm(prev => ({
+    ...prev,
     state: stateId,
     city: "",
-  });
+  }));
 
   if (stateId) {
     const cityData = await getallCities(stateId);
     setCities(cityData);
-
-    // 🔹 If form.city already set (edit mode), auto zoom to city
-    if (form.city) {
-      const matchedCity = cityData.find(c => c.id == form.city);
-      if (matchedCity) {
-        zoomToLocation({ name: matchedCity.name });
-      }
-    }
   } else {
     setCities([]);
   }
 };
+
 const [isScriptLoaded, setIsScriptLoaded] = useState(false);  
 const [isFranchiseLoaded, setIsFranchiseLoaded] = useState(false);
 useEffect(() => {
-  if (isScriptLoaded) {
-    initMap();
-  }
+  if (!isScriptLoaded) return;
+
+  const interval = setInterval(() => {
+    if (
+      mapRef.current &&
+      window.google &&
+      !mapInstance.current &&
+      mapRef.current.offsetHeight > 0   // 🔥 KEY LINE
+    ) {
+      initMap();
+      clearInterval(interval);
+    }
+  }, 200);
+
+  return () => clearInterval(interval);
 }, [isScriptLoaded]);
+
+
+
+useEffect(() => {
+  if (!isMapReady) return; // wait for map
+  if (!workingArea || workingArea.length < 3) return;
+
+  // remove old polygon if exists
+  if (polygonRef.current) polygonRef.current.setMap(null);
+
+  const polygon = new window.google.maps.Polygon({
+    paths: workingArea.map(p => ({ lat: Number(p.latitude), lng: Number(p.longitude) })),
+    strokeColor: "#FF0000",
+    strokeOpacity: 1,
+    strokeWeight: 2,
+    fillColor: "#FF0000",
+    fillOpacity: 0.35,
+    editable: true,
+  });
+
+  polygon.setMap(mapInstance.current);
+  polygonRef.current = polygon;
+
+  // Auto zoom
+  const bounds = new window.google.maps.LatLngBounds();
+  workingArea.forEach(p => bounds.extend({ lat: Number(p.latitude), lng: Number(p.longitude) }));
+  mapInstance.current.fitBounds(bounds);
+
+}, [isMapReady, workingArea]);
+
 
   return (
     <Layout>

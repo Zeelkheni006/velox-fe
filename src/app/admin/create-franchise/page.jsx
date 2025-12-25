@@ -24,7 +24,7 @@ const ReactSelect = dynamic(() => import("react-select"), { ssr: false });
       const { popupMessage, popupType, showPopup } = usePopup();
   const [showPolygonMenu, setShowPolygonMenu] = useState(false);
       const [countries, setCountries] = useState([]);
-      const [states, setStates] = useState([]);
+      const [states, setStates] = useState([]); 
       const [cities, setCities] = useState([]);
       const [serviceOptions, setServiceOptions] = useState([]);
       const [selectedServices, setSelectedServices] = useState([]);
@@ -187,42 +187,15 @@ useEffect(() => {
       }
     });
   };
-      const handleLoadPoints = async () => {
-    if (!polygonRef.current) return showPopup("Please draw a polygon first!", "error");
 
-    const path = polygonRef.current.getPath();
-    const polygonPoints = [];
-
-    for (let i = 0; i < path.getLength(); i++) {
-      const p = path.getAt(i);
-      polygonPoints.push({ latitude: p.lat(), longitude: p.lng() });
-    }
-    if (polygonPoints.length > 0) {
-      polygonPoints.push({ 
-        latitude: polygonPoints[0].latitude, 
-        longitude: polygonPoints[0].longitude 
-      });
-    }
-    try {
-      const points = await fetchGooglePoints(polygonPoints);
-      if (!points.length) return showPopup("⚠️ No points found.");
-
-      points.forEach((p) => {
-        new window.google.maps.Marker({
-          position: { lat: p.latitude, lng: p.longitude },
-          map: mapInstance.current,
-        });
-      });
-      showPopup("✅ Points loaded!");
-    } catch {
-      showPopup("❌ Failed to load points.", "error");
-    }
-  };
 
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!polygonRef.current) return showPopup("Please draw polygon!", "error");
+
+  const leadId = selectedLeadId || localStorage.getItem("lead_id");
+  if (!leadId) return showPopup("Lead ID missing!", "error");
 
   let rawPolygonPoints = [];
   const path = polygonRef.current.getPath();
@@ -249,15 +222,16 @@ const handleSubmit = async (e) => {
   formData.append("franchise_state_id", form.state);
   formData.append("franchise_city_id", form.city);
   formData.append("franchise_pincode", form.pincode);
-  formData.append("worker_count", Number(form.workerCount) || 0); // number
+  formData.append("commission_rate", form.commission || 0);
+  formData.append("worker_count", Number(form.workerCount) || 0);
   formData.append("raw_polygon_points", JSON.stringify(rawPolygonPoints));
+  formData.append(
+    "service_ids",
+    JSON.stringify(selectedServices.map(s => Number(s.value)))
+  );
 
- formData.append(
-  "service_ids",
-  JSON.stringify(selectedServices.map(s => Number(s.value)))
-);
-  // Submit
-  const res = await makeFranchise(formData);
+  // Pass lead_id
+  const res = await makeFranchise(leadId, formData);
 
   if (res.success) {
     showPopup("✔ Franchise Updated Successfully", "success");
@@ -266,6 +240,9 @@ const handleSubmit = async (e) => {
     showPopup(res.message || "Failed", "error");
   }
 };
+
+
+
 
 
     const fetchFranchiseOwnerData = async (adminId) => {
@@ -291,7 +268,7 @@ setInitialServices(selected);
       franchiseName: f?.franchise_name || "",
       firstAddress: f?.franchise_address || "",
       mobile: f?.franchise_phone || "",
-      commission: "",
+      commission: f?.commission_rate || "",
       pincode: f?.franchise_pincode || "",
       email: f?.franchise_email || "", 
       services: f?.service_list || "",
@@ -493,29 +470,22 @@ const loadServices = async () => {
                 <div className={styles.full}><label>FIRST ADDRESS</label><input name="firstAddress" value={form.firstAddress} onChange={handleChange} /></div>
 <div>
   <label>FRANCHISE MOBILE</label>
+
   <input
     type="text"
-    placeholder={countryCode}    
-    value={form.mobile.replace(countryCode, "")} 
-    onChange={async (e) => {
-      let numberPart = e.target.value.replace(/\D/g, "").slice(0, 10);
-      const fullNumber = countryCode + numberPart;
-
-      setForm({ ...form, mobile: fullNumber });
-
-      showPopup("");
-      if (numberPart.length === 10) {
-        const res = await checkDuplicate("owner_phone", fullNumber);
-        if (res.success) {
-          showPopup("Phone number is available ✔", "success");
-        } else {
-          showPopup(res.message, "error");
-        }
-      }
+    value={form.mobile}
+    onChange={(e) => {
+      setForm({ ...form, mobile: e.target.value });
     }}
+    placeholder="Enter mobile number"
     required
   />
 </div>
+
+
+
+
+
                 <div><label>FRANCHISE EMAIL</label><input name="email" value={form.email} onChange={handleChange} /></div>
                <div>
   <label>WORKER COUNT</label>
@@ -527,9 +497,7 @@ const loadServices = async () => {
   />
 </div>
                 <div><label>COMMISSION(%)</label><input name="commission" value={form.commission} onChange={handleChange} /></div>
-                <div><label>LATITUDE</label><input name="latitude" value={form.latitude} onChange={handleChange} /></div>
-                <div><label>LONGITUDE</label><input name="longitude" value={form.longitude} onChange={handleChange} /></div>
-
+               
                 <div className={styles.editfull}>
                   <button
                     type="button"
@@ -711,7 +679,6 @@ const loadServices = async () => {
   </div>
  
   </div>
-                <button type="submit" className={styles.submitBtn} onClick={handleLoadPoints}>SUBMit point</button>
               <button type="submit" className={styles.submitBtn}  >SUBMIT</button>
             </form>
           </div>

@@ -68,24 +68,28 @@ export const getFranchiseOwnersData = async (adminId) => {
   }
 };
 
-export const makeFranchise = async (formData) => {
+export const makeFranchise = async (lead_id, formData) => {
   const token = localStorage.getItem("access_token");
   if (!token) throw new Error("Token missing");
 
+  if (!lead_id) throw new Error("lead_id is required");
+
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/make-franchise`,
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/admin/manage-franchise/franchise-owners/make-franchise/${lead_id}`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: formData,   
+      body: formData,
     }
   );
 
   const data = await res.json();
   return data;
 };
+
+
 // src/app/api/manage_users/franchise.jsx
 export const updateFranchiseOwner = async (adminId, payload) => {
   try {

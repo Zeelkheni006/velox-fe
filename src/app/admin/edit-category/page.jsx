@@ -17,7 +17,7 @@ export default function EditCategory() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const { popupMessage, popupType, showPopup } = usePopup();
-
+const [originalCategory, setOriginalCategory] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(false);
   const editor = useRef(null);
@@ -34,72 +34,96 @@ export default function EditCategory() {
   const [logoPreview, setLogoPreview] = useState(null);
 
   // ✅ Load data from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("editCategoryData");
-    if (!stored) return;
+ useEffect(() => {
+  const stored = localStorage.getItem("editCategoryData");
+  if (!stored) return;
 
-    const cat = JSON.parse(stored);
-    setCategory({
-      id: cat.id,
-      title: cat.title || "",
-      logo: cat.logo || "",
-      description: cat.description || "",
-      status: cat.status || "INACTIVE",
-    });
-    setLogoPreview(cat.logo ? process.env.NEXT_PUBLIC_API_BASE_URL + cat.logo : null);
-  }, [id]);
+  const cat = JSON.parse(stored);
+
+  const normalized = {
+    id: cat.id,
+    title: cat.title || "",
+    logo: cat.logo || "",
+    description: cat.description || "",
+    status: cat.status || "INACTIVE",
+  };
+
+  setCategory(normalized);
+  setOriginalCategory(normalized); // 🔥 original save
+  setLogoPreview(cat.logo ? process.env.NEXT_PUBLIC_API_BASE_URL + cat.logo : null);
+}, [id]);
+
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // ✅ Only SVG upload Allow & Preview
-  const handleLogoChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+ const handleLogoChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    if (file.type !== "image/svg+xml") {
-      showPopup("❌ Only SVG format allowed!", "error");
-      return;
-    }
-    if (file.size > 2 * 1024 * 1024) {
-      showPopup("❌ Max file size 2MB allowed!", "error");
-      return;
-    }
+  // ✅ Extension check
+  if (!file.name.toLowerCase().endsWith(".svg")) {
+    showPopup("❌ Only SVG format allowed!", "error");
+    return;
+  }
 
-    setLogoFile(file);
-    setLogoPreview(URL.createObjectURL(file));
-  };
+  // ✅ MIME check (extra safe)
+  if (file.type !== "image/svg+xml") {
+    showPopup("❌ Invalid SVG file!", "error");
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    showPopup("❌ Max file size 2MB allowed!", "error");
+    return;
+  }
+
+  setLogoFile(file);
+  setLogoPreview(URL.createObjectURL(file));
+};
 
   // ✅ Update Category Handler
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const payload = new FormData();
-      payload.append("title", category.title);
-      payload.append("description", category.description);
+  // 🔴 No change validation
+  const isTitleSame = category.title === originalCategory?.title;
+  const isDescSame = category.description === originalCategory?.description;
+  const isLogoSame = !logoFile; // logoFile null means no change
 
-      if (logoFile) payload.append("logo", logoFile);
+  if (isTitleSame && isDescSame && isLogoSame) {
+    showPopup("❌ No changes detected. Please update something.", "error");
+    return;
+  }
 
-      const res = await updateCategory(category.id, payload);
+  setLoading(true);
 
-      if (res.success) {
-        showPopup("✅ Category Updated!", "success");
-        localStorage.removeItem("editCategoryData");
+  try {
+    const payload = new FormData();
+    payload.append("title", category.title);
+    payload.append("description", category.description);
 
-        setTimeout(() => router.push("/admin/categories"), 700);
-      } else {
-        showPopup("❌ Update Failed!", "error");
-      }
-    } catch (err) {
-      console.log(err);
-      showPopup("❌ Something went wrong!", "error");
+    if (logoFile) payload.append("logo", logoFile);
+
+    const res = await updateCategory(category.id, payload);
+
+    if (res.success) {
+      showPopup("✅ Category Updated!", "success");
+      localStorage.removeItem("editCategoryData");
+      setTimeout(() => router.push("/admin/categories"), 700);
+    } else {
+      showPopup("❌ Update Failed!", "error");
     }
+  } catch (err) {
+    console.log(err);
+    showPopup("❌ Something went wrong!", "error");
+  }
 
-    setLoading(false);
-  };
+  setLoading(false);
+};
+
 
   const goBack = () => {
     router.push("/admin/categories");
@@ -149,7 +173,7 @@ export default function EditCategory() {
             <input
               type="file"
               className={styles.editinput}
-              accept="image/svg+xml"
+              accept="svg+xml"
               onChange={handleLogoChange}
             />
 
