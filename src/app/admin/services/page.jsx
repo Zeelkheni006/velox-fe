@@ -318,7 +318,7 @@ const handleToggleStatus = async (index) => {
 <li
   onClick={() => {
     localStorage.setItem("selectedService", JSON.stringify(service));
-    router.push(`/admin/edit-services?id=${service.id}`);
+   router.push(`/admin/edit-services?service_id=${service.id}`);
   }}
 >  <FontAwesomeIcon icon={faEdit} />
   Edit
