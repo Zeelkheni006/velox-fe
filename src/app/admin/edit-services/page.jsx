@@ -103,66 +103,56 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!originalService) {
-    showPopup("❌ No original data found", "error");
+  if (!serviceId) {
+    showPopup("❌ Service ID missing", "error");
     return;
   }
 
   const formattedHours = formData.hours
     ? String(formData.hours).padStart(2, "0")
     : "00";
+
   const formattedMinutes = formData.minutes
     ? String(formData.minutes).padStart(2, "0")
     : "00";
 
-  // 🔴 CHANGE DETECTION
-  const isNoChange =
-    formData.title === originalService.title &&
-    String(formData.category_id) === originalService.category_id &&
-    String(formData.sub_category_id) === originalService.sub_category_id &&
-    String(formData.price) === originalService.price &&
-    String(formData.displayNumber) === originalService.displayNumber &&
-    formattedHours === originalService.hours &&
-    formattedMinutes === originalService.minutes &&
-    description === originalService.description &&
-    longDescription === originalService.longDescription &&
-    !(formData.image instanceof File) &&
-    !(formData.banner instanceof File);
+  try {
+    const payload = new FormData();
 
-  if (isNoChange) {
-    showPopup("❌ No changes detected. Please update something.", "error");
-    return;
-  }
+    payload.append("title", formData.title);
+    payload.append("description", description);
+    payload.append("long_description", longDescription);
+    payload.append("category_id", Number(formData.category_id));
+    payload.append("sub_category_id", Number(formData.sub_category_id));
+    payload.append("price", Number(formData.price));
+    payload.append("display_number", formData.displayNumber);
+    payload.append("duration", `${formattedHours}:${formattedMinutes}`);
 
-  // ✅ Proceed update
-  const payload = new FormData();
-  payload.append("title", formData.title);
-  payload.append("description", description);
-  payload.append("long_description", longDescription);
-  payload.append("category_id", Number(formData.category_id));
-  payload.append("sub_category_id", Number(formData.sub_category_id));
-  payload.append("price", Number(formData.price));
-  payload.append("display_number", formData.displayNumber);
-  payload.append("duration", `${formattedHours}:${formattedMinutes}`);
+    // ✅ ONLY append if new file selected
+    if (formData.image instanceof File) {
+      payload.append("image", formData.image);
+    }
 
-  payload.append(
-    "image",
-    formData.image instanceof File ? formData.image : formData.image
-  );
-  payload.append(
-    "banner",
-    formData.banner instanceof File ? formData.banner : formData.banner
-  );
+    if (formData.banner instanceof File) {
+      payload.append("banner", formData.banner);
+    }
 
-  const res = await updateService(serviceId, payload);
+    console.log("🚀 Calling update API");
 
-  if (res.success) {
-    showPopup("✅ Service updated successfully!", "success");
-    router.push("/admin/services");
-  } else {
-    showPopup("❌ " + (res.message || "Update failed"), "error");
+    const res = await updateService(serviceId, payload);
+
+    if (res?.success) {
+      showPopup("✅ Service updated successfully!", "success");
+      router.push("/admin/services");
+    } else {
+      showPopup("❌ " + (res?.message || "Update failed"), "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showPopup("❌ Something went wrong", "error");
   }
 };
+
 
 
     const goToDashboard = () => {

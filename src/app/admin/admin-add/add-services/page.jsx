@@ -179,6 +179,17 @@ const handleSubmit = async (e) => {
             accept=".svg"
             onChange={handleIconChange}
           />
+          {icon && (
+  <div style={{ marginTop: "10px" }}>
+    <img
+      src={URL.createObjectURL(icon)}
+      alt="Icon Preview"
+      width={64}
+      height={64}
+      style={{ border: "1px solid #ddd", padding: "5px" }}
+    />
+  </div>
+)}
           <small>
             Only allowed png format. Image resolution must be 64*64. Max file size allowed : 2MB
           </small>
@@ -190,6 +201,21 @@ const handleSubmit = async (e) => {
             accept=".jpg"
             onChange={handleBannerChange}
           />
+          {banner && (
+  <div style={{ marginTop: "10px" }}>
+    <img
+      src={URL.createObjectURL(banner)}
+      alt="Banner Preview"
+      style={{
+        width: "300px",
+        height: "200px",
+        objectFit: "cover",
+        border: "1px solid #ddd",
+      }}
+    />
+  </div>
+)}
+
           <small>
             Only allowed jpg, png, jpeg format. Image resolution must be 300*200. Max file size allowed : 2MB
           </small>

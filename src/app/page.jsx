@@ -15,7 +15,7 @@ import usePopup from './admin/components/popup';
 import PopupAlert from "./admin/components/PopupAlert";
 import {getStats, fetchSliders,getCategories,getCityWiseCategories} from "./api/user-side/home_api";
 import PageLoader from "../components/PageLoader";
-
+import { useRouter } from "next/navigation";
 // Array with image + text
 
 const OTHER_CATEGORY = {
@@ -369,22 +369,28 @@ useEffect(() => {
   loadCategories();
 }, []);
 
-
+const router = useRouter();
 const handleCategoryClick = (e, slug) => {
-  // 🚫 city select નથી
   if (!query.trim()) {
-    e.preventDefault(); // navigation stop
+    e.preventDefault();
     setShowLocationPopup(true);
     return;
   }
- if (slug === "other") {
-    e.preventDefault(); // stop navigation
-    setShowServicePopup(true); // open popup
+
+  if (!slug) {
+    alert("Slug missing");
     return;
   }
-  // ✅ city selected → navigation allow
-  window.location.href = `/services-list/${slug}`;
+
+  if (slug === "other") {
+    setShowServicePopup(true);
+    return;
+  }
+
+  router.push(`/services-list/${slug}`);
 };
+
+
 const handleClearSearch = () => {
   setQuery("");
   setFullLocation("");
@@ -517,12 +523,10 @@ const handleClearSearch = () => {
     ...services,
     ...(showOther ? [OTHER_CATEGORY] : []),
   ].map((service) => (
-    <Link
-      key={service.id}
-      href={`/services-list/${service.slug}`}
-      className="service-card"
-      onClick={(e) => handleCategoryClick(e, service.slug)}
-    >
+   <div
+  className="service-card"
+  onClick={(e) => handleCategoryClick(e, service.slug)}
+>
       <div className="service-image">
         <Image
           src={
@@ -536,7 +540,7 @@ const handleClearSearch = () => {
         />
       </div>
       <p className="service-label">{service.title}</p>
-    </Link>
+    </div>
   ))}
 
   {showLocationPopup && (

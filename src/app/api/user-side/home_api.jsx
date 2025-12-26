@@ -59,7 +59,7 @@ export const fetchSliders = async () => {
 export const getCategories = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home_page_body/categories/get`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/home_page_body/categories`,
       {
         method: "GET",
         headers: {

@@ -12,6 +12,8 @@ export default function ServiceDetails({ params }) {
    const [openDetail, setOpenDetail] = useState(false);
    const [active, setActive] = useState(false);
      const [count, setCount] = useState(0);
+       const { category } = params;
+          console.log(params.slug);
      const galleryImages = [
   "/images/image1.jpg",
   "/images/image1.jpg",
@@ -38,6 +40,7 @@ export default function ServiceDetails({ params }) {
 
   return (
     <div className="service-detail-container">
+       <p>Slug: {params.slug}</p>
  <div
   className={`service-heading-box ${active ? "active" : ""}`}
   onClick={() => setActive(!active)}

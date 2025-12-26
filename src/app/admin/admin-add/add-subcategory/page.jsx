@@ -17,28 +17,33 @@ export default function AddSubCategory() {
   });
   const [loading, setLoading] = useState(false);
  const { popupMessage, popupType, showPopup } = usePopup();
-  
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
-    if (name === 'logo') {
-      const file = files[0];
-      if (file) {
-        // ✅ SVG validation
-        if (file.type !== 'image/svg+xml') {
-          showPopup('❌ Only SVG files are allowed!');
-          e.target.value = null;
-          return;
-        }
-        if (file.size > 2 * 1024 * 1024) {
-          showPopup('❌ File size cannot exceed 2MB!');
-          e.target.value = null;
-          return;
-        }
-        setFormData({ ...formData, logo: file });
-      }
-    } else {
+   if (name === 'logo') {
+  const file = files[0];
+  if (file) {
+    if (file.type !== 'image/svg+xml') {
+      showPopup('❌ Only SVG files are allowed!');
+      e.target.value = null;
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      showPopup('❌ File size cannot exceed 2MB!');
+      e.target.value = null;
+      return;
+    }
+
+    setFormData({ ...formData, logo: file });
+
+    // ✅ SVG preview
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  }
+}
+ else {
       setFormData({ ...formData, [name]: value });
     }
   };
@@ -158,6 +163,16 @@ useEffect(() => {
               onChange={handleChange}
               className={styles.addinput}
             />
+            {previewUrl && (
+  <div style={{ marginTop: "10px" }}>
+    <p>Preview:</p>
+    <img
+      src={previewUrl}
+      alt="SVG Preview"
+      style={{ width: "64px", height: "64px", border: "1px solid #ccc" }}
+    />
+  </div>
+)}
             <small>
               Only allowed SVG format. Image resolution must be 64×64. Max file size: 2MB
             </small>
